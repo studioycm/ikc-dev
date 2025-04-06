@@ -8,33 +8,50 @@ use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
+use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
+use Filament\Notifications\Actions\Action;
+use Filament\Notifications\Auth\VerifyEmail;
+use Filament\Pages\Auth\EmailVerification\EmailVerificationPrompt;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Settings';
+
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
+                    ->required(),
                 Forms\Components\TextInput::make('email')
                     ->email()
-                    ->required()
-                    ->maxLength(255),
+                    ->required(),
                 Forms\Components\DateTimePicker::make('email_verified_at'),
                 Forms\Components\TextInput::make('password')
                     ->password()
-                    ->required()
-                    ->maxLength(255),
+                    ->revealable()
+                    ->required(),
+                Forms\Components\Select::make('roles')
+                    ->relationship('roles', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
             ]);
     }
 
@@ -42,13 +59,31 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->icon('heroicon-o-envelope')
+                    ->iconColor('primary')
+                    ->sortable()
+                    ->searchable()
+                    ->copyable()
+                    ->copyMessage('Email address copied')
+                    ->copyMessageDuration(1500),
+                Tables\Columns\BooleanColumn::make('email_verified_at')
+                    ->label('Verified')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->label('Role')
+                    ->badge()
+                    ->formatStateUsing(fn ($state): string => Str::headline($state))
+                    ->colors(['primary'])
+                    ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email_verified_at')
-                    ->dateTime()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -58,11 +93,54 @@ class UserResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->searchPlaceholder('Search (ID, Name)')
+            ->searchOnBlur()
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('email_verification')
+                    ->label('Verify')
+                    ->button()
+                    ->tooltip('Send email verification link')
+                    ->color(Color::hex('#ec8200'))
+                    ->icon('heroicon-o-shield-check')
+                    ->action(function (User $user) {
+                        // $notification = new VerifyEmail;
+                        // $notification->toMail($user);
+                        // $user->sendEmailVerificationNotification();
+                        $notification = app(VerifyEmail::class);
+                        $notification->url = Filament::getVerifyEmailUrl($user);
+                        $user->notify($notification);
+                        Notification::make()
+                            ->title('Email verification link sent')
+                            ->body('Email verification link sent to ' . $user->email . 
+                            '<br>' . $notification->url)
+                            ->actions([
+                                Action::make('verify')
+                                    ->button()
+                                    ->label('Verify')
+                                    ->tooltip('Mark email as verified')
+                                    ->url($notification->url),
+                            ])
+                            ->success()
+                            ->icon('heroicon-o-shield-check')
+                            ->iconColor('primery')
+                            ->persistent()
+                            ->send();
+                    }),
+                Tables\Actions\Action::make('email_verified')
+                    ->label('Verified')
+                    ->button()
+                    ->tooltip('Mark as verified')
+                    ->color(Color::hex('#10b138'))
+                    ->icon('heroicon-o-check')
+                    ->action(function (User $user) {
+                        $user->markEmailAsVerified();
+                        // $user->email_verified_at = now();
+                        // $user->save();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

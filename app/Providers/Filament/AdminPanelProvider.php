@@ -6,18 +6,24 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Facades\Filament;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-
+use Filament\FontProviders\GoogleFontProvider;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Notifications\DatabaseNotification;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -27,7 +33,20 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()    
+            ->brandName('IKC System')
+            ->font('Assistant', provider: GoogleFontProvider::class)
+            ->sidebarWidth('15rem')
+            ->sidebarCollapsibleOnDesktop()
+            ->collapsedSidebarWidth('10rem')
+            ->breadcrumbs(true)
+            ->favicon(url('favicon.ico'))
+            ->login()
+            ->passwordReset()
+            ->emailVerification()
+            ->authGuard('web')
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('60s')
+            ->maxContentWidth(MaxWidth::Full)    
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -56,7 +75,23 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
-                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
+                FilamentShieldPlugin::make()
+                    ->gridColumns([
+                        'default' => 1,
+                        'sm' => 2,
+                        'lg' => 3
+                    ])
+                    ->sectionColumnSpan(1)
+                    ->checkboxListColumns([
+                        'default' => 1,
+                        'sm' => 2,
+                        'lg' => 3,
+                    ])
+                    ->resourceCheckboxListColumns([
+                        'default' => 1,
+                        'sm' => 2,
+                        'lg' => 3,
+                    ]),
             ]);
     }
 }
