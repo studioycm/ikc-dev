@@ -235,12 +235,24 @@ class PrevDogResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('father.Eng_Name')
                     ->label('Father')
-                    // ->description(fn (PrevDog $record): string => $record->father->Heb_Name ?? '', position: 'under')
-                    ->sortable(),
+                    ->description(function (PrevDog $record): string {
+                        $father = $record->father;
+                        $name = empty($father->Heb_Name) ? '~' : $father->Heb_Name;
+                        $sex = empty($father->GenderSex) ? '~' : $father->GenderID;
+                        $sagirId = empty($father->SagirID) ? '~' : $father->SagirID;
+                        
+                        return "{$name} | {$sex} | {$sagirId}";
+                    }, position: 'under'),
                 Tables\Columns\TextColumn::make('mother.Eng_Name')
                     ->label('Mother')
-                    // ->description(fn (PrevDog $record): string => $record->mother->Heb_Name ?? '', position: 'under')
-                    ->sortable(),
+                    ->description(function (PrevDog $record): string {
+                        $mother = $record->mother;
+                        $name = empty($mother->Heb_Name) ? '~' : $mother->Heb_Name;
+                        $sex = empty($mother->sex) ? '~' : $mother->sex;
+                        $sagirId = empty($mother->SagirID) ? '~' : $mother->SagirID;
+                        
+                        return "{$name} | {$sex} | {$sagirId}";
+                    }, position: 'under'),
                 Tables\Columns\TextColumn::make('ShowsCount')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
