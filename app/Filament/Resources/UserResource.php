@@ -24,7 +24,11 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'System Settings';
+    protected static ?string $label = 'System User';
+    protected static ?string $pluralLabel = 'System Users';
+    protected static ?string $navigationLabel = 'System Users';
+    protected static ?int $navigationSort = 98;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
@@ -117,13 +121,6 @@ class UserResource extends Resource
                             ->title('Email verification link sent')
                             ->body('Email verification link sent to ' . $user->email . 
                             '<br>' . $notification->url)
-                            ->actions([
-                                Action::make('verify')
-                                    ->button()
-                                    ->label('Verify')
-                                    ->tooltip('Mark email as verified')
-                                    ->url($notification->url),
-                            ])
                             ->success()
                             ->icon('heroicon-o-shield-check')
                             ->iconColor('primery')

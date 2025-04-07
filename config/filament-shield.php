@@ -3,10 +3,10 @@
 return [
     'shield_resource' => [
         'should_register_navigation' => true,
+        'should_register_resource' => true,
         'slug' => 'shield/roles',
-        'navigation_sort' => -1,
+        'navigation_sort' => 99,
         'navigation_badge' => true,
-        'navigation_group' => true,
         'is_globally_searchable' => false,
         'show_model_path' => true,
         'is_scoped_to_tenant' => true,
@@ -55,7 +55,7 @@ return [
         'pages' => true,
         'widgets' => true,
         'resources' => true,
-        'custom_permissions' => false,
+        'custom_permissions' => true,
     ],
 
     'generator' => [

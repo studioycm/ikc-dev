@@ -4,28 +4,46 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PrevDogResource\Pages;
 use App\Filament\Resources\PrevDogResource\RelationManagers;
+use App\Models\PrevColor;
 use App\Models\PrevDog;
+use App\Models\PrevBreed;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Support\Colors\Color;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+// use App\Filament\Exports\DogExporter;
+// use App\Filament\Imports\DogImporter;
+// use Filament\Tables\Actions\ExportAction;
+// use Filament\Tables\Actions\ImportAction;
 
 class PrevDogResource extends Resource
 {
     protected static ?string $model = PrevDog::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $label = 'Dog';
+    protected static ?string $pluralLabel = 'Dogs';
+
+    protected static ?string $navigationGroup = 'Dogs Management';
+
+    protected static ?string $navigationLabel = 'Dogs';
+
+    protected static ?int $navigationSort = 1;
+
+    protected static ?string $navigationIcon = 'fas-dog';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('DataID')
-                    ->required()
-                    ->numeric(),
                 Forms\Components\DateTimePicker::make('ModificationDateTime'),
                 Forms\Components\DateTimePicker::make('CreationDateTime'),
                 Forms\Components\TextInput::make('SagirID')
@@ -145,43 +163,61 @@ class PrevDogResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('DataID')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('id')
+                    ->label('id')
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('ModificationDateTime')
+                    ->label('Modification Date')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('CreationDateTime')
+                    ->label('Creation Date')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('SagirPrefix')
+                    ->label('Prefix')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('SagirID')
-                    ->numeric()
+                    ->label('Sagir')
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('Heb_Name')
+                    ->label('Hebrew Name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('Eng_Name')
+                    ->label('English Name')    
                     ->searchable(),
                 Tables\Columns\TextColumn::make('BeitGidulID')
-                    ->numeric()
+                    ->label('Beit Gidul ID')
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('BeitGidulName')
+                    ->label('Beit Gidul')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('RegDate')
-                    ->dateTime()
+                    ->label('Regiestration Date')
+                    ->since()
+                    ->dateTimeTooltip()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('BirthDate')
-                    ->dateTime()
+                    ->label('Birth Date')
+                    ->date()
+                    ->sinceTooltip()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('RaceID')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('breed.BreedName')
+                    ->label('Breed')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('Sex')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('ColorID')
-                    ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('HairID')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('color.ColorNameHE')
+                    ->label('Color')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('hair.HairNameHE')
+                    ->label('Hair')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('SupplementarySign')
                     ->numeric()
@@ -191,78 +227,117 @@ class PrevDogResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('CurrentOwnerId')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('OwnershipDate')
                     ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('father.Eng_Name')
+                    ->label('Father')
+                    // ->description(fn (PrevDog $record): string => $record->father->Heb_Name ?? '', position: 'under')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('FatherSAGIR')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('MotherSAGIR')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('mother.Eng_Name')
+                    ->label('Mother')
+                    // ->description(fn (PrevDog $record): string => $record->mother->Heb_Name ?? '', position: 'under')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('ShowsCount')
-                    ->numeric()
-                    ->sortable(),
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('Pelvis')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('ImportNumber')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('SCH')
-                    ->numeric()
+                    ->label('SCH')
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('RemarkCode')
-                    ->numeric()
+                    ->label('Remark Code')
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('GenderID')
+                    ->label('Gender ID')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('SizeID')
+                    ->label('Size ID')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('ProfileImage')
-                    ->searchable(),
+                    ->label('Profile Image')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('GroupID')
-                    ->numeric()
+                    ->label('Group ID')
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('IsMagPass')
+                    ->label('Mag Pass')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('MagDate')
-                    ->dateTime()
+                    ->label('Mag Date')
+                    ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('MagJudge')
-                    ->searchable(),
+                    ->label('Mag Judge'),
                 Tables\Columns\TextColumn::make('MagPlace')
-                    ->searchable(),
+                    ->label('Mag Place'),
                 Tables\Columns\TextColumn::make('DnaID')
+                    ->label('DNA ID')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('Chip')
+                    ->label('Chip')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('GidulShowType')
-                    ->searchable(),
+                    ->label('Gidul Show'),
                 Tables\Columns\TextColumn::make('pedigree_color')
-                    ->searchable(),
+                    ->label('Pedigree Color'),
                 Tables\Columns\TextColumn::make('PedigreeNotes')
-                    ->searchable(),
+                    ->label('Pedigree Notes')
+                    ->limit(200)
+                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                        $state = $column->getState();
+                
+                        if (strlen($state) <= $column->getCharacterLimit()) {
+                            return null;
+                        }
+                
+                        // Only render the tooltip if the column content exceeds the length limit.
+                        return $state;
+                    }),
                 Tables\Columns\TextColumn::make('HealthNotes')
-                    ->searchable(),
+                    ->label('Health Notes')
+                    ->limit(200)
+                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                        $state = $column->getState();
+                
+                        if (strlen($state) <= $column->getCharacterLimit()) {
+                            return null;
+                        }
+                
+                        // Only render the tooltip if the column content exceeds the length limit.
+                        return $state;
+                    }),
                 Tables\Columns\TextColumn::make('Status')
-                    ->searchable(),
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('Image2')
-                    ->searchable(),
+                    ->label('Profile Image 2')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('TitleName')
+                    ->label('Title Name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('Breeder_Name')
-                    ->searchable(),
+                    ->label('Breeder Name'),
                 Tables\Columns\TextColumn::make('BreedID')
-                    ->numeric()
+                    ->label('Breed ID - check')
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('sheger_id')
-                    ->numeric()
+                    ->label('Sheger ID')
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('sagir_prefix')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -276,35 +351,65 @@ class PrevDogResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('encoding')
-                    ->boolean(),
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('is_correct')
-                    ->searchable(),
+                    ->label('Is Correct'),
                 Tables\Columns\TextColumn::make('message_test')
-                    ->searchable(),
+                    ->label('Message Test')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('not_relevant')
+                    ->label('Not Relevant')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('IsMagPass_2')
-                    ->numeric()
+                    ->label('Mag Pass 2')
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('MagDate_2')
-                    ->dateTime()
+                    ->label('Mag Date 2')
+                    ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('MagJudge_2')
-                    ->searchable(),
+                    ->label('Mag Judge 2'),
                 Tables\Columns\TextColumn::make('MagPlace_2')
-                    ->searchable(),
+                    ->label('Mag Place 2'),
                 Tables\Columns\TextColumn::make('PedigreeNotes_2')
-                    ->searchable(),
+                    ->label('Pedigree Notes 2')
+                    ->limit(200)
+                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                        $state = $column->getState();
+                
+                        if (strlen($state) <= $column->getCharacterLimit()) {
+                            return null;
+                        }
+                
+                        // Only render the tooltip if the column content exceeds the length limit.
+                        return $state;
+                    }),
                 Tables\Columns\TextColumn::make('Notes_2')
-                    ->searchable(),
+                    ->label('Notes 2')
+                    ->limit(200)
+                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                        $state = $column->getState();
+                
+                        if (strlen($state) <= $column->getCharacterLimit()) {
+                            return null;
+                        }
+                
+                        // Only render the tooltip if the column content exceeds the length limit.
+                        return $state;
+                    }),
                 Tables\Columns\IconColumn::make('red_pedigree')
+                    ->label('Red Pedigree')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('Chip_2')
+                    ->label('Chip 2')
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('Foreign_Breeder_name')
-                    ->searchable(),
+                    ->label('Foreign Breeder'),
                 Tables\Columns\TextColumn::make('Breeding_ManagerID')
-                    ->numeric()
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
             ])
             ->filters([
