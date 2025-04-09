@@ -39,13 +39,13 @@ class PrevDog extends Model
         'Heb_Name' => 'string',
         'Eng_Name' => 'string',
         'GenderID' => 'integer',
-        'ColorID' => 'integer',
-        'HairID' => 'integer',
-        'RaceID' => 'integer',
+        // 'ColorID' => 'integer',
+        // 'HairID' => 'integer',
+        // 'RaceID' => 'integer',
     ];
 
     // create maping for sagir_prefix (1"ISR", 2"IMP", 3"APX", 4"EXT", 5"NUL")
-    const SAGIR_PREFIX = [
+    const SAGIR_PREFIX_MAP = [
         1 => 'ISR',
         2 => 'IMP',
         3 => 'APX',
@@ -57,26 +57,40 @@ class PrevDog extends Model
     const GenderMap = [
         1 => 'M',
         2 => 'F',
-        'ז' => 'M',
-        'נ' => 'F',
+        'ז' => 'm',
+        'נ' => 'f',
     ];
 
     // create a mutator for the sagir_prefix attribute
-    public function getSagirPrefixAttribute()
+    public function getPrefixAttribute()
     {
-        return self::SAGIR_PREFIX[$this->attributes['sagir_prefix']] ?? 'NUL';
+        return self::SAGIR_PREFIX_MAP[$this->attributes['sagir_prefix']] ?? 'NUL';
     }
     
+    // create a mutator for the GenderID attribute
+    public function getGenderAttribute()
+    {
+        $genderIDKey = isset($this->attributes['GenderID']) ? (int)$this->attributes['GenderID'] : null;
+        return array_key_exists($genderIDKey, self::GenderMap) ? self::GenderMap[$genderIDKey] : 'n/a';
+    }
+
     // create a mutator for the GenderID and Sex attribute
     public function getGenderSexAttribute()
     {
                 $sexKey = isset($this->attributes['Sex']) ? trim((string)$this->attributes['Sex']) : null;
                 $genderIDKey = isset($this->attributes['GenderID']) ? (int)$this->attributes['GenderID'] : null;
 
-                $mappedSex = array_key_exists($sexKey, self::GenderMap) ? self::GenderMap[$sexKey] : 'n/a';
-                $mappedGenderID = array_key_exists($genderIDKey, self::GenderMap) ? self::GenderMap[$genderIDKey] : 'n/a';
+                $mappedSex = array_key_exists($sexKey, self::GenderMap) ? self::GenderMap[$sexKey] : null;
+                $mappedGenderID = array_key_exists($genderIDKey, self::GenderMap) ? self::GenderMap[$genderIDKey] : null;
 
-                return $mappedSex . ' - ' . $mappedGenderID;
+                if (!empty($mappedSex) && !empty($mappedGenderID)) {
+                    return $mappedGenderID;
+                } elseif (!empty($mappedSex)) {
+                    return $mappedSex;
+                } elseif (!empty($mappedGenderID)) {
+                    return $mappedGenderID;
+                }
+                return 'n/a';
     }
     // eloquent relationships with PrevBreed and PrevColor
     public function breed()
@@ -95,12 +109,12 @@ class PrevDog extends Model
     
     public function father()
     {
-        return $this->hasOne(self::class, 'FatherSAGIR', 'SagirID');
+        return $this->hasOne(self::class, 'SagirID', 'FatherSAGIR');
     }
 
     public function mother()
     {
-        return $this->hasOne(self::class, 'MotherSAGIR', 'SagirID');
+        return $this->hasOne(self::class, 'SagirID', 'MotherSAGIR');
     }
    /* 
     // a dog has one father using the dog's field FatherSAGIR as the foreign key and SagirID as the local key, the father has many dogs

@@ -24,8 +24,8 @@ class RoleResource extends Resource implements HasShieldPermissions
 
     protected static ?string $navigationGroup = 'System Settings';
     protected static ?string $label = 'Role';
-    protected static ?string $pluralLabel = 'Roles';
-    protected static ?string $navigationLabel = 'Roles';
+    protected static ?string $pluralLabel = 'Roles & Permissions';
+    protected static ?string $navigationLabel = 'Roles Management';
     protected static ?int $navigationSort = 99;
     protected static ?string $navigationIcon = 'fas-shield-dog';
 
