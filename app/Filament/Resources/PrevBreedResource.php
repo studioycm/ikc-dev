@@ -75,37 +75,67 @@ class PrevBreedResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('DataID')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('ModificationDateTime')
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('CreationDateTime')
-                    ->dateTime()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('BreedName')
+                    ->label('Hebrew Name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('BreedCode')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('BreedNameEN')
+                    ->label('English Name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('GroupID')
+                    Tables\Columns\TextColumn::make('BreedCode')
+                    ->label('Breed Code')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable(true)
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('FCICODE')
+                    ->label('FCI Code')
+                    ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('UserManagerID')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('ClubManagerID')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('fci_group')
+                    ->label('FCI Group')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('DataID')
+                    ->label('Previous ID')
+                    ->numeric()
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('ModificationDateTime')
+                    ->date()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('CreationDateTime')
+                    ->date()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('GroupID')
+                    ->label('Previous GroupID')
+                    ->numeric()
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('UserManagerID')
+                    ->label('User Manager ID')
+                    ->description(fn (PrevBreed $record): string => $record->userManager->FullName ?? 'n/a')
+                    ->numeric()
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('ClubManagerID')
+                    ->label('Club Manager ID')
+                    ->description(fn (PrevBreed $record): string => $record->clubManager->FullName ?? 'n/a')
+                    ->numeric()
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

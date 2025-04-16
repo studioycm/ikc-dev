@@ -2,10 +2,23 @@
 
 namespace App\Models;
 
+use App\Models\PrevHair;
+use App\Models\PrevUser;
+use App\Models\PrevBreed;
+use App\Models\PrevColor;
+use App\Models\PrevUserDog;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
-class PrevDog extends Model
+class PrevDog extends Model 
+
 {
+    use SoftDeletes;
     /**
      * The connection name for the model.
      *
@@ -61,71 +74,95 @@ class PrevDog extends Model
         'נ' => 'f',
     ];
 
-    // create a mutator for the sagir_prefix attribute
-    public function getPrefixAttribute()
+    // create an accessor for the sagir_prefix attribute using Laravel 12 syntax
+    public function sagirPrefix(): Attribute
     {
-        return self::SAGIR_PREFIX_MAP[$this->attributes['sagir_prefix']] ?? 'NUL';
+        return new Attribute(
+            get: fn($value) =>
+                self::SAGIR_PREFIX_MAP[$value] ?? 'NUL'
+        );
     }
     
-    // create a mutator for the GenderID attribute
-    public function getGenderAttribute()
+    // create an accessor for the Gender attribute using Laravel 12 syntax
+    public function gender(): Attribute
     {
-        $genderIDKey = isset($this->attributes['GenderID']) ? (int)$this->attributes['GenderID'] : null;
-        return array_key_exists($genderIDKey, self::GenderMap) ? self::GenderMap[$genderIDKey] : 'n/a';
+        return new Attribute(
+            get: fn() => isset($this->attributes['GenderID']) && array_key_exists((int)$this->attributes['GenderID'], self::GenderMap)
+                        ? self::GenderMap[(int)$this->attributes['GenderID']]
+                        : 'n/a'
+        );
     }
 
-    // create a mutator for the GenderID and Sex attribute
-    public function getGenderSexAttribute()
-    {
-                $sexKey = isset($this->attributes['Sex']) ? trim((string)$this->attributes['Sex']) : null;
-                $genderIDKey = isset($this->attributes['GenderID']) ? (int)$this->attributes['GenderID'] : null;
-
-                $mappedSex = array_key_exists($sexKey, self::GenderMap) ? self::GenderMap[$sexKey] : null;
-                $mappedGenderID = array_key_exists($genderIDKey, self::GenderMap) ? self::GenderMap[$genderIDKey] : null;
-
-                if (!empty($mappedSex) && !empty($mappedGenderID)) {
-                    return $mappedGenderID;
-                } elseif (!empty($mappedSex)) {
-                    return $mappedSex;
-                } elseif (!empty($mappedGenderID)) {
-                    return $mappedGenderID;
-                }
-                return 'n/a';
-    }
     // eloquent relationships with PrevBreed and PrevColor
-    public function breed()
+    public function breed(): HasOne 
     {
         return $this->hasOne(PrevBreed::class, 'BreedCode', 'RaceID');
     }
-    public function color()
+    public function color(): HasOne
     {
         return $this->hasOne(PrevColor::class, 'OldCode', 'ColorID');
     }
-    public function hair()
+    
+    public function hair(): HasOne
     {
         return $this->hasOne(PrevHair::class, 'OldCode', 'HairID');
     }
     // eloquent relationships with PrevDog
     
-    public function father()
+    public function father(): HasOne
     {
         return $this->hasOne(self::class, 'SagirID', 'FatherSAGIR');
     }
 
-    public function mother()
+    public function mother(): HasOne
     {
         return $this->hasOne(self::class, 'SagirID', 'MotherSAGIR');
     }
-   /* 
-    // a dog has one father using the dog's field FatherSAGIR as the foreign key and SagirID as the local key, the father has many dogs
-    public function father()
+
+    // users that are dog owners using dogs2users table or PrevUserDog model
+    public function owners(): BelongsToMany
     {
-        return $this->hasOne(PrevDog::class, 'SagirID', 'FatherSAGIR');
+        return $this->belongsToMany(PrevUser::class, 'dogs2users', 'SagirID', 'user_id', 'SagirID', 'id')
+            ->withTimestamps()
+            ->wherePivot('status', 'current')
+            ->wherePivot('deleted_at', null);
     }
-    // a dog has one mother using the dog's field MotherSAGIR as the foreign key and SagirID as the local key, the mother has many dogs
-    public function mother()
+
+    // breedingManager using PrevUser model
+    public function breedingManager(): BelongsTo
     {
-        return $this->hasOne(PrevDog::class, 'SagirID', 'MotherSAGIR');
+        return $this->belongsTo(PrevUser::class, 'BreedingManagerID', 'id');
     }
-    */
+    // currentOwner using PrevUser model
+    public function currentOwner(): BelongsTo
+    {
+        return $this->belongsTo(PrevUser::class, 'CurrentOwnerID', 'id');
+    }
+
+    // public function duplicates(): HasMany
+    // {
+    //     return $this->hasMany(self::class, 'SagirID', 'SagirID')
+    //     ->withTrashed();
+    // }
+
+    protected function fullName(): Attribute
+    {
+        return new Attribute(
+            get: function () {
+                $heb = $this->attributes['Heb_Name'] ?? null;
+                $eng = $this->attributes['Eng_Name'] ?? null;
+
+                if ($heb && $eng) {
+                    return $heb . ' | ' . $eng;
+                }
+                if ($heb) {
+                    return $heb;
+                }
+                if ($eng) {
+                    return $eng;
+                }
+                return '<< Name Not Found >>';
+            }
+        );
+    }
 }
