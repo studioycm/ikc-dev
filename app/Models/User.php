@@ -13,6 +13,7 @@ use Filament\Panel;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 
 
+
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail, HasName
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -97,7 +98,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
 
     public function getFilamentName(): string
     {
-        return "{$this->first_name} {$this->last_name}";
+        return "{$this->name}";
     }
 
 }

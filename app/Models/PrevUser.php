@@ -32,11 +32,26 @@ class PrevUser extends Model
 
     // relationship with the dogs
 
-    public function dogs()
+    public function dogs(): BelongsToMany
     {
-        return $this->hasMany(PrevDog::class, 'dogs2users', 'user_id', 'id');
+        return $this->belongsToMany(PrevDog::class, 'dogs2users', 'user_id', 'SagirID', 'id', 'SagirID')
+        ->withTimestamps()
+        ->using(PrevUserDog::class)
+        ->as('ownership')
+        ->withPivot('status', 'created_at', 'updated_at', 'deleted_at')
+        ->wherePivot('deleted_at', null)
+        ->wherePivot('status', 'current');
     }
 
+    public function history_dogs(): HasMany
+    {
+        return $this->hasMany(PrevDog::class, 'CurrentOwnerId', 'owner_code')
+        ->where('deleted_at', null);
+    }
+
+
+    protected $appends = ['full_name', 'name'];
+    
     // get hebrew full name and english full name - from first and last name, add checks which exist and then try to have both 
     public function getFullNameHEAttribute()
     {
@@ -63,9 +78,16 @@ class PrevUser extends Model
                         : '<< Name Not Found >>')
             );
     }
-    
-    
-   
-    
+
+    public function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => tap(
+                // try Hebrew first
+                trim(implode(' ', array_filter([$this->first_name, $this->last_name]))),
+                fn(&$n) => $n || $n = trim(implode(' ', array_filter([$this->first_name_en, $this->last_name_en])))
+            ) ?: '---'
+        );
+    }
 
 }

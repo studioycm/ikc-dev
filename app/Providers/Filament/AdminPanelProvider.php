@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Notifications\DatabaseNotification;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Illuminate\Contracts\View\View;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -44,8 +45,9 @@ class AdminPanelProvider extends PanelProvider
             ->passwordReset()
             ->emailVerification()
             ->authGuard('web')
+            // ->spa()
             ->databaseNotifications()
-            ->databaseNotificationsPolling('60s')
+            // ->databaseNotificationsPolling('60s')
             ->maxContentWidth(MaxWidth::Full)    
             ->colors([
                 'primary' => Color::Amber,
@@ -92,6 +94,11 @@ class AdminPanelProvider extends PanelProvider
                         'sm' => 2,
                         'lg' => 3,
                     ]),
-            ]);
+            ])
+            ->renderHook(
+                    'panels::footer',
+                    fn (): View => view('filament.components.loading-indicator')
+                        
+            );
     }
 }

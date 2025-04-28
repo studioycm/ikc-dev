@@ -6,6 +6,8 @@ use Filament\Tables;
 use Filament\Forms;
 use Filament\Forms\Form;
 use App\Models\PrevDog;
+use App\Models\PrevTitle;
+use App\Models\PrevDogTitle;
 use App\Models\PrevBreed;
 use App\Models\PrevColor;
 use App\Models\PrevHair;
@@ -14,6 +16,7 @@ use App\Models\PrevUserDog;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentColor;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Split;
 use Filament\Forms\Components\Section;
@@ -26,12 +29,23 @@ use Filament\Tables\Filters\QueryBuilder\Constraints\BooleanConstraint;
 use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint;
 use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint\Operators\IsRelatedToOperator;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Resources\PrevDogResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Eloquent\Model;
 use App\Filament\Resources\PrevDogResource\RelationManagers;
+// infolist use
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\Tabs;
+use Filament\Infolists\Components\Tabs\Tab;
+use Filament\Infolists\Components\Grid as InfolistGrid;
+use Filament\Infolists\Components\Section as InfolistSection;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\ImageEntry;
 
 // use App\Filament\Exports\DogExporter;
 // use App\Filament\Imports\DogImporter;
@@ -182,8 +196,9 @@ class PrevDogResource extends Resource
         return $table
             ->modifyQueryUsing(function (Builder $query) {
                 return $query
-                    ->where('sagir_prefix', '!=', 5)
-                    ->with('owners');
+                ->with('owners')
+                ->with('currentOwner')
+                ->with('titles');
                     // ->with('duplicates')
                     // ->withCount('duplicates');
             })
@@ -203,14 +218,10 @@ class PrevDogResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('sagir_prefix')
-                    ->label('Prefix')
-                    ->sortable(['sagir_prefix']),
-                Tables\Columns\TextColumn::make('SagirID')
+                Tables\Columns\TextColumn::make('prefixed_sagir')
                     ->label('Sagir')
-                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->searchable(isIndividual: true, isGlobal: false)
-                    ->sortable(),
+                    ->searchable(['SagirID'], isIndividual: true, isGlobal: false)
+                    ->sortable(['sagir_prefix','SagirID']),
                 Tables\Columns\TextColumn::make('full_name')
                     ->label('Full Name')
                     ->searchable(['Heb_Name','Eng_Name'], isIndividual: true, isGlobal: false),
@@ -247,7 +258,7 @@ class PrevDogResource extends Resource
                         $nameEn = $color->ColorNameEN ?? '~';
                         return $nameEn;
                     }, position: 'under')
-                    ->sortable(),
+                    ->sortable(['OldCode']),
                 Tables\Columns\TextColumn::make('hair.HairNameHE')
                     ->label('Hair')
                     ->description(function (PrevDog $record): string {
@@ -274,7 +285,19 @@ class PrevDogResource extends Resource
                         default => 'gray',
                     })
                     ->sortable(['GenderID']),
-                // add owners relationship column with owners names list, max listing 2 with colapsible see all 
+                Tables\Columns\TextColumn::make('titles.name')
+                    ->label('Titles')
+                    ->listWithLineBreaks() 
+                    ->limitList(3)
+                    ->tooltip(fn (Tables\Columns\TextColumn $column): ?string => 
+                        (($state = $column->getState()) === null) ? null : 
+                        (is_array($state)
+                            ? (count($state) > $column->getListLimit() ? implode(' | ', $state) : null)
+                            : (string) $state
+                        )
+                    )
+                    ->searchable(['dogs_titles_db.TitleName'], isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('owners')
                     ->label('Owners')
                     ->getStateUsing(function (PrevDog $record): string {
@@ -325,17 +348,22 @@ class PrevDogResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('CurrentOwnerId')
-                    ->label('Current Owner ID - depracted')
+                    ->label('Owner (depracted)')
                     ->wrapHeader()
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->description(fn (PrevDog $record): string => $record->currentOwner->full_name ?? 'n/a')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\TextColumn::make('OwnershipDate')
-                    ->label('Ownership Date - depracted')
-                    ->wrapHeader()
-                    ->date()
-                    ->sortable()
+                    ->getStateUsing(function (PrevDog $record): string {
+                        if ($record->CurrentOwnerId === null) {
+                            return 'n/a';
+                        }
+                        $ownerName = $record->currentOwner?->first_name ?? '<unknown>';
+                        $ownershipDate = $record->OwnershipDate 
+                            ? \Carbon\Carbon::parse($record->OwnershipDate)->format('d-m-Y') 
+                            : 'n/a';
+                        $ownershipDetails = $ownerName . ' | ' . $ownershipDate;
+                        return $ownershipDetails;
+                    })  
+                    ->description(fn (PrevDog $record): string => $record->CurrentOwnerId ? (string)((int)$record->CurrentOwnerId) : 'n/a')
+                    ->sortable(['OwnershipDate'])
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('Breeder_Name')
                     ->label('Breeder Name - depracted')
@@ -402,9 +430,10 @@ class PrevDogResource extends Resource
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                    Tables\Columns\TextColumn::make('TitleName')
+                Tables\Columns\TextColumn::make('TitleName')
                     ->label('Titles (pre ~2010)')
                     ->wrapHeader()
+                    ->separator(',')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),                
                 Tables\Columns\TextColumn::make('GroupID')
@@ -554,17 +583,30 @@ class PrevDogResource extends Resource
          
             ])
             ->filters([
-                // soft delete filter
-                Tables\Filters\TrashedFilter::make('trashed')
-                    ->label('Deleted')
-                    ->placeholder('All')
-                    ->trueLabel('Deleted')
-                    ->falseLabel('Not Deleted')
-                    ->queries(
-                        true: fn (Builder $query) => $query->onlyTrashed(),
-                        false: fn (Builder $query) => $query->withoutTrashed(),
-                        blank: fn (Builder $query) => $query,
-                    ),
+                Filter::make('trashed')
+                    ->form([
+                        Forms\Components\ToggleButtons::make('trashed')
+                            ->options([
+                                'all'         => 'All',
+                                'deleted'     => 'Deleted',
+                                'not_deleted' => 'Not Deleted',
+                            ])
+                            ->colors([
+                                'all'         => 'gray',
+                                'deleted'     => 'danger',
+                                'not_deleted' => 'success',
+                            ])
+                            ->grouped(),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (empty($data['trashed']) || $data['trashed'] === 'all') {
+                            return $query;
+                        }
+                        return match ($data['trashed']) {
+                            'deleted'     => $query->onlyTrashed(),
+                            'not_deleted' => $query->withoutTrashed(),
+                        };
+                    }),
                 // create a filter for "duplicates_count > 1" and "all" - duplicates_count is made by filament modifyQueryUsing and withCount() method:
                 // Tables\Filters\TernaryFilter::make('duplicates_count')
                 //     ->label('Duplicates')
@@ -609,6 +651,46 @@ class PrevDogResource extends Resource
                                 ELSE 'n/a'
                             END = ?
                         ", [$data['gender']]);
+                    }),
+                // filter by "sagir_prefix" like the "gender" filter
+                Filter::make('sagir_prefix')
+                    ->form([
+                        Forms\Components\ToggleButtons::make('sagir_prefix')
+                            ->options([
+                                'all'  => 'All',
+                                'ISR'    => 'ISR',
+                                'IMP'    => 'IMP',
+                                'APX'    => 'APX',
+                                'EXT'    => 'EXT',
+                                'NUL'    => 'NUL',
+                            ])
+                            ->colors([
+                                'all'  => 'gray',
+                                'ISR'    => 'info',
+                                'IMP'    => Color::Purple,
+                                'APX'    => 'warning',
+                                'EXT'    => 'success',
+                                'NUL'    => 'danger',
+                            ])
+                            ->grouped(),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        // If no specific prefix is chosen, return unfiltered results.
+                        if (empty($data['sagir_prefix']) || $data['sagir_prefix'] === 'all') {
+                            return $query;
+                        }
+                        
+                        // Apply a raw WHERE clause that replicates the accessor's logic.
+                        // Adjust the CASE statement as needed to match your accessor.
+                        return $query->whereRaw("
+                            CASE 
+                                WHEN sagir_prefix = 1 THEN 'ISR'
+                                WHEN sagir_prefix = 2 THEN 'IMP'
+                                WHEN sagir_prefix = 3 THEN 'APX'
+                                WHEN sagir_prefix = 4 THEN 'EXT'
+                                WHEN sagir_prefix = 5 THEN 'NUL'
+                            END = ?
+                        ", [$data['sagir_prefix']]);
                     }),
                 // Relationship filters for Breed, Color, and Hair
                 Tables\Filters\SelectFilter::make('breed')
@@ -658,6 +740,33 @@ class PrevDogResource extends Resource
                         Forms\Components\TextInput::make('search')
                             ->label('Mother Hebrew, English Name or Sagir'),
                     ]),
+                // create filters to select and search by "owners" (PrevUser many 2 many relationship) fields: full_name, phone, id - owners is a relationship, full_name is a custom accessor using: ["first_name", "last_name", "first_name_en", "last_name_en"] 
+                Filter::make('owners')
+                    ->form([
+                        Select::make('owners')
+                            ->label('Owners')
+                            ->multiple()
+                            ->relationship(
+                                'owners',
+                                'id',
+                                modifyQueryUsing: fn (Builder $query) => $query
+                                    ->whereNull('users.deleted_at')
+                                    ->where(function (Builder $q) {
+                                        $q->has('dogs');
+                                    })
+                                    ->orderBy('users.first_name')
+                                    ->orderBy('users.last_name'),
+                            )
+                            ->getOptionLabelFromRecordUsing(fn (PrevUser $record): string => $record->name)
+                            ->searchable(['users.first_name', 'users.last_name', 'users.first_name_en', 'users.last_name_en', 'users.id'])
+                            ->searchDebounce(2000),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['owners'] ?? null,
+                            fn (Builder $q, $owners) => $q->whereHas('owners', fn (Builder $q2) => $q2->whereIn('users.id', $owners)),
+                        );
+                    }),
                 // bulean filters for: IsMagPass, IsMagPass_2, not_relevant, red_pedigree 
                 Tables\Filters\TernaryFilter::make('red_pedigree')
                     ->label('Red Pedigree')
@@ -666,7 +775,7 @@ class PrevDogResource extends Resource
                     ->falseLabel('No')
                     ->queries(
                         true: fn (Builder $query) => $query->where('red_pedigree', 1),
-                        false: fn (Builder $query) => $query->where('red_pedigree', 0),
+                        false: fn (Builder $query) => $query->whereNot('red_pedigree', 1),
                         blank: fn (Builder $query) => $query,
                     ),
                 Tables\Filters\TernaryFilter::make('IsMagPass')
@@ -730,6 +839,7 @@ class PrevDogResource extends Resource
             ], layout: FiltersLayout::AboveContentCollapsible)
             ->filtersFormColumns(5)
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -740,9 +850,139 @@ class PrevDogResource extends Resource
             ->paginated([10, 25, 50, 100, 200, 250, 300])
             ->defaultPaginationPageOption(25)
             ->defaultSort('SagirID', 'desc')
-            ->searchOnBlur();
+            ->searchOnBlur()
+            ->striped()
+            ->deferLoading()
+            // ->recordUrl(fn (PrevDog $record): string => route('filament.admin.resources.prev-dogs.view', $record), shouldOpenInNewTab: false,);
+            ->recordUrl(false);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Tabs::make('Record')->tabs([
+                    /***** 1. Overview *****/
+                    Tab::make('Overview')->schema([
+                        InfolistGrid::make(2)->schema([
+                            TextEntry::make('sagir_prefix')->label('Prefix'),
+                            TextEntry::make('SagirID')->label('Sagir ID'),
+                            TextEntry::make('full_name')
+                                ->label('Full Name')
+                                ->columnSpanFull(),
+                            TextEntry::make('RegDate')
+                                ->label('Registration Date')
+                                ->columnSpanFull(),
+                            TextEntry::make('BirthDate')
+                                ->label('Birth Date')
+                                ->columnSpanFull(),
+                        ]),
+                        InfolistGrid::make(3)->schema([
+                            TextEntry::make('breed.BreedName')->label('Breed'),
+                            TextEntry::make('color.ColorNameHE')->label('Color'),
+                            TextEntry::make('hair.HairNameHE')->label('Hair'),
+                        ]),
+                        InfolistGrid::make(2)->schema([
+                            TextEntry::make('Sex')->label('Sex'),
+                            TextEntry::make('gender')->label('Gender'),
+                        ]),
+                    ]),
+
+                    /***** 2. Ownership & Breeding *****/
+                    Tab::make('Ownership & Breeding')->schema([
+                        InfolistSection::make('Ownership')->schema([
+                            TextEntry::make('owners')
+                                ->label('Owners')
+                                ->state(fn(PrevDog $record) => $record->owners->pluck('full_name')->implode(', ')),
+                            TextEntry::make('currentOwner.full_name')
+                                ->label('Current Owner'),
+                            TextEntry::make('OwnershipDate')
+                                ->label('Ownership Date'),
+                        ]),
+                        InfolistSection::make('Breeding')->schema([
+                            TextEntry::make('Breeder_Name')->label('Breeder'),
+                            TextEntry::make('Foreign_Breeder_name')->label('Foreign Breeder'),
+                            TextEntry::make('breedingManager.full_name')->label('Breeding Manager'),
+                        ]),
+                    ]),
+
+                    /***** 3. Pedigree & Titles *****/
+                    Tab::make('Pedigree & Titles')->schema([
+                        InfolistGrid::make(2)->schema([
+                            TextEntry::make('father.full_name')->label('Father'),
+                            TextEntry::make('mother.full_name')->label('Mother'),
+                        ]),
+                        InfolistSection::make('Pedigree')->schema([
+                            TextEntry::make('pedigree_color')->label('Pedigree Color'),
+                            IconEntry::make('red_pedigree')->label('Red Pedigree'),
+                            TextEntry::make('PedigreeNotes')
+                                ->label('Pedigree Notes')
+                                ->columnSpanFull(),
+                        ]),
+                        InfolistSection::make('Titles & Shows')->schema([
+                            TextEntry::make('TitleName')->label('Titles (pre‑2010)'),
+                            TextEntry::make('ShowsCount')->label('Shows Count'),
+                            TextEntry::make('GidulShowType')->label('Gidul Show'),
+                        ]),
+                    ]),
+
+                    /***** 4. Metrics & Performance *****/
+                    Tab::make('Metrics & Performance')->schema([
+                        InfolistGrid::make(2)->schema([
+                            IconEntry::make('IsMagPass')->label('MHG Pass'),
+                            IconEntry::make('IsMagPass_2')->label('MHG 2nd Pass'),
+                        ]),
+                        InfolistGrid::make(3)->schema([
+                            TextEntry::make('SupplementarySign')->label('Supplementary Sign'),
+                            TextEntry::make('SizeID')->label('Size ID'),
+                            TextEntry::make('GroupID')->label('Group ID'),
+                        ]),
+                    ]),
+
+                    /***** 5. Health & Notes *****/
+                    Tab::make('Health & Notes')->schema([
+                        TextEntry::make('HealthNotes')
+                            ->label('Health Notes')
+                            ->columnSpanFull(),
+                        InfolistGrid::make(2)->schema([
+                            TextEntry::make('Pelvis'),
+                            TextEntry::make('SCH'),
+                        ]),
+                        TextEntry::make('Notes_2')
+                            ->label('Additional Notes')
+                            ->columnSpanFull(),
+                        TextEntry::make('message_test')->label('Message Test'),
+                    ]),
+
+                    /***** 6. Media & Flags *****/
+                    Tab::make('Media & Flags')->schema([
+                        InfolistGrid::make(2)->schema([
+                            ImageEntry::make('ProfileImage')->label('Profile Image'),
+                            ImageEntry::make('Image2')->label('Image 2'),
+                        ]),
+                        InfolistGrid::make(2)->schema([
+                            IconEntry::make('not_relevant')->label('Not Relevant'),
+                            IconEntry::make('encoding')->label('Encoding Issue'),
+                        ]),
+                    ]),
+
+                    /***** 7. Metadata *****/
+                    Tab::make('Metadata')->schema([
+                        InfolistGrid::make(2)->schema([
+                            TextEntry::make('id')->label('ID'),
+                            TextEntry::make('BeitGidulID')->label('Beit Gidul ID'),
+                            TextEntry::make('CreationDateTime')->label('Created On'),
+                            TextEntry::make('ModificationDateTime')->label('Modified On'),
+                            TextEntry::make('created_at')->label('Created At'),
+                            TextEntry::make('updated_at')->label('Updated At'),
+                            TextEntry::make('deleted_at')->label('Deleted At'),
+                        ]),
+                    ]),
+                ]),
+            ]);
+    }
+
+    
     public static function getRelations(): array
     {
         return [
@@ -755,6 +995,7 @@ class PrevDogResource extends Resource
         return [
             'index' => Pages\ListPrevDogs::route('/'),
             'create' => Pages\CreatePrevDog::route('/create'),
+            'view' => Pages\ViewPrevDog::route('/{record}'),
             'edit' => Pages\EditPrevDog::route('/{record}/edit'),
         ];
     }

@@ -3,17 +3,19 @@
 namespace App\Models;
 
 use App\Models\PrevHair;
-use App\Models\PrevUser;
 use App\Models\PrevBreed;
 use App\Models\PrevColor;
+use App\Models\PrevUser;
 use App\Models\PrevUserDog;
+use App\Models\PrevTitle;
+use App\Models\PrevDogTitle;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class PrevDog extends Model 
 
@@ -74,24 +76,7 @@ class PrevDog extends Model
         'נ' => 'f',
     ];
 
-    // create an accessor for the sagir_prefix attribute using Laravel 12 syntax
-    public function sagirPrefix(): Attribute
-    {
-        return new Attribute(
-            get: fn($value) =>
-                self::SAGIR_PREFIX_MAP[$value] ?? 'NUL'
-        );
-    }
     
-    // create an accessor for the Gender attribute using Laravel 12 syntax
-    public function gender(): Attribute
-    {
-        return new Attribute(
-            get: fn() => isset($this->attributes['GenderID']) && array_key_exists((int)$this->attributes['GenderID'], self::GenderMap)
-                        ? self::GenderMap[(int)$this->attributes['GenderID']]
-                        : 'n/a'
-        );
-    }
 
     // eloquent relationships with PrevBreed and PrevColor
     public function breed(): HasOne 
@@ -124,19 +109,34 @@ class PrevDog extends Model
     {
         return $this->belongsToMany(PrevUser::class, 'dogs2users', 'SagirID', 'user_id', 'SagirID', 'id')
             ->withTimestamps()
-            ->wherePivot('status', 'current')
-            ->wherePivot('deleted_at', null);
+            ->using(PrevUserDog::class)
+            ->as('ownership')
+            ->withPivot('status', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivot('deleted_at', null)
+            ->wherePivot('status', 'current');
     }
+
+    // get dog titles by a relationship of many 2 many with PrevDogTitle model
+    public function titles(): BelongsToMany
+    {
+        return $this->belongsToMany(PrevTitle::class, 'Dogs_ScoresDB', 'SagirID', 'AwardID', 'SagirID', 'TitleCode')
+            ->where('Dogs_ScoresDB.deleted_at', null)
+            ->withTimestamps()
+            ->using(PrevDogTitle::class)
+            ->as('awarding')
+            ->withPivot('AwardID', 'EventPlace', 'EventName', 'EventDate', 'ShowID', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivot('deleted_at', null);
+    } 
 
     // breedingManager using PrevUser model
     public function breedingManager(): BelongsTo
     {
         return $this->belongsTo(PrevUser::class, 'BreedingManagerID', 'id');
     }
-    // currentOwner using PrevUser model
+    // current_owner using "DogsOwners" table from connection "mysql_prev" without a dedicated model
     public function currentOwner(): BelongsTo
     {
-        return $this->belongsTo(PrevUser::class, 'CurrentOwnerID', 'id');
+        return $this->belongsTo(PrevUser::class, 'CurrentOwnerId', 'owner_code');
     }
 
     // public function duplicates(): HasMany
@@ -145,7 +145,9 @@ class PrevDog extends Model
     //     ->withTrashed();
     // }
 
-    protected function fullName(): Attribute
+    protected $appends = ['full_name', 'sagir_prefix', 'prefixed_sagir', 'gender'];
+
+    public function fullName(): Attribute
     {
         return new Attribute(
             get: function () {
@@ -165,4 +167,33 @@ class PrevDog extends Model
             }
         );
     }
+
+    // create an accessor for the sagir_prefix attribute using Laravel 12 syntax
+    public function sagirPrefix(): Attribute
+    {
+        return new Attribute(
+            get: fn($value) =>
+                self::SAGIR_PREFIX_MAP[$value] ?? 'NUL'
+        );
+    }
+    
+    // create an attribute that concatnating the SagirID (an integer) with the "sagir_prefix" and "-" in between
+    public function prefixedSagir(): Attribute
+    {
+        return new Attribute(
+            get: fn($value) => $this->sagir_prefix . '-' . (string)$this->SagirID
+        );
+    }
+
+    // create an accessor for the Gender attribute using Laravel 12 syntax
+    public function gender(): Attribute
+    {
+        return new Attribute(
+            get: fn() => isset($this->attributes['GenderID']) && array_key_exists((int)$this->attributes['GenderID'], self::GenderMap)
+                        ? self::GenderMap[(int)$this->attributes['GenderID']]
+                        : 'n/a'
+        );
+    }
+
+
 }
