@@ -149,7 +149,7 @@ class PrevDog extends Model
 
     public function fullName(): Attribute
     {
-        return new Attribute(
+        return Attribute::make(
             get: function () {
                 $heb = $this->attributes['Heb_Name'] ?? null;
                 $eng = $this->attributes['Eng_Name'] ?? null;
@@ -171,7 +171,7 @@ class PrevDog extends Model
     // create an accessor for the sagir_prefix attribute using Laravel 12 syntax
     public function sagirPrefix(): Attribute
     {
-        return new Attribute(
+        return Attribute::make(
             get: fn($value) =>
                 self::SAGIR_PREFIX_MAP[$value] ?? 'NUL'
         );
@@ -180,7 +180,7 @@ class PrevDog extends Model
     // create an attribute that concatnating the SagirID (an integer) with the "sagir_prefix" and "-" in between
     public function prefixedSagir(): Attribute
     {
-        return new Attribute(
+        return Attribute::make(
             get: fn($value) => $this->sagir_prefix . '-' . (string)$this->SagirID
         );
     }
@@ -188,7 +188,7 @@ class PrevDog extends Model
     // create an accessor for the Gender attribute using Laravel 12 syntax
     public function gender(): Attribute
     {
-        return new Attribute(
+        return Attribute::make(
             get: fn() => isset($this->attributes['GenderID']) && array_key_exists((int)$this->attributes['GenderID'], self::GenderMap)
                         ? self::GenderMap[(int)$this->attributes['GenderID']]
                         : 'n/a'

@@ -2,50 +2,52 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Tables;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Tables;
 use App\Models\PrevDog;
-use App\Models\PrevTitle;
-use App\Models\PrevDogTitle;
-use App\Models\PrevBreed;
-use App\Models\PrevColor;
 use App\Models\PrevHair;
 use App\Models\PrevUser;
-use App\Models\PrevUserDog;
+use Filament\Forms\Form;
+use App\Models\PrevBreed;
+use App\Models\PrevColor;
+use App\Models\PrevTitle;
 use Filament\Tables\Table;
+use App\Models\PrevUserDog;
+use App\Models\PrevDogTitle;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
-use Filament\Support\Facades\FilamentColor;
 use Filament\Forms\Components\Grid;
+use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Split;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
+use Filament\Infolists\Components\Tabs;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Enums\FiltersLayout;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\QueryBuilder;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Infolists\Components\Tabs\Tab;
+use Filament\Support\Facades\FilamentColor;
+// infolist use
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\KeyValueEntry;
+use App\Filament\Resources\PrevDogResource\Pages;
+use Filament\Infolists\Components\RepeatableEntry;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Infolists\Components\Grid as InfolistGrid;
+use App\Filament\Resources\PrevDogResource\RelationManagers;
+use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Tables\Filters\QueryBuilder\Constraints\DateConstraint;
 use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
 use Filament\Tables\Filters\QueryBuilder\Constraints\NumberConstraint;
 use Filament\Tables\Filters\QueryBuilder\Constraints\BooleanConstraint;
 use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint;
 use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint\Operators\IsRelatedToOperator;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\DatePicker;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
-use App\Filament\Resources\PrevDogResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Database\Eloquent\Model;
-use App\Filament\Resources\PrevDogResource\RelationManagers;
-// infolist use
-use Filament\Infolists\Infolist;
-use Filament\Infolists\Components\Tabs;
-use Filament\Infolists\Components\Tabs\Tab;
-use Filament\Infolists\Components\Grid as InfolistGrid;
-use Filament\Infolists\Components\Section as InfolistSection;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\ImageEntry;
 
 // use App\Filament\Exports\DogExporter;
 // use App\Filament\Imports\DogImporter;
@@ -861,124 +863,147 @@ class PrevDogResource extends Resource
     {
         return $infolist
             ->schema([
-                Tabs::make('Record')->tabs([
-                    /***** 1. Overview *****/
-                    Tab::make('Overview')->schema([
-                        InfolistGrid::make(2)->schema([
-                            TextEntry::make('sagir_prefix')->label('Prefix'),
-                            TextEntry::make('SagirID')->label('Sagir ID'),
-                            TextEntry::make('full_name')
-                                ->label('Full Name')
+                    Tabs::make('Dog Record')->tabs([
+                        /***** 1. Overview *****/
+                        Tab::make('Overview')->schema([
+                            InfolistGrid::make(4)->schema([
+                                TextEntry::make('SagirID')
+                                    ->label(__('dogs.Sagir'))
+                                    ->state(fn(PrevDog $record) => $record->sagir_prefix . ' - ' . $record->SagirID),
+                                TextEntry::make('full_name')->label('Full Name'),
+                                TextEntry::make('RegDate')->label('Registration Date'),
+                                TextEntry::make('BirthDate')->label('Birth Date'),
+                            ]),
+                            InfolistGrid::make(4)->schema([
+                                TextEntry::make('gender')
+                                    ->label(__('general.Gender'))
+                                    ->state(fn(PrevDog $record): string => 
+                                        $record->gender 
+                                        . (!empty($record->Sex) 
+                                            ? " ({$record->Sex})" 
+                                            : ''
+                                        )
+                                    ),
+                                TextEntry::make('breed.BreedName')->label('Breed'),
+                                TextEntry::make('color.ColorNameHE')->label('Color'),
+                                TextEntry::make('hair.HairNameHE')->label('Hair'),
+                            ]),
+                        ]),
+
+                        /***** 2. Ownership & Breeding *****/
+                        Tab::make('Ownership & Breeding')->schema([
+                            InfolistSection::make('Ownership')->schema([
+                                RepeatableEntry::make('owners')
+                                    ->schema([
+                                        TextEntry::make('full_name')->label('Full Name'),
+                                        TextEntry::make('mobile_phone')->label('Phone'),
+                                        TextEntry::make('email')->label('Email'),
+                                    ])
+                                    ->grid(4),
+                                TextEntry::make('currentOwner.full_name')
+                                    ->label('Current Owner'),
+                                TextEntry::make('OwnershipDate')
+                                    ->label('Ownership Date'),
+                            ]),
+                            InfolistSection::make('Breeding')->schema([
+                                TextEntry::make('Breeder_Name')->label('Breeder'),
+                                TextEntry::make('Foreign_Breeder_name')->label('Foreign Breeder'),
+                                TextEntry::make('breedingManager.full_name')->label('Breeding Manager'),
+                                TextEntry::make('BeitGidulID')->label('Beit Gidul ID'),
+                            ]),
+                        ]),
+
+                        /***** 3. Pedigree & Titles *****/
+                        Tab::make('Pedigree & Titles')->schema([
+                            InfolistSection::make('Pedigree')->schema([
+                                InfolistSection::make('Parants')->schema([
+                                    InfolistSection::make('Father Details')->schema([
+                                        TextEntry::make('father.full_name')->label('Father Name'),
+                                        TextEntry::make('father.SagirID')->label('Father Sagir ID'),
+                                    ])->columns(2),
+                                    InfolistSection::make('Mother Details')->schema([
+                                        TextEntry::make('mother.full_name')->label('Mother Name'),
+                                        TextEntry::make('mother.SagirID')->label('Mother Sagir ID'),
+                                    ])->columns(2),
+                                ])->columns(2),
+                                TextEntry::make('pedigree_color')->label('Pedigree Color'),
+                                IconEntry::make('red_pedigree')->label('Red Pedigree'),
+                                TextEntry::make('PedigreeNotes')
+                                    ->label('Pedigree Notes')
+                                    ->columnSpanFull(),
+                            ]),
+                            InfolistSection::make('Titles & Shows')->schema([
+                                RepeatableEntry::make('titles')
+                                    ->schema([
+                                        TextEntry::make('name')->label('Title'),
+                                        TextEntry::make('awarding.EventPlace')->label('Event Place'),
+                                        TextEntry::make('awarding.EventName')->label('Event Name'),
+                                        TextEntry::make('awarding.EventDate')->label('Event Date'),
+                                    ])
+                                    ->grid(4),
+                                TextEntry::make('ShowsCount')->label('Shows Count'),
+                            ]),
+                            InfolistSection::make('Titles pre‑2010')->schema([
+                                TextEntry::make('TitleName')->label('Titles (pre‑2010)'),
+                                TextEntry::make('GidulShowType')->label('Gidul Show'),
+                            ]),
+                        ]),
+
+                        /***** 4. Metrics & Performance *****/
+                        Tab::make('Metrics & Performance')->schema([
+                            InfolistGrid::make(2)->schema([
+                                IconEntry::make('IsMagPass')->label('MHG Pass'),
+                                IconEntry::make('IsMagPass_2')->label('MHG 2nd Pass'),
+                            ]),
+                            InfolistGrid::make(3)->schema([
+                                TextEntry::make('SupplementarySign')->label('Supplementary Sign'),
+                                TextEntry::make('SizeID')->label('Size ID'),
+                                TextEntry::make('GroupID')->label('Group ID'),
+                            ]),
+                        ]),
+
+                        /***** 5. Health & Notes *****/
+                        Tab::make('Health & Notes')->schema([
+                            TextEntry::make('HealthNotes')
+                                ->label('Health Notes')
                                 ->columnSpanFull(),
-                            TextEntry::make('RegDate')
-                                ->label('Registration Date')
+                            InfolistGrid::make(2)->schema([
+                                TextEntry::make('Pelvis'),
+                                TextEntry::make('SCH'),
+                            ]),
+                            TextEntry::make('Notes_2')
+                                ->label('Additional Notes')
                                 ->columnSpanFull(),
-                            TextEntry::make('BirthDate')
-                                ->label('Birth Date')
-                                ->columnSpanFull(),
+                            TextEntry::make('message_test')->label('Message Test'),
                         ]),
-                        InfolistGrid::make(3)->schema([
-                            TextEntry::make('breed.BreedName')->label('Breed'),
-                            TextEntry::make('color.ColorNameHE')->label('Color'),
-                            TextEntry::make('hair.HairNameHE')->label('Hair'),
-                        ]),
-                        InfolistGrid::make(2)->schema([
-                            TextEntry::make('Sex')->label('Sex'),
-                            TextEntry::make('gender')->label('Gender'),
-                        ]),
-                    ]),
 
-                    /***** 2. Ownership & Breeding *****/
-                    Tab::make('Ownership & Breeding')->schema([
-                        InfolistSection::make('Ownership')->schema([
-                            TextEntry::make('owners')
-                                ->label('Owners')
-                                ->state(fn(PrevDog $record) => $record->owners->pluck('full_name')->implode(', ')),
-                            TextEntry::make('currentOwner.full_name')
-                                ->label('Current Owner'),
-                            TextEntry::make('OwnershipDate')
-                                ->label('Ownership Date'),
+                        /***** 6. Media & Flags *****/
+                        Tab::make('Media')->schema([
+                            InfolistGrid::make(2)->schema([
+                                ImageEntry::make('ProfileImage')->label('Profile Image'),
+                                ImageEntry::make('Image2')->label('Image 2'),
+                            ]),
                         ]),
-                        InfolistSection::make('Breeding')->schema([
-                            TextEntry::make('Breeder_Name')->label('Breeder'),
-                            TextEntry::make('Foreign_Breeder_name')->label('Foreign Breeder'),
-                            TextEntry::make('breedingManager.full_name')->label('Breeding Manager'),
+                        
+                        /***** 7. Metadata *****/
+                        Tab::make('Metadata')->schema([
+                            InfolistGrid::make(4)->schema([
+                                IconEntry::make('not_relevant')->label('Not Relevant'),
+                                IconEntry::make('encoding')->label('Encoding Issue'),
+                            ]),
+                            InfolistGrid::make(3)->schema([
+                                TextEntry::make('id')->label('ID'),
+                                TextEntry::make('CreationDateTime')->label('Created On'),
+                                TextEntry::make('ModificationDateTime')->label('Modified On'),
+                                TextEntry::make('created_at')->label('Created At'),
+                                TextEntry::make('updated_at')->label('Updated At'),
+                                TextEntry::make('deleted_at')->label('Deleted At'),
+                            ]),
                         ]),
-                    ]),
-
-                    /***** 3. Pedigree & Titles *****/
-                    Tab::make('Pedigree & Titles')->schema([
-                        InfolistGrid::make(2)->schema([
-                            TextEntry::make('father.full_name')->label('Father'),
-                            TextEntry::make('mother.full_name')->label('Mother'),
-                        ]),
-                        InfolistSection::make('Pedigree')->schema([
-                            TextEntry::make('pedigree_color')->label('Pedigree Color'),
-                            IconEntry::make('red_pedigree')->label('Red Pedigree'),
-                            TextEntry::make('PedigreeNotes')
-                                ->label('Pedigree Notes')
-                                ->columnSpanFull(),
-                        ]),
-                        InfolistSection::make('Titles & Shows')->schema([
-                            TextEntry::make('TitleName')->label('Titles (pre‑2010)'),
-                            TextEntry::make('ShowsCount')->label('Shows Count'),
-                            TextEntry::make('GidulShowType')->label('Gidul Show'),
-                        ]),
-                    ]),
-
-                    /***** 4. Metrics & Performance *****/
-                    Tab::make('Metrics & Performance')->schema([
-                        InfolistGrid::make(2)->schema([
-                            IconEntry::make('IsMagPass')->label('MHG Pass'),
-                            IconEntry::make('IsMagPass_2')->label('MHG 2nd Pass'),
-                        ]),
-                        InfolistGrid::make(3)->schema([
-                            TextEntry::make('SupplementarySign')->label('Supplementary Sign'),
-                            TextEntry::make('SizeID')->label('Size ID'),
-                            TextEntry::make('GroupID')->label('Group ID'),
-                        ]),
-                    ]),
-
-                    /***** 5. Health & Notes *****/
-                    Tab::make('Health & Notes')->schema([
-                        TextEntry::make('HealthNotes')
-                            ->label('Health Notes')
-                            ->columnSpanFull(),
-                        InfolistGrid::make(2)->schema([
-                            TextEntry::make('Pelvis'),
-                            TextEntry::make('SCH'),
-                        ]),
-                        TextEntry::make('Notes_2')
-                            ->label('Additional Notes')
-                            ->columnSpanFull(),
-                        TextEntry::make('message_test')->label('Message Test'),
-                    ]),
-
-                    /***** 6. Media & Flags *****/
-                    Tab::make('Media & Flags')->schema([
-                        InfolistGrid::make(2)->schema([
-                            ImageEntry::make('ProfileImage')->label('Profile Image'),
-                            ImageEntry::make('Image2')->label('Image 2'),
-                        ]),
-                        InfolistGrid::make(2)->schema([
-                            IconEntry::make('not_relevant')->label('Not Relevant'),
-                            IconEntry::make('encoding')->label('Encoding Issue'),
-                        ]),
-                    ]),
-
-                    /***** 7. Metadata *****/
-                    Tab::make('Metadata')->schema([
-                        InfolistGrid::make(2)->schema([
-                            TextEntry::make('id')->label('ID'),
-                            TextEntry::make('BeitGidulID')->label('Beit Gidul ID'),
-                            TextEntry::make('CreationDateTime')->label('Created On'),
-                            TextEntry::make('ModificationDateTime')->label('Modified On'),
-                            TextEntry::make('created_at')->label('Created At'),
-                            TextEntry::make('updated_at')->label('Updated At'),
-                            TextEntry::make('deleted_at')->label('Deleted At'),
-                        ]),
-                    ]),
-                ]),
+                    ])
+                    ->columnSpanFull()
+                    ->persistTabInQueryString(),
+                
             ]);
     }
 

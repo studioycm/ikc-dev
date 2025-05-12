@@ -70,10 +70,10 @@ class PrevUser extends Model
     
     public function fullName(): Attribute
     {
-        return new Attribute(
-            get: fn () => ($this->first_name && $this->last_name)
+        return Attribute::make(
+            get: fn () => ($this->first_name || $this->last_name)
                     ? $this->first_name . ' ' . $this->last_name
-                    : (($this->first_name_en && $this->last_name_en)
+                    : (($this->first_name_en || $this->last_name_en)
                         ? $this->first_name_en . ' ' . $this->last_name_en
                         : '<< Name Not Found >>')
             );
@@ -89,5 +89,6 @@ class PrevUser extends Model
             ) ?: '---'
         );
     }
+
 
 }

@@ -186,19 +186,32 @@ class PrevUserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('role_id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('id')
+                    ->sortable()
+                    ->searchable(isIndividual: true, isGlobal: false),
+                Tables\Columns\TextColumn::make('name')
+                    ->sortable(['last_name', 'first_name'])
+                    ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en'],isIndividual: true, isGlobal: false)
+                    ->label('Name'),
+                Tables\Columns\TextColumn::make('full_name')
+                    ->sortable(['last_name', 'first_name'])
+                    ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en'],isIndividual: true, isGlobal: false)
+                    ->label('Full Name'),
                 Tables\Columns\TextColumn::make('first_name')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('last_name')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('first_name_en')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('last_name_en')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->dateTime()
                     ->sortable(),
@@ -206,145 +219,187 @@ class PrevUserResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('mobile_phone')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false),
                 Tables\Columns\TextColumn::make('phone')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false),
+                Tables\Columns\TextColumn::make('role_id')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('birth_date')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('address_city')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('address_city_en')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('address_street')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('address_street_en')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('address_street_number')
-                    ->searchable(),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('house_number')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('address_zip')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('country_id')
-                    ->numeric()
-                    ->sortable(),
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('country_code')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('fax')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('social_id_number')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('passport_id')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('profile_photo')
-                    ->searchable(),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('last_active_date_time')
                     ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('is_superadmin')
-                    ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('language_id')
-                    ->numeric()
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('is_superadmin')
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->numeric()
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('record_type')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false),
                 Tables\Columns\TextColumn::make('migration_status'),
                 Tables\Columns\TextColumn::make('data_id')
-                    ->numeric()
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('owner_code')
-                    ->numeric()
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('info_id')
-                    ->numeric()
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('owner_email')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false),
                 Tables\Columns\TextColumn::make('sagir_owner_id')
-                    ->numeric()
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('is_current_owner')
-                    ->numeric()
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('order_id')
-                    ->numeric()
-                    ->sortable(),
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('new_sid')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('new_org_data_id')
-                    ->numeric()
-                    ->sortable(),
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('new_fill_date')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('new_filler_ip')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('club_id')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('owner_payment_sum')
-                    ->searchable(),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('owner_payment_last4')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('member_status')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('special_key')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('expire_date')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('owner_total_payment')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('start_date')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('record_source')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('is_judge')
-                    ->searchable(),
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('city_id')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('private_phone_1')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('private_phone_2')
-                    ->searchable(),
-                Tables\Columns\ImageColumn::make('image'),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\ImageColumn::make('image')
+                ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('invoice_id')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('breed_id')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('user_key')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('is_breed_manager')
-                    ->searchable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('payment_status')
-                    ->searchable(),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('beit_gidul_id')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('approved_terms')
-                    ->searchable(),
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('approved_date')
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('ClubManagerID')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('logout')
-                    ->boolean(),
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('breeding_otp')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

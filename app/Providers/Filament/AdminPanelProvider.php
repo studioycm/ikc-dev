@@ -42,6 +42,7 @@ class AdminPanelProvider extends PanelProvider
             ->breadcrumbs(true)
             ->favicon(url('favicon.ico'))
             ->login()
+            ->profile()
             ->passwordReset()
             ->emailVerification()
             ->authGuard('web')
