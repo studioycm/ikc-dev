@@ -30,7 +30,9 @@ class PrevUser extends Model
 
     protected $primaryKey = 'id';
 
-    // relationship with the dogs
+    protected $appends = ['full_name', 'name'];
+
+    // relationship with dogs
 
     public function dogs(): BelongsToMany
     {
@@ -49,18 +51,16 @@ class PrevUser extends Model
         ->where('deleted_at', null);
     }
 
-
-    protected $appends = ['full_name', 'name'];
     
     // get hebrew full name and english full name - from first and last name, add checks which exist and then try to have both 
-    public function getFullNameHEAttribute()
+    public function getFullNameHebAttribute()
     {
         $firstName = $this->first_name ?? '';
         $lastName = $this->last_name ?? '';
 
         return trim($firstName . ' ' . $lastName);
     }
-    public function getFullNameENAttribute()
+    public function getFullNameEngAttribute()
     {
         $firstName = $this->first_name_en ?? '';
         $lastName = $this->last_name_en ?? '';

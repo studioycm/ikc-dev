@@ -17,12 +17,22 @@ class PrevHairResource extends Resource
 {
     protected static ?string $model = PrevHair::class;
 
-    protected static ?string $label = 'Hair Type';
-    protected static ?string $pluralLabel = 'Hair Types';
-
-    protected static ?string $navigationGroup = 'Dogs Management';
-
-    protected static ?string $navigationLabel = 'Hair Types';
+    public static function getModelLabel(): string
+    {
+        return __('Hair Type');
+    }
+    public static function getPluralModelLabel(): string
+    {
+        return __('Hair Types');
+    }
+    public static function getNavigationGroup(): string
+    {
+        return __('Dogs Management');
+    }
+    public static function getNavigationLabel(): string
+    {
+        return __('Hair Types');
+    }
 
     protected static ?int $navigationSort = 4;
 

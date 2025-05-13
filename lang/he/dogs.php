@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'Sagir' => 'סגיר',
+    'sagir' => 'סגיר',
 ];

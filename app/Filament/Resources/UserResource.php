@@ -24,10 +24,27 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationGroup = 'System Settings';
-    protected static ?string $label = 'System User';
-    protected static ?string $pluralLabel = 'System Users';
-    protected static ?string $navigationLabel = 'System Users';
+    public static function getModelLabel(): string
+    {
+        return __('System User');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('System Users');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return __('Users Management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('System Users');
+    }
+
+
     protected static ?int $navigationSort = 98;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';

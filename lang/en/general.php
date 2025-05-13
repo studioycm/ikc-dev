@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'Gender' => 'Gender',
+    'gender' => 'Gender',
 ];

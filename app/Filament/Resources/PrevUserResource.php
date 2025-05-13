@@ -2,31 +2,67 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PrevUserResource\Pages;
-use App\Filament\Resources\PrevUserResource\RelationManagers;
-use App\Models\PrevUser;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\PrevUser;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Support\Htmlable;
+use App\Filament\Resources\PrevUserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\PrevUserResource\RelationManagers;
 
 class PrevUserResource extends Resource
 {
     protected static ?string $model = PrevUser::class;
 
-    protected static ?string $label = 'Owner';
-    protected static ?string $pluralLabel = 'Owners';
 
-    protected static ?string $navigationGroup = 'Owners Management';
+    public static function getModelLabel(): string
+    {
+        return __('Owner');
+    }
 
-    protected static ?string $navigationLabel = 'Owners';
+    public static function getPluralModelLabel(): string
+    {
+        return __('Owners');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return __('Owners Management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Owners');
+    }
+
+
     protected static ?string $slug = 'prev-users';
     protected static ?string $navigationIcon = 'fas-user';
     protected static ?int $navigationSort = 3;
-    protected static ?string $recordTitleAttribute = 'full_name';
+    protected static ?string $recordTitleAttribute = 'first_name';
+
+    public static function getGlobalSearchResultTitle(Model $record): Htmlable | string
+    {
+        return $record->name;
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['first_name', 'last_name', 'first_name_en', 'last_name_en'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Email' => $record->Email,
+            'Phone' => $record->mobile_phone,
+        ];
+    }
 
     public static function getNavigationBadge(): ?string
     {

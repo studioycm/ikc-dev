@@ -24,12 +24,22 @@ class PrevColorResource extends Resource
 {
     protected static ?string $model = PrevColor::class;
 
-    protected static ?string $label = 'Color';
-    protected static ?string $pluralLabel = 'Colors';
-
-    protected static ?string $navigationGroup = 'Dogs Management';
-
-    protected static ?string $navigationLabel = 'Colors';
+    public static function getModelLabel(): string
+    {
+        return __('Color');
+    }
+    public static function getPluralModelLabel(): string
+    {
+        return __('Colors');
+    }
+    public static function getNavigationGroup(): string
+    {
+        return __('Dogs Management');
+    }
+    public static function getNavigationLabel(): string
+    {
+        return __('Colors');
+    }
 
     protected static ?int $navigationSort = 3;
 

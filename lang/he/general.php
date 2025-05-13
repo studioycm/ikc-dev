@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'Gender' => 'מין',
+    'gender' => 'מין',
 ];

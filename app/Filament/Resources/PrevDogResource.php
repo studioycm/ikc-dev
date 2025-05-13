@@ -58,20 +58,33 @@ class PrevDogResource extends Resource
 {
     protected static ?string $model = PrevDog::class;
 
-    protected static ?string $label = 'Dog';
-    protected static ?string $pluralLabel = 'Dogs';
-
-    protected static ?string $navigationGroup = 'Dogs Management';
-
-    protected static ?string $navigationLabel = 'Dogs';
-
     protected static ?int $navigationSort = 1;
-
+    
     protected static ?string $navigationIcon = 'fas-dog';
-
+    
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Dog');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Dogs');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return __('Dogs Management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Dogs');
     }
 
     public static function form(Form $form): Form
@@ -621,7 +634,6 @@ class PrevDogResource extends Resource
                 //         blank: fn (Builder $query) => $query,
                 //     ),    
                 
-                // create gender ("M","F") filter with toggle buttons 
                 Filter::make('gender')
                     ->form([
                         Forms\Components\ToggleButtons::make('gender')
@@ -654,7 +666,6 @@ class PrevDogResource extends Resource
                             END = ?
                         ", [$data['gender']]);
                     }),
-                // filter by "sagir_prefix" like the "gender" filter
                 Filter::make('sagir_prefix')
                     ->form([
                         Forms\Components\ToggleButtons::make('sagir_prefix')
@@ -694,53 +705,58 @@ class PrevDogResource extends Resource
                             END = ?
                         ", [$data['sagir_prefix']]);
                     }),
-                // Relationship filters for Breed, Color, and Hair
                 Tables\Filters\SelectFilter::make('breed')
                     ->label('Breed')
                     ->relationship('breed', 'BreedName')
                     ->multiple()
-                    ->searchable(),
+                    ->searchable(['BreedName', 'BreedNameEN'])
+                    ->getOptionLabelFromRecordUsing(fn (PrevBreed $record): string => $record->BreedName . ' | ' . $record->BreedNameEN),
                 Tables\Filters\SelectFilter::make('color')
                     ->label('Color')
                     ->relationship('color', 'ColorNameHE')
                     ->multiple()
-                    ->searchable(),
+                    ->searchable(['ColorNameHE', 'ColorNameEN'])
+                    ->getOptionLabelFromRecordUsing(fn (PrevColor $record): string => $record->ColorNameHE . ' | ' . $record->ColorNameEN),
                 Tables\Filters\SelectFilter::make('hair')
                     ->label('Hair')
                     ->relationship('hair', 'HairNameHE')
                     ->multiple()
-                    ->searchable(),
+                    ->searchable(['HairNameHE', 'HairNameEN'])
+                    ->getOptionLabelFromRecordUsing(fn (PrevHair $record): string => $record->HairNameHE . ' | ' . $record->HairNameEN),
                 // Combined filter for Father (searching by Hebrew Name, English Name or SagirID)
                 Filter::make('father')
-                    ->label('Father')
                     ->query(function (Builder $query, array $data) {
-                        if (! empty($data['search'])) {
+                        if (! empty($data['father_search'])) {
                             $query->whereHas('father', function (Builder $query) use ($data) {
-                                $query->where('Heb_Name', 'like', "%{$data['search']}%")
-                                    ->orWhere('Eng_Name', 'like', "%{$data['search']}%")
-                                    ->orWhere('SagirID', 'like', "%{$data['search']}%");
+                                $query->where('Heb_Name', 'like', "%{$data['father_search']}%")
+                                    ->orWhere('Eng_Name', 'like', "%{$data['father_search']}%")
+                                    ->orWhere('SagirID', 'like', "%{$data['father_search']}%");
                             });
                         }
                     })
                     ->form([
-                        Forms\Components\TextInput::make('search')
-                            ->label('Father Hebrew, English Name or Sagir'),
+                        Forms\Components\TextInput::make('father_search')
+                            ->label('Father')
+                            ->hint('Name \ Sagir')
+                            ->helperText('Search by Hebrew\English Name or Sagir'),
                     ]),
                 // Combined filter for Mother (searching by Hebrew Name, English Name or SagirID)
                 Filter::make('mother')
                     ->label('Mother')
                     ->query(function (Builder $query, array $data) {
-                        if (! empty($data['search'])) {
+                        if (! empty($data['mother_search'])) {
                             $query->whereHas('mother', function (Builder $query) use ($data) {
-                                $query->where('Heb_Name', 'like', "%{$data['search']}%")
-                                    ->orWhere('Eng_Name', 'like', "%{$data['search']}%")
-                                    ->orWhere('SagirID', 'like', "%{$data['search']}%");
+                                $query->where('Heb_Name', 'like', "%{$data['mother_search']}%")
+                                    ->orWhere('Eng_Name', 'like', "%{$data['mother_search']}%")
+                                    ->orWhere('SagirID', 'like', "%{$data['mother_search']}%");
                             });
                         }
                     })
                     ->form([
-                        Forms\Components\TextInput::make('search')
-                            ->label('Mother Hebrew, English Name or Sagir'),
+                        Forms\Components\TextInput::make('mother_search')
+                            ->label('Mother')
+                            ->hint('Name \ Sagir')
+                            ->helperText('Search by Hebrew\English Name or Sagir'),
                     ]),
                 // create filters to select and search by "owners" (PrevUser many 2 many relationship) fields: full_name, phone, id - owners is a relationship, full_name is a custom accessor using: ["first_name", "last_name", "first_name_en", "last_name_en"] 
                 Filter::make('owners')
@@ -770,36 +786,36 @@ class PrevDogResource extends Resource
                         );
                     }),
                 // bulean filters for: IsMagPass, IsMagPass_2, not_relevant, red_pedigree 
-                Tables\Filters\TernaryFilter::make('red_pedigree')
-                    ->label('Red Pedigree')
-                    ->placeholder('All')
-                    ->trueLabel('Yes')
-                    ->falseLabel('No')
-                    ->queries(
-                        true: fn (Builder $query) => $query->where('red_pedigree', 1),
-                        false: fn (Builder $query) => $query->whereNot('red_pedigree', 1),
-                        blank: fn (Builder $query) => $query,
-                    ),
-                Tables\Filters\TernaryFilter::make('IsMagPass')
-                    ->label('MHG Pass')
-                    ->placeholder('All')
-                    ->trueLabel('Yes')
-                    ->falseLabel('No')
-                    ->queries(
-                        true: fn (Builder $query) => $query->where('IsMagPass', 1),
-                        false: fn (Builder $query) => $query->where('IsMagPass', 0),
-                        blank: fn (Builder $query) => $query,
-                    ),
-                Tables\Filters\TernaryFilter::make('IsMagPass_2')
-                    ->label('MHG 2nd Pass')
-                    ->placeholder('All')
-                    ->trueLabel('Yes')
-                    ->falseLabel('No')
-                    ->queries(
-                        true: fn (Builder $query) => $query->where('IsMagPass_2', 1),
-                        false: fn (Builder $query) => $query->where('IsMagPass_2', 0),
-                        blank: fn (Builder $query) => $query,
-                    ),
+                // Tables\Filters\TernaryFilter::make('red_pedigree')
+                //     ->label('Red Pedigree')
+                //     ->placeholder('All')
+                //     ->trueLabel('Yes')
+                //     ->falseLabel('No')
+                //     ->queries(
+                //         true: fn (Builder $query) => $query->where('red_pedigree', 1),
+                //         false: fn (Builder $query) => $query->whereNot('red_pedigree', 1),
+                //         blank: fn (Builder $query) => $query,
+                //     ),
+                // Tables\Filters\TernaryFilter::make('IsMagPass')
+                //     ->label('MHG Pass')
+                //     ->placeholder('All')
+                //     ->trueLabel('Yes')
+                //     ->falseLabel('No')
+                //     ->queries(
+                //         true: fn (Builder $query) => $query->where('IsMagPass', 1),
+                //         false: fn (Builder $query) => $query->where('IsMagPass', 0),
+                //         blank: fn (Builder $query) => $query,
+                //     ),
+                // Tables\Filters\TernaryFilter::make('IsMagPass_2')
+                //     ->label('MHG 2nd Pass')
+                //     ->placeholder('All')
+                //     ->trueLabel('Yes')
+                //     ->falseLabel('No')
+                //     ->queries(
+                //         true: fn (Builder $query) => $query->where('IsMagPass_2', 1),
+                //         false: fn (Builder $query) => $query->where('IsMagPass_2', 0),
+                //         blank: fn (Builder $query) => $query,
+                //     ),
                 // Date filters for RegDate, BirthDate, OwnershipDate
                 Filter::make('RegDate')
                     ->label('Regiestration')
@@ -839,7 +855,7 @@ class PrevDogResource extends Resource
                     }),
             
             ], layout: FiltersLayout::AboveContentCollapsible)
-            ->filtersFormColumns(5)
+            ->filtersFormColumns(3)
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
@@ -865,10 +881,10 @@ class PrevDogResource extends Resource
             ->schema([
                     Tabs::make('Dog Record')->tabs([
                         /***** 1. Overview *****/
-                        Tab::make('Overview')->schema([
+                        Tab::make('General')->schema([
                             InfolistGrid::make(4)->schema([
                                 TextEntry::make('SagirID')
-                                    ->label(__('dogs.Sagir'))
+                                    ->label(__('Sagir'))
                                     ->state(fn(PrevDog $record) => $record->sagir_prefix . ' - ' . $record->SagirID),
                                 TextEntry::make('full_name')->label('Full Name'),
                                 TextEntry::make('RegDate')->label('Registration Date'),
@@ -876,7 +892,7 @@ class PrevDogResource extends Resource
                             ]),
                             InfolistGrid::make(4)->schema([
                                 TextEntry::make('gender')
-                                    ->label(__('general.Gender'))
+                                    ->label(__('Gender'))
                                     ->state(fn(PrevDog $record): string => 
                                         $record->gender 
                                         . (!empty($record->Sex) 
@@ -888,16 +904,17 @@ class PrevDogResource extends Resource
                                 TextEntry::make('color.ColorNameHE')->label('Color'),
                                 TextEntry::make('hair.HairNameHE')->label('Hair'),
                             ]),
-                        ]),
+                        ])
+                        ->label(__('General')),
 
                         /***** 2. Ownership & Breeding *****/
                         Tab::make('Ownership & Breeding')->schema([
                             InfolistSection::make('Ownership')->schema([
                                 RepeatableEntry::make('owners')
                                     ->schema([
-                                        TextEntry::make('full_name')->label('Full Name'),
-                                        TextEntry::make('mobile_phone')->label('Phone'),
-                                        TextEntry::make('email')->label('Email'),
+                                        TextEntry::make('full_name')->label(__('Full Name')),
+                                        TextEntry::make('mobile_phone')->label(__('Phone')),
+                                        TextEntry::make('email')->label(__('Email')),
                                     ])
                                     ->grid(4),
                                 TextEntry::make('currentOwner.full_name')

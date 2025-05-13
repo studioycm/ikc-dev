@@ -24,12 +24,26 @@ class PrevBreedResource extends Resource
 {
     protected static ?string $model = PrevBreed::class;
 
-    protected static ?string $label = 'Breed';
-    protected static ?string $pluralLabel = 'Breeds';
 
-    protected static ?string $navigationGroup = 'Dogs Management';
+    public static function getModelLabel(): string
+    {
+        return __('Breed');
+    }
 
-    protected static ?string $navigationLabel = 'Breeds';
+    public static function getPluralModelLabel(): string
+    {
+        return __('Breeds');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return __('Dogs Management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Breeds');
+    }
 
     protected static ?int $navigationSort = 2;
 
