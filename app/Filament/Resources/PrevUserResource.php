@@ -44,25 +44,25 @@ class PrevUserResource extends Resource
     protected static ?string $slug = 'prev-users';
     protected static ?string $navigationIcon = 'fas-user';
     protected static ?int $navigationSort = 3;
-    protected static ?string $recordTitleAttribute = 'first_name';
+    // protected static ?string $recordTitleAttribute = 'first_name';
 
-    public static function getGlobalSearchResultTitle(Model $record): Htmlable | string
-    {
-        return $record->name;
-    }
+    // public static function getGlobalSearchResultTitle(Model $record): Htmlable | string
+    // {
+    //     return $record->name;
+    // }
 
-    public static function getGloballySearchableAttributes(): array
-    {
-        return ['first_name', 'last_name', 'first_name_en', 'last_name_en'];
-    }
+    // public static function getGloballySearchableAttributes(): array
+    // {
+    //     return ['first_name', 'last_name', 'first_name_en', 'last_name_en'];
+    // }
 
-    public static function getGlobalSearchResultDetails(Model $record): array
-    {
-        return [
-            'Email' => $record->Email,
-            'Phone' => $record->mobile_phone,
-        ];
-    }
+    // public static function getGlobalSearchResultDetails(Model $record): array
+    // {
+    //     return [
+    //         'Email' => $record->Email,
+    //         'Phone' => $record->mobile_phone,
+    //     ];
+    // }
 
     public static function getNavigationBadge(): ?string
     {

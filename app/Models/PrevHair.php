@@ -29,6 +29,7 @@ class PrevHair extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'DataID',
         'HairNameHE',
         'HairNameEN',
         'OldCode',

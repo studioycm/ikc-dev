@@ -125,7 +125,8 @@ class PrevDog extends Model
             ->using(PrevDogTitle::class)
             ->as('awarding')
             ->withPivot('AwardID', 'EventPlace', 'EventName', 'EventDate', 'ShowID', 'created_at', 'updated_at', 'deleted_at')
-            ->wherePivot('deleted_at', null);
+            ->wherePivot('deleted_at', null)
+            ->orderBy('EventDate', 'asc');
     } 
 
     // breedingManager using PrevUser model
