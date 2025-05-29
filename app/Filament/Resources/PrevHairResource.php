@@ -68,13 +68,16 @@ class PrevHairResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('DataID')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('ModificationDateTime')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('CreationDateTime')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('HairNameHE')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('HairNameEN')

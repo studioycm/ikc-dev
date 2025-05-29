@@ -54,6 +54,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
         ];
     }
 
+    
     /**
      * Checks if the user has access to the panel.
      *

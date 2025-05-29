@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\Filter;
 use Filament\Support\Colors\Color;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -88,39 +89,50 @@ class PrevBreedResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                return $query
+                    ->withCount(['dogs']);
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
                     ->sortable()
-                    ->searchable(),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('BreedName')
                     ->label('Hebrew Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('BreedNameEN')
                     ->label('English Name')
-                    ->searchable(),
-                    Tables\Columns\TextColumn::make('BreedCode')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('BreedCode')
                     ->label('Breed Code')
                     ->numeric()
-                    ->sortable(true)
-                    ->searchable(),
+                    ->sortable()
+                    ->searchable(isGlobal: false, isIndividual: true),
+                Tables\Columns\TextColumn::make('dogs_count')
+                    ->label(__('Dogs Count'))
+                    ->counts('dogs')
+                    ->numeric()
+                    ->sortable(['dogs_count'])
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('FCICODE')
                     ->label('FCI Code')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable(isGlobal: false, isIndividual: true),
                 Tables\Columns\TextColumn::make('fci_group')
                     ->label('FCI Group')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable(isGlobal: false, isIndividual: true),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->sortable()
-                    ->searchable(),
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('DataID')
                     ->label('Previous ID')
                     ->numeric()
                     ->sortable()
-                    ->searchable()
+                    ->searchable(isGlobal: false, isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('ModificationDateTime')
                     ->date()
@@ -134,21 +146,21 @@ class PrevBreedResource extends Resource
                     ->label('Previous GroupID')
                     ->numeric()
                     ->sortable()
-                    ->searchable()
+                    ->searchable(isGlobal: false, isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('UserManagerID')
                     ->label('User Manager ID')
                     ->description(fn (PrevBreed $record): string => $record->userManager->FullName ?? 'n/a')
                     ->numeric()
                     ->sortable()
-                    ->searchable()
+                    ->searchable(isGlobal: false, isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('ClubManagerID')
                     ->label('Club Manager ID')
                     ->description(fn (PrevBreed $record): string => $record->clubManager->FullName ?? 'n/a')
                     ->numeric()
                     ->sortable()
-                    ->searchable()
+                    ->searchable(isGlobal: false, isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -164,7 +176,32 @@ class PrevBreedResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Filter::make('trashed')
+                    ->form([
+                        Forms\Components\ToggleButtons::make('trashed')
+                            ->label(__('Trashed'))
+                            ->options([
+                                'not_deleted' => 'Not Deleted',
+                                'deleted'     => 'Deleted',
+                                'all'         => 'All',
+                            ])
+                            ->colors([
+                                'not_deleted' => 'success',
+                                'deleted'     => 'danger',
+                                'all'         => 'gray',
+                            ])
+                            ->default('not_deleted')
+                            ->grouped(),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (empty($data['trashed']) || $data['trashed'] === 'all') {
+                            return $query;
+                        }
+                        return match ($data['trashed']) {
+                            'deleted'     => $query->onlyTrashed(),
+                            'not_deleted' => $query->withoutTrashed(),
+                        };
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -183,12 +220,27 @@ class PrevBreedResource extends Resource
         ];
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListPrevBreeds::route('/'),
             'create' => Pages\CreatePrevBreed::route('/create'),
             'edit' => Pages\EditPrevBreed::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            PrevBreedResource\Widgets\BreedStats::class,
         ];
     }
 }

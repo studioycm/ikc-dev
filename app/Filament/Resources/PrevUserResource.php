@@ -6,7 +6,12 @@ use Filament\Forms;
 use Filament\Tables;
 use App\Models\PrevUser;
 use Filament\Forms\Form;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Split;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -226,41 +231,45 @@ class PrevUserResource extends Resource
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false),
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Name')
                     ->sortable(['last_name', 'first_name'])
                     ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en'],isIndividual: true, isGlobal: false)
-                    ->label('Name'),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('full_name')
+                    ->label('Full Name')
                     ->sortable(['last_name', 'first_name'])
                     ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en'],isIndividual: true, isGlobal: false)
-                    ->label('Full Name'),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('first_name')
-                    ->searchable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('last_name')
-                    ->searchable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('first_name_en')
-                    ->searchable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('last_name_en')
-                    ->searchable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('email')
-                    ->searchable()
+                    ->searchable(isGlobal: false, isIndividual: true)
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('otp')
-                    ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('mobile_phone')
-                    ->searchable(isIndividual: true, isGlobal: false),
+                    ->sortable()
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('phone')
-                    ->searchable(isIndividual: true, isGlobal: false),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('role_id')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('birth_date')
                     ->date()
                     ->sortable()
@@ -288,6 +297,7 @@ class PrevUserResource extends Resource
                 Tables\Columns\TextColumn::make('country_id')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
+                    ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('country_code')
                     ->searchable(isIndividual: true, isGlobal: false)
@@ -313,30 +323,50 @@ class PrevUserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('is_superadmin')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('status')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('record_type')
-                    ->searchable(isIndividual: true, isGlobal: false),
-                Tables\Columns\TextColumn::make('migration_status'),
+                    ->label(__('User Type'))
+                    ->badge()
+                    ->color(fn (PrevUser $record): string => match ($record->record_type) {
+                        'Native'  => 'success',
+                        'Owners'  => 'warning',
+                        'Members' => 'blue',
+                        default   => 'gray',
+                    })
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('migration_status')
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('data_id')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('owner_code')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('info_id')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('owner_email')
-                    ->searchable(isIndividual: true, isGlobal: false),
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('sagir_owner_id')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('is_current_owner')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('order_id')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
@@ -366,7 +396,8 @@ class PrevUserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('member_status')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('special_key')
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -387,7 +418,8 @@ class PrevUserResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('is_judge')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('city_id')
                     ->numeric()
                     ->sortable()
@@ -399,7 +431,7 @@ class PrevUserResource extends Resource
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\ImageColumn::make('image')
-                ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('invoice_id')
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -421,10 +453,12 @@ class PrevUserResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('approved_terms')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('approved_date')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('ClubManagerID')
                     ->numeric()
                     ->sortable()
@@ -450,8 +484,103 @@ class PrevUserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
-            ])
+                Filter::make('trashed')
+                    ->form([
+                        Forms\Components\ToggleButtons::make('trashed')
+                            ->label(__('Deleted Status'))
+                            ->options([
+                                'not_deleted' => __('Not Deleted'),
+                                'deleted'     => __('Deleted'),
+                                'all'         => __('All'),
+                            ])
+                            ->colors([
+                                'not_deleted' => 'success',
+                                'deleted'     => 'danger',
+                                'all'         => 'gray',
+                            ])
+                            ->default('not_deleted')
+                            ->grouped(),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (empty($data['trashed']) || $data['trashed'] === 'all') {
+                            return $query;
+                        }
+                        return match ($data['trashed']) {
+                            'deleted'     => $query->onlyTrashed(),
+                            'not_deleted' => $query->withoutTrashed(),
+                        };
+                    }),
+                Filter::make('record_type')
+                    ->form([
+                        Forms\Components\ToggleButtons::make('record_type')
+                            ->label(__('User Type'))
+                            ->options([
+                                'all' => __('All'),
+                                'Native'  => 'Native',
+                                'Owners'  => __('Owners'),
+                                'Members' => __('Members'),
+                                'without' => __('-without-'),
+                            ])
+                            ->colors([
+                                'all' => 'gray',
+                                'Native'  => 'success',
+                                'Owners'  => 'warning',
+                                'Members' => 'danger',
+                                'without' => 'gray',
+                            ])
+                            ->default('all')
+                            ->grouped(),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (empty($data['record_type']) || $data['record_type'] === 'all') {
+                            return $query;
+                        }
+                        return match ($data['record_type']) {
+                            'all' => $query,
+                            'Native'  => $query->where('record_type', 'Native'),
+                            'Owners'  => $query->where('record_type', 'Owners'),
+                            'Members' => $query->where('record_type', 'Members'),
+                            'without' => $query->whereNull('record_type'),
+                        };
+                    }),
+                    Filter::make('created_at')
+                        ->form([
+                            Grid::make()
+                                ->columns(2)
+                                ->schema([
+                                    Forms\Components\DatePicker::make('created_at_from')
+                                        ->label(__('From Date')),
+                                    Forms\Components\DatePicker::make('created_at_to')
+                                        ->label(__('To Date')),
+                                ]),
+                        ])
+                        ->query(function (Builder $query, array $data) {
+                            if (!empty($data['created_at_from'])) {
+                                $query->where('created_at', '>=', $data['created_at_from']);
+                            }
+                            if (!empty($data['created_at_to'])) {
+                                $query->where('created_at', '<=', $data['created_at_to']);
+                            }
+                            return $query;
+                        }),
+                        Filter::make('updated_at')
+                        ->form([
+                            Forms\Components\DatePicker::make('updated_at_from')
+                                ->label(__('Updated From')),
+                            Forms\Components\DatePicker::make('updated_at_to')
+                                ->label(__('Updated To')),
+                        ])
+                        ->query(function (Builder $query, array $data) {
+                            if (!empty($data['updated_at_from'])) {
+                                $query->where('updated_at', '>=', $data['updated_at_from']);
+                            }
+                            if (!empty($data['updated_at_to'])) {
+                                $query->where('updated_at', '<=', $data['updated_at_to']);
+                            }
+                            return $query;
+                        }),
+            ], layout: FiltersLayout::AboveContentCollapsible)
+            ->filtersFormColumns(4)
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
@@ -459,7 +588,14 @@ class PrevUserResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->paginated([10, 25, 50, 100, 200, 250, 300])
+            ->defaultPaginationPageOption(25)
+            ->defaultSort('first_name', 'asc')
+            ->searchOnBlur()
+            ->striped()
+            ->deferLoading()
+            ->recordUrl(false);
     }
 
     public static function getRelations(): array
@@ -469,12 +605,27 @@ class PrevUserResource extends Resource
         ];
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListPrevUsers::route('/'),
             'create' => Pages\CreatePrevUser::route('/create'),
             'edit' => Pages\EditPrevUser::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            PrevUserResource\Widgets\UserStats::class,
         ];
     }
 }

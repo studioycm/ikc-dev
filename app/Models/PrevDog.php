@@ -54,9 +54,9 @@ class PrevDog extends Model
         'Heb_Name' => 'string',
         'Eng_Name' => 'string',
         'GenderID' => 'integer',
-        // 'ColorID' => 'integer',
-        // 'HairID' => 'integer',
-        // 'RaceID' => 'integer',
+        'ColorID' => 'integer',
+        'HairID' => 'integer',
+        'RaceID' => 'integer',
     ];
 
     // create maping for sagir_prefix (1"ISR", 2"IMP", 3"APX", 4"EXT", 5"NUL")
@@ -140,11 +140,11 @@ class PrevDog extends Model
         return $this->belongsTo(PrevUser::class, 'CurrentOwnerId', 'owner_code');
     }
 
-    // public function duplicates(): HasMany
-    // {
-    //     return $this->hasMany(self::class, 'SagirID', 'SagirID')
-    //     ->withTrashed();
-    // }
+    public function duplicates(): HasMany
+    {
+        return $this->hasMany(self::class, 'SagirID', 'SagirID')
+        ->withTrashed();
+    }
 
     protected $appends = ['full_name', 'sagir_prefix', 'prefixed_sagir', 'gender'];
 
