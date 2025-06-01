@@ -10,6 +10,7 @@
     "User Email": "דוא\"ל משתמש",
     "User Type": "סוג משתמש",
     "Users Management": "ניהול משתמשים",
+    "Authorisation Management": "ניהול הרשאות",
     "People": "אנשים",
     "People Management": "ניהול אנשים",
     "Owners": "בעלים",
@@ -51,7 +52,13 @@
     "Updated at": "עודכן",
     "Deleted at": "נמחק",
     "Create Date": "תאריך יצירה",
-    "Modify Date": "תאריך עדכון",
+    "Modify Date": "תאריך שינוי",
+    "Updated Dates": "טווח תאריכי עדכון",
+    "Created Dates": "טווח תאריכי יצירה",
+    "Created From": "נוצר: החל מ-",
+    "Created To": "נוצר: עד -",
+    "Updated From": "עודכן: החל מ-",
+    "Updated To": "עודכן: עד -",
     "Gender": "מגדר",
     "Name": "שם",
     "First Name": "שם פרטי",
@@ -180,5 +187,9 @@
     "Record Types": "סוגי רשומות",
     "Date": "תאריך",
     "From Date": "מתאריך",
-    "To Date": "אל תאריך"
+    "To Date": "אל תאריך",
+    "Duplicates Count": "כמות כפילויות",
+    "Duplicates": "כפילויות",
+    "Duplicate": "כפילות",
+    "Other Duplicate IDs": "כפילויות"
 }

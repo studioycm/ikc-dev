@@ -120,14 +120,17 @@ class PrevBreedResource extends Resource
                 Tables\Columns\TextColumn::make('FCICODE')
                     ->label('FCI Code')
                     ->sortable()
-                    ->searchable(isGlobal: false, isIndividual: true),
+                    ->searchable(isGlobal: false, isIndividual: true)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('fci_group')
                     ->label('FCI Group')
                     ->sortable()
-                    ->searchable(isGlobal: false, isIndividual: true),
+                    ->searchable(isGlobal: false, isIndividual: true)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('DataID')
                     ->label('Previous ID')
                     ->numeric()

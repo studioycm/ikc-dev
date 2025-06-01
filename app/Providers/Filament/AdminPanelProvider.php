@@ -114,6 +114,9 @@ class AdminPanelProvider extends PanelProvider
                     ->label(fn (): string => __('Dogs Management'))
                     ->icon('fas-dog'),
                 NavigationGroup::make()
+                    ->label(fn (): string => __('Owners Management'))
+                    ->icon('fas-user'),
+                NavigationGroup::make()
                     ->label(fn (): string => __('Shows Management'))
                     ->icon('fas-trophy'),
                 NavigationGroup::make()
@@ -137,26 +140,29 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label(fn (): string => __('Reports Management'))
                     ->icon('heroicon-o-presentation-chart-line'),
+                NavigationGroup::make()
+                    ->label(fn (): string => __('Authorisation Management'))
+                    ->icon('fas-shield-dog'),
             ])
             ->navigationItems([                
                 NavigationItem::make('shows')
                     ->label(fn (): string => __('Shows'))
                     ->url(fn (): string => Pages\Dashboard::getUrl())
-                    ->icon('heroicon-o-presentation-chart-line')
+                    ->icon('fas-scale-balanced')
                     ->group(fn (): string => __('Shows Management'))
                     ->sort(5),
 
                 NavigationItem::make('Breedings')
                     ->label(fn (): string => __('Breedings'))
                     ->url(fn (): string => Pages\Dashboard::getUrl())
-                    ->icon('heroicon-o-heart')
+                    ->icon('fas-seedling')
                     ->group(fn (): string => __('Breedings Management'))
                     ->sort(40),
 
                 NavigationItem::make('Judges')
                     ->label(fn (): string => __('Judges'))
                     ->url(fn (): string => Pages\Dashboard::getUrl())
-                    ->icon('heroicon-o-user-group')
+                    ->icon('fas-gavel')
                     ->group(fn (): string => __('Shows Management'))
                     ->sort(50),
 
@@ -208,6 +214,7 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-presentation-chart-line')
                     ->group(fn (): string => __('Reports Management'))
                     ->sort(130),
-            ]);
+            ])
+            ->theme(asset('css/filament/admin/theme.css'));
     }
 }

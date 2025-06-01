@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind variants;
+@import '../../../../vendor/filament/filament/resources/css/base.css';
+
+@config 'tailwind.config.js';
+
+
+.fi-sidebar-nav-groups {
+    @apply gap-y-2;
+}
+
+.fi-wi-stats-overview-stat {
+    @apply px-6 py-2;
+}

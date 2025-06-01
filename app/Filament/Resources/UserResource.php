@@ -36,7 +36,7 @@ class UserResource extends Resource
 
     public static function getNavigationGroup(): string
     {
-        return __('Users Management');
+        return __('Authorisation Management');
     }
 
     public static function getNavigationLabel(): string
@@ -63,7 +63,9 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required(),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
+                Forms\Components\DateTimePicker::make('email_verified_at')
+                    ->native(false)
+                    ->displayFormat('d/m/Y H:i'),
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->revealable()
@@ -88,7 +90,7 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->icon('heroicon-o-envelope')
-                    ->iconColor('primary')
+                    ->iconColor('warning')
                     ->sortable()
                     ->searchable()
                     ->copyable()
@@ -102,7 +104,10 @@ class UserResource extends Resource
                     ->label('Role')
                     ->badge()
                     ->formatStateUsing(fn ($state): string => Str::headline($state))
-                    ->colors(['primary'])
+                    ->color(fn (string $state): string => match ($state) {
+                            'super_admin' => 'success',
+                            'panel_user' => 'warning',
+                        })
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')

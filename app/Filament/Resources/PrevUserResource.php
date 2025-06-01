@@ -6,9 +6,6 @@ use Filament\Forms;
 use Filament\Tables;
 use App\Models\PrevUser;
 use Filament\Forms\Form;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Split;
-use Filament\Forms\Components\Section;
 use Filament\Tables\Table;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Enums\FiltersLayout;
@@ -362,6 +359,7 @@ class PrevUserResource extends Resource
                 Tables\Columns\TextColumn::make('sagir_owner_id')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
+                    ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('is_current_owner')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
@@ -545,13 +543,25 @@ class PrevUserResource extends Resource
                     }),
                     Filter::make('created_at')
                         ->form([
-                            Grid::make()
+                            Forms\Components\Section::make(__('Created Dates'))
                                 ->columns(2)
                                 ->schema([
                                     Forms\Components\DatePicker::make('created_at_from')
-                                        ->label(__('From Date')),
+                                        ->label(__('Created From'))
+                                        ->native(true)
+                                        ->format('d/m/Y')
+                                        ->displayFormat('d/m/Y')
+                                        ->locale('he')
+                                        ->weekStartsOnSunday()
+                                        ->closeOnDateSelection(),
                                     Forms\Components\DatePicker::make('created_at_to')
-                                        ->label(__('To Date')),
+                                        ->label(__('Created To'))
+                                        ->native(false)
+                                        ->format('d/m/Y')
+                                        ->displayFormat('d/m/Y')
+                                        ->locale('he')
+                                        ->weekStartsOnSunday()
+                                        ->closeOnDateSelection(),
                                 ]),
                         ])
                         ->query(function (Builder $query, array $data) {
@@ -565,10 +575,14 @@ class PrevUserResource extends Resource
                         }),
                         Filter::make('updated_at')
                         ->form([
-                            Forms\Components\DatePicker::make('updated_at_from')
-                                ->label(__('Updated From')),
-                            Forms\Components\DatePicker::make('updated_at_to')
-                                ->label(__('Updated To')),
+                            Forms\Components\Section::make(__('Updated Dates'))
+                                ->columns(2)
+                                ->schema([
+                                    Forms\Components\DatePicker::make('updated_at_from')
+                                        ->label(__('Updated From')),
+                                    Forms\Components\DatePicker::make('updated_at_to')
+                                        ->label(__('Updated To')),
+                                ]),
                         ])
                         ->query(function (Builder $query, array $data) {
                             if (!empty($data['updated_at_from'])) {

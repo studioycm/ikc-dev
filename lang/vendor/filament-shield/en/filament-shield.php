@@ -34,7 +34,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'nav.group' => 'Users Management',
+    'nav.group' => 'Authorisation Management',
     'nav.role.label' => 'Roles',
     'nav.role.icon' => 'heroicon-o-shield-check',
     'resource.label.role' => 'Role',

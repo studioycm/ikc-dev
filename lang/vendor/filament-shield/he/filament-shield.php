@@ -7,12 +7,12 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'column.name' => 'Name',
-    'column.guard_name' => 'Guard Name',
-    'column.team' => 'Team',
-    'column.roles' => 'Roles',
-    'column.permissions' => 'Permissions',
-    'column.updated_at' => 'Updated At',
+    'column.name' => 'שם',
+    'column.guard_name' => 'מגן',
+    'column.team' => 'צוות',
+    'column.roles' => 'תפקידים',
+    'column.permissions' => 'הרשאות',
+    'column.updated_at' => 'עודכן ב',
 
     /*
     |--------------------------------------------------------------------------
@@ -20,13 +20,13 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'field.name' => 'Name',
-    'field.guard_name' => 'Guard Name',
-    'field.permissions' => 'Permissions',
-    'field.team' => 'Team',
-    'field.team.placeholder' => 'Select a team ...',
-    'field.select_all.name' => 'Select All',
-    'field.select_all.message' => 'Enables/Disables all Permissions for this role',
+    'field.name' => 'שם',
+    'field.guard_name' => 'שם המגן',
+    'field.permissions' => 'הרשאות',
+    'field.team' => 'צוות',
+    'field.team.placeholder' => 'בחר צוות ...',
+    'field.select_all.name' => 'בחר הכל',
+    'field.select_all.message' => 'מאפשר/מבטל את כל ההרשאות עבור תפקיד זה',
 
     /*
     |--------------------------------------------------------------------------
@@ -34,7 +34,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'nav.group' => 'ניהול משתמשים',
+    'nav.group' => 'ניהול הרשאות',
     'nav.role.label' => 'תפקידים',
     'nav.role.icon' => 'heroicon-o-shield-check',
     'resource.label.role' => 'תפקיד',
@@ -46,11 +46,11 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'section' => 'Entities',
-    'resources' => 'Resources',
-    'widgets' => 'Widgets',
-    'pages' => 'Pages',
-    'custom' => 'Custom Permissions',
+    'section' => 'יישויות',
+    'resources' => 'משאבים',
+    'widgets' => 'וידג\'טים',
+    'pages' => 'דפים',
+    'custom' => 'הרשאות מותאמות',
 
     /*
     |--------------------------------------------------------------------------
@@ -58,7 +58,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'forbidden' => 'You do not have permission to access',
+    'forbidden' => 'גישה אסורה',
 
     /*
     |--------------------------------------------------------------------------
@@ -67,17 +67,17 @@ return [
     */
 
     'resource_permission_prefixes_labels' => [
-        'view' => 'View',
-        'view_any' => 'View Any',
-        'create' => 'Create',
-        'update' => 'Update',
-        'delete' => 'Delete',
-        'delete_any' => 'Delete Any',
-        'force_delete' => 'Force Delete',
-        'force_delete_any' => 'Force Delete Any',
-        'restore' => 'Restore',
-        'reorder' => 'Reorder',
-        'restore_any' => 'Restore Any',
-        'replicate' => 'Replicate',
+        'view' => 'צפייה',
+        'view_any' => 'צפייה בכל',
+        'create' => 'יצירה',
+        'update' => 'עדכון',
+        'delete' => 'מחיקה',
+        'delete_any' => 'מחיקה של כל',
+        'force_delete' => 'מחיקה כפויה',
+        'force_delete_any' => 'מחיקה כפויה של כל',
+        'restore' => 'שחזור',
+        'reorder' => 'סידור מחדש',
+        'restore_any' => 'שחזור של כל',
+        'replicate' => 'שכפול',
     ],
 ];

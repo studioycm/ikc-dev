@@ -32,6 +32,7 @@ use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint\Oper
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use Filament\Support\Enums\FontWeight;
+use Illuminate\Support\HtmlString;
 use Filament\Tables\Enums\FiltersLayout;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -230,15 +231,24 @@ class PrevDogResource extends Resource
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('ModificationDateTime')
-                    ->label(__('Modification Date'))
-                    ->dateTime()
-                    ->sortable()
+                Tables\Columns\TextColumn::make('duplicates_count')
+                    ->label(__('Duplicates Count'))
+                    ->numeric()
+                    ->counts('duplicates')
+                    ->sortable(['duplicates_count'])
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('CreationDateTime')
-                    ->label(__('Creation Date'))
-                    ->dateTime()
-                    ->sortable()
+                Tables\Columns\TextColumn::make('duplicates')
+                    ->label(__('Other Duplicate IDs'))
+                    ->formatStateUsing(function (PrevDog $record): HtmlString {
+                        // format the related duplicates so each of the duplicates array items will be a link to the route of PrevDogResource view page using the id as the parameter
+                        $duplicatesLinks = $record->duplicates->pluck('id')->map(fn ($id) =>
+                            '<a href="' . route('filament.admin.resources.prev-dogs.view', ['record' => $id]) . '" target="_blank">' . $id . '</a>'
+                        )->implode(', ');
+                        return new HtmlString($duplicatesLinks);
+                    })
+                    ->wrap()
+                    ->words(5)
+                    // ->getStateUsing(fn (PrevDog $record): string =>$record->duplicates->pluck('id')->implode(', '))
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('prefixed_sagir')
                     ->label(__('Sagir'))
@@ -300,7 +310,7 @@ class PrevDogResource extends Resource
                 Tables\Columns\TextColumn::make('titles.name')
                     ->label(__('Titles'))
                     ->listWithLineBreaks() 
-                    ->limitList(3)
+                    ->limitList(1)
                     ->tooltip(fn (Tables\Columns\TextColumn $column): ?string => 
                         (($state = $column->getState()) === null) ? null : 
                         (is_array($state)
@@ -379,24 +389,24 @@ class PrevDogResource extends Resource
                         return $ownershipDetails;
                     })  
                     ->description(fn (PrevDog $record): string => $record->CurrentOwnerId ? (string)((int)$record->CurrentOwnerId) : 'n/a')
-                    ->sortable(['OwnershipDate'])
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->sortable(['CurrentOwnerId'])
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('Breeder_Name')
                     ->label(__('Breeder Name - depracted'))
                     ->wrapHeader()
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('Foreign_Breeder_name')
                     ->label(__('Foreign Breeder'))
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('Breeding_ManagerID')
                     ->label(__('Breeding Manager ID - check'))
                     ->wrapHeader()
                     ->description(fn (PrevDog $record): string => $record->breedingManager->full_name ?? 'n/a')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('Status')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -451,7 +461,7 @@ class PrevDogResource extends Resource
                     ->wrapHeader()
                     ->separator(',')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),                
+                    ->toggleable(isToggledHiddenByDefault: true),                
                 Tables\Columns\TextColumn::make('GroupID')
                     ->label(__('Group ID'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
@@ -464,12 +474,12 @@ class PrevDogResource extends Resource
                 Tables\Columns\TextColumn::make('pedigree_color')
                     ->label(__('Pedigree Color'))
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('red_pedigree')
                     ->label(__('Red Pedigree'))
                     ->boolean()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('PedigreeNotes')
                     ->label(__('Pedigree Notes'))
                     ->limit(200)
@@ -572,17 +582,14 @@ class PrevDogResource extends Resource
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('duplicates_count')
-                    ->label(__('Duplicates'))
-                    ->numeric()
-                    ->sortable(['duplicates_count'])
+                Tables\Columns\TextColumn::make('ModificationDateTime')
+                    ->label(__('Modification Date'))
+                    ->dateTime()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('duplicates_list')
-                    ->label(__('Other Duplicate IDs'))
-                    ->getStateUsing(function (PrevDog $record): string {
-                        // Lists the IDs from the duplicates collection
-                        return $record->duplicates->pluck('id')->implode(', ');
-                    })
+                Tables\Columns\TextColumn::make('CreationDateTime')
+                    ->label(__('Creation Date'))
+                    ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
