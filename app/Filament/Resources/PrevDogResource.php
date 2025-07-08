@@ -883,7 +883,7 @@ class PrevDogResource extends Resource
             ->deferLoading()
             // ->recordUrl(fn (PrevDog $record): string => route('filament.admin.resources.prev-dogs.view', $record), shouldOpenInNewTab: false,);
             ->recordUrl(false)
-            ->recordClasses(fn (Model $record) => $record->trashed() ? 'bg-danger-300 dark:bg-danger-600' : null);
+            ->recordClasses(fn (Model $record) => $record->trashed() ? 'fi-ta-row-deleted' : null);
     }
 
     public static function infolist(Infolist $infolist): Infolist
@@ -897,9 +897,14 @@ class PrevDogResource extends Resource
                                 TextEntry::make('SagirID')
                                     ->label(__('Sagir'))
                                     ->state(fn(PrevDog $record) => $record->sagir_prefix . ' - ' . $record->SagirID),
-                                TextEntry::make('full_name')->label(__('Full Name')),
-                                TextEntry::make('RegDate')->label(__('Registration Date')),
-                                TextEntry::make('BirthDate')->label(__('Birth Date')),
+                                TextEntry::make('full_name')
+                                    ->label(__('Full Name')),
+                                TextEntry::make('RegDate')
+                                    ->label(__('Registration Date'))
+                                    ->date(),
+                                TextEntry::make('BirthDate')
+                                    ->label(__('Birth Date'))
+                                    ->date(),
                             ]),
                             InfolistGrid::make(4)->schema([
                                 TextEntry::make('gender')
@@ -975,21 +980,22 @@ class PrevDogResource extends Resource
                                             ->weight(FontWeight::Bold)
                                             ->color(Color::Blue)
                                             ->columnSpan(2),
-                                        TextEntry::make('awarding.EventName')
+                                        TextEntry::make('awarding.EventPlace')
                                             ->hiddenLabel()
+                                            //->badge()
+                                            ->color('warning')
+                                            ->size(TextEntry\TextEntrySize::Medium)
                                             ->columnSpan(3),
                                         TextEntry::make('awarding.EventDate')
                                             ->hiddenLabel()
                                             ->date()
-                                            ->badge()
-                                            ->color(Color::hex('#ffffff'))
                                             ->columnSpan(2),
-                                        TextEntry::make('awarding.EventPlace')
+                                        TextEntry::make('awarding.EventName')
                                             ->hiddenLabel()
                                             ->columnSpan(3),
                                     ])
                                     ->columns(5)
-                                    ->grid(4),
+                                    ->grid(5),
                                 TextEntry::make('ShowsCount')->label(__('Shows Count')),
                             ])
                             ->label(__('Titles & Shows')),
@@ -1035,17 +1041,27 @@ class PrevDogResource extends Resource
                         
                         /***** 7. Metadata *****/
                         Tab::make('Metadata')->schema([
-                            InfolistGrid::make(4)->schema([
+                            InfolistGrid::make(5)->schema([
+                                TextEntry::make('id')->label(__('ID')),
                                 IconEntry::make('not_relevant')->label(__('Not Relevant')),
                                 IconEntry::make('encoding')->label(__('Encoding Issue')),
                             ]),
-                            InfolistGrid::make(3)->schema([
-                                TextEntry::make('id')->label(__('ID')),
-                                TextEntry::make('CreationDateTime')->label(__('Created On')),
-                                TextEntry::make('ModificationDateTime')->label(__('Modified On')),
-                                TextEntry::make('created_at')->label(__('Created At')),
-                                TextEntry::make('updated_at')->label(__('Updated At')),
-                                TextEntry::make('deleted_at')->label(__('Deleted At')),
+                            InfolistGrid::make(5)->schema([
+                                TextEntry::make('CreationDateTime')
+                                    ->label(__('Created On'))
+                                    ->date(),
+                                TextEntry::make('ModificationDateTime')
+                                    ->label(__('Modified On'))
+                                    ->date(),
+                                TextEntry::make('created_at')
+                                    ->label(__('Created At'))
+                                    ->date(),
+                                TextEntry::make('updated_at')
+                                    ->label(__('Updated At'))
+                                    ->date(),
+                                TextEntry::make('deleted_at')
+                                    ->label(__('Deleted At'))
+                                    ->date(),
                             ]),
                         ]),
                     ])

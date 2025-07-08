@@ -14,3 +14,7 @@
 .fi-wi-stats-overview-stat {
     @apply px-6 py-2;
 }
+
+.fi-ta-row.fi-ta-row-deleted {
+    @apply bg-red-100 dark:bg-red-900;
+}

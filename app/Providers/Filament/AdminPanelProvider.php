@@ -215,6 +215,7 @@ class AdminPanelProvider extends PanelProvider
                     ->group(fn (): string => __('Reports Management'))
                     ->sort(130),
             ])
-            ->theme(asset('css/filament/admin/theme.css'));
+            ->theme(asset('css/filament/admin/theme.css'))
+            ->LazyLoadedDatabaseNotifications();
     }
 }

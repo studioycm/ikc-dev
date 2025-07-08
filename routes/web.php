@@ -7,3 +7,5 @@ Route::get('/', function () {
     return redirect('/admin');
 });
 
+Route::get('/login', fn() => redirect(route('filament.admin.auth.login'))
+)->name('login');
