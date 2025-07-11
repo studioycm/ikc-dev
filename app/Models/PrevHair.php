@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class PrevHair extends Model
 {
     use SoftDeletes;
-    
+
     /**
      * The connection name for the model.
      *
@@ -34,5 +34,9 @@ class PrevHair extends Model
         'HairNameEN',
         'OldCode',
         'Remark',
+    ];
+
+    protected $casts = [
+        'OldCode' => 'integer',
     ];
 }

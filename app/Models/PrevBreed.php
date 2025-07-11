@@ -43,6 +43,10 @@ class PrevBreed extends Model
         'GroupID',
     ];
 
+    protected $casts = [
+        'BreedCode' => 'integer',
+    ];
+
     // relationships with PrevUser model for UserManagerID and ClubManagerID
     public function userManager(): BelongsTo
     {
@@ -52,7 +56,7 @@ class PrevBreed extends Model
     {
         return $this->belongsTo(PrevUser::class, 'ClubManagerID', 'id');
     }
-    // dogs model (PrevDog) reverse relationship without soft deletes 
+    // dogs model (PrevDog) reverse relationship without soft deletes
     public function dogs(): HasMany
     {
         return $this->hasMany(PrevDog::class, 'RaceID', 'BreedCode');

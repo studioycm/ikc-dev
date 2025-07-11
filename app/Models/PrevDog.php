@@ -2,13 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\PrevHair;
-use App\Models\PrevBreed;
-use App\Models\PrevColor;
-use App\Models\PrevUser;
-use App\Models\PrevUserDog;
-use App\Models\PrevTitle;
-use App\Models\PrevDogTitle;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -17,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class PrevDog extends Model 
+class PrevDog extends Model
 
 {
     use SoftDeletes;
@@ -76,10 +69,10 @@ class PrevDog extends Model
         'נ' => 'f',
     ];
 
-    
+
 
     // eloquent relationships with PrevBreed and PrevColor
-    public function breed(): HasOne 
+    public function breed(): HasOne
     {
         return $this->hasOne(PrevBreed::class, 'BreedCode', 'RaceID');
     }
@@ -87,13 +80,13 @@ class PrevDog extends Model
     {
         return $this->hasOne(PrevColor::class, 'OldCode', 'ColorID');
     }
-    
+
     public function hair(): HasOne
     {
         return $this->hasOne(PrevHair::class, 'OldCode', 'HairID');
     }
     // eloquent relationships with PrevDog
-    
+
     public function father(): HasOne
     {
         return $this->hasOne(self::class, 'SagirID', 'FatherSAGIR');
@@ -127,7 +120,7 @@ class PrevDog extends Model
             ->withPivot('AwardID', 'EventPlace', 'EventName', 'EventDate', 'ShowID', 'created_at', 'updated_at', 'deleted_at')
             ->wherePivot('deleted_at', null)
             ->orderBy('EventDate', 'desc');
-    } 
+    }
 
     // breedingManager using PrevUser model
     public function breedingManager(): BelongsTo
@@ -140,11 +133,11 @@ class PrevDog extends Model
         return $this->belongsTo(PrevUser::class, 'CurrentOwnerId', 'owner_code');
     }
 
-    public function duplicates(): HasMany
-    {
-        return $this->hasMany(self::class, 'SagirID', 'SagirID')
-        ->withTrashed();
-    }
+//    public function duplicates(): HasMany
+//    {
+//        return $this->hasMany(self::class, 'SagirID', 'SagirID')
+//        ->withTrashed();
+//    }
 
     protected $appends = ['full_name', 'sagir_prefix', 'prefixed_sagir', 'gender'];
 
@@ -177,7 +170,7 @@ class PrevDog extends Model
                 self::SAGIR_PREFIX_MAP[$value] ?? 'NUL'
         );
     }
-    
+
     // create an attribute that concatnating the SagirID (an integer) with the "sagir_prefix" and "-" in between
     public function prefixedSagir(): Attribute
     {

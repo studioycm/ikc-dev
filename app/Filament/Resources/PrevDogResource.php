@@ -21,16 +21,16 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\QueryBuilder;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\QueryBuilder\Constraints\DateConstraint;
-use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
-use Filament\Tables\Filters\QueryBuilder\Constraints\NumberConstraint;
-use Filament\Tables\Filters\QueryBuilder\Constraints\BooleanConstraint;
-use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint;
-use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint\Operators\IsRelatedToOperator;
+//use Filament\Tables\Filters\QueryBuilder;
+//use Filament\Tables\Filters\SelectFilter;
+//use Filament\Tables\Filters\QueryBuilder\Constraints\DateConstraint;
+//use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
+//use Filament\Tables\Filters\QueryBuilder\Constraints\NumberConstraint;
+//use Filament\Tables\Filters\QueryBuilder\Constraints\BooleanConstraint;
+//use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint;
+//use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint\Operators\IsRelatedToOperator;
 use Filament\Support\Colors\Color;
-use Filament\Support\Facades\FilamentColor;
+//use Filament\Support\Facades\FilamentColor;
 use Filament\Support\Enums\FontWeight;
 use Illuminate\Support\HtmlString;
 use Filament\Tables\Enums\FiltersLayout;
@@ -38,15 +38,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PrevDogResource\Pages;
-use App\Filament\Resources\PrevDogResource\RelationManagers;
-// infolist use
+// use App\Filament\Resources\PrevDogResource\RelationManagers;
+// infolist class
 use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ImageEntry;
-use Filament\Infolists\Components\KeyValueEntry;
+// use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Grid as InfolistGrid;
 use Filament\Infolists\Components\Section as InfolistSection;
@@ -62,9 +62,9 @@ class PrevDogResource extends Resource
     protected static ?string $model = PrevDog::class;
 
     protected static ?int $navigationSort = 1;
-    
+
     protected static ?string $navigationIcon = 'fas-paw';
-    
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
@@ -220,10 +220,10 @@ class PrevDogResource extends Resource
                 ->with('father')
                 ->with('mother')
                 ->with('owners')
-                ->with('currentOwner')
-                ->with('titles')
-                ->with('duplicates');
-                // ->withCount('duplicates');
+                ->with('titles');
+//                ->with('duplicates');
+//                ->with('currentOwner')
+//                ->withCount('duplicates')
             })
             ->columns([
                 Tables\Columns\TextColumn::make('id')
@@ -231,25 +231,25 @@ class PrevDogResource extends Resource
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('duplicates_count')
-                    ->label(__('Duplicates Count'))
-                    ->numeric()
-                    ->counts('duplicates')
-                    ->sortable(['duplicates_count'])
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('duplicates')
-                    ->label(__('Other Duplicate IDs'))
-                    ->formatStateUsing(function (PrevDog $record): HtmlString {
-                        // format the related duplicates so each of the duplicates array items will be a link to the route of PrevDogResource view page using the id as the parameter
-                        $duplicatesLinks = $record->duplicates->pluck('id')->map(fn ($id) =>
-                            '<a href="' . route('filament.admin.resources.prev-dogs.view', ['record' => $id]) . '" target="_blank">' . $id . '</a>'
-                        )->implode(', ');
-                        return new HtmlString($duplicatesLinks);
-                    })
-                    ->wrap()
-                    ->words(5)
-                    // ->getStateUsing(fn (PrevDog $record): string =>$record->duplicates->pluck('id')->implode(', '))
-                    ->toggleable(isToggledHiddenByDefault: true),
+//                Tables\Columns\TextColumn::make('duplicates_count')
+//                    ->label(__('Duplicates Count'))
+//                    ->numeric()
+//                    ->counts('duplicates')
+//                    ->sortable(['duplicates_count'])
+//                    ->toggleable(isToggledHiddenByDefault: true),
+//                Tables\Columns\TextColumn::make('duplicates')
+//                    ->label(__('Other Duplicate IDs'))
+//                    ->formatStateUsing(function (PrevDog $record): HtmlString {
+//                        // format the related duplicates so each of the duplicates array items will be a link to the route of PrevDogResource view page using the id as the parameter
+//                        $duplicatesLinks = $record->duplicates?->pluck('id')->map(fn ($id) =>
+//                            '<a href="' . route('filament.admin.resources.prev-dogs.view', ['record' => $id]) . '" target="_blank">' . $id . '</a>'
+//                        )->implode(', ');
+//                        return new HtmlString($duplicatesLinks);
+//                    })
+//                    ->wrap()
+////                    ->words(5)
+//                    // ->getStateUsing(fn (PrevDog $record): string =>$record->duplicates->pluck('id')->implode(', '))
+//                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('prefixed_sagir')
                     ->label(__('Sagir'))
                     ->searchable(['SagirID'], isIndividual: true, isGlobal: false)
@@ -262,21 +262,21 @@ class PrevDogResource extends Resource
                     ->description(function (PrevDog $record): string {
                         return $record->breed?->BreedNameEN ?? '~';
                     }, position: 'under')
-                    ->sortable()
+                    ->sortable(['BreedName'])
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('color.ColorNameHE')
                     ->label(__('Color'))
                     ->description(function (PrevDog $record): string {
                         return $record->color?->ColorNameEN ?? '~';
                     }, position: 'under')
-                    ->sortable(['OldCode'])
+                    ->sortable(['ColorNameHE'])
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('hair.HairNameHE')
                     ->label(__('Hair'))
                     ->description(function (PrevDog $record): string {
                         return $record->hair?->HairNameEN ?? '~';
                     }, position: 'under')
-                    ->sortable()
+                    ->sortable(['HairNameHE'])
                     ->toggleable(isToggledHiddenByDefault: false),
                 // Tables\Columns\TextColumn::make('Sex')
                 //     ->badge()
@@ -309,10 +309,10 @@ class PrevDogResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('titles.name')
                     ->label(__('Titles'))
-                    ->listWithLineBreaks() 
+                    ->listWithLineBreaks()
                     ->limitList(1)
-                    ->tooltip(fn (Tables\Columns\TextColumn $column): ?string => 
-                        (($state = $column->getState()) === null) ? null : 
+                    ->tooltip(fn (Tables\Columns\TextColumn $column): ?string =>
+                        (($state = $column->getState()) === null) ? null :
                         (is_array($state)
                             ? (count($state) > $column->getListLimit() ? implode(' | ', $state) : null)
                             : (string) $state
@@ -373,24 +373,24 @@ class PrevDogResource extends Resource
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('CurrentOwnerId')
-                    ->label(__('Owner (depracted)'))
-                    ->wrapHeader()
-                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->getStateUsing(function (PrevDog $record): string {
-                        if ($record->CurrentOwnerId === null) {
-                            return 'n/a';
-                        }
-                        $ownerName = $record->currentOwner?->first_name ?? '<unknown>';
-                        $ownershipDate = $record->OwnershipDate 
-                            ? \Carbon\Carbon::parse($record->OwnershipDate)->format('d-m-Y') 
-                            : 'n/a';
-                        $ownershipDetails = $ownerName . ' | ' . $ownershipDate;
-                        return $ownershipDetails;
-                    })  
-                    ->description(fn (PrevDog $record): string => $record->CurrentOwnerId ? (string)((int)$record->CurrentOwnerId) : 'n/a')
-                    ->sortable(['CurrentOwnerId'])
-                    ->toggleable(isToggledHiddenByDefault: true),
+//                Tables\Columns\TextColumn::make('CurrentOwnerId')
+//                    ->label(__('Owner (depracted)'))
+//                    ->wrapHeader()
+//                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
+//                    ->getStateUsing(function (PrevDog $record): string {
+//                        if ($record->CurrentOwnerId === null) {
+//                            return 'n/a';
+//                        }
+//                        $ownerName = $record->currentOwner?->first_name ?? '<unknown>';
+//                        $ownershipDate = $record->OwnershipDate
+//                            ? \Carbon\Carbon::parse($record->OwnershipDate)->format('d-m-Y')
+//                            : 'n/a';
+//                        $ownershipDetails = $ownerName . ' | ' . $ownershipDate;
+//                        return $ownershipDetails;
+//                    })
+//                    ->description(fn (PrevDog $record): string => $record->CurrentOwnerId ? (string)((int)$record->CurrentOwnerId) : 'n/a')
+//                    ->sortable(['CurrentOwnerId'])
+//                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('Breeder_Name')
                     ->label(__('Breeder Name - depracted'))
                     ->wrapHeader()
@@ -461,7 +461,7 @@ class PrevDogResource extends Resource
                     ->wrapHeader()
                     ->separator(',')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),                
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('GroupID')
                     ->label(__('Group ID'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
@@ -496,7 +496,7 @@ class PrevDogResource extends Resource
                     ->label(__('Pedigree Notes 2'))
                     ->limit(200)
                     ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
-                        $state = $column->getState();                        
+                        $state = $column->getState();
                         if (strlen($state) <= $column->getCharacterLimit()) {
                             return null;
                         }
@@ -508,7 +508,7 @@ class PrevDogResource extends Resource
                     ->label(__('Health Notes'))
                     ->limit(200)
                     ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
-                        $state = $column->getState();               
+                        $state = $column->getState();
                         if (strlen($state) <= $column->getCharacterLimit()) {
                             return null;
                         }
@@ -520,7 +520,7 @@ class PrevDogResource extends Resource
                     ->label(__('Notes 2'))
                     ->limit(200)
                     ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
-                        $state = $column->getState();                        
+                        $state = $column->getState();
                         if (strlen($state) <= $column->getCharacterLimit()) {
                             return null;
                         }
@@ -545,12 +545,12 @@ class PrevDogResource extends Resource
                         $magDate = $record->MagDate ?? '~';
                         $magJudge = $record->MagJudge ?? '~';
                         $magPlace = $record->MagPlace ?? '~';
-                        
+
                         return "{$magDate} | {$magJudge} | {$magPlace}";
                     }, position: 'under')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                // combine the Mag 2 columns into one column, pass will be the value/state and the rest in a description 
+                // combine the Mag 2 columns into one column, pass will be the value/state and the rest in a description
                 Tables\Columns\TextColumn::make('IsMagPass_2')
                     ->label(__('Mag 2'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
@@ -558,7 +558,7 @@ class PrevDogResource extends Resource
                         $magDate = $record->MagDate_2 ?? '~';
                         $magJudge = $record->MagJudge_2 ?? '~';
                         $magPlace = $record->MagPlace_2 ?? '~';
-                        
+
                         return "{$magDate} | {$magJudge} | {$magPlace}";
                     }, position: 'under')
                     ->sortable()
@@ -604,7 +604,7 @@ class PrevDogResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-         
+
             ])
             ->filters([
                 Filter::make('trashed')
@@ -633,7 +633,7 @@ class PrevDogResource extends Resource
                             'not_deleted' => $query->withoutTrashed(),
                         };
                     }),
-                
+
                 Filter::make('gender')
                     ->form([
                         Forms\Components\ToggleButtons::make('gender')
@@ -656,11 +656,11 @@ class PrevDogResource extends Resource
                         if (empty($data['gender']) || $data['gender'] === 'all') {
                             return $query;
                         }
-                        
+
                         // Apply a raw WHERE clause that replicates the accessor's logic.
                         // Adjust the CASE statement as needed to match your accessor.
                         return $query->whereRaw("
-                            CASE 
+                            CASE
                                 WHEN GenderID = 1 THEN 'M'
                                 WHEN GenderID = 2 THEN 'F'
                                 ELSE 'n/a'
@@ -694,11 +694,11 @@ class PrevDogResource extends Resource
                         if (empty($data['sagir_prefix']) || $data['sagir_prefix'] === 'all') {
                             return $query;
                         }
-                        
+
                         // Apply a raw WHERE clause that replicates the accessor's logic.
                         // Adjust the CASE statement as needed to match your accessor.
                         return $query->whereRaw("
-                            CASE 
+                            CASE
                                 WHEN sagir_prefix = 1 THEN 'ISR'
                                 WHEN sagir_prefix = 2 THEN 'IMP'
                                 WHEN sagir_prefix = 3 THEN 'APX'
@@ -760,7 +760,7 @@ class PrevDogResource extends Resource
                             ->hint('Name \ Sagir')
                             ->helperText('Search by Hebrew\English Name or Sagir'),
                     ]),
-                // create filters to select and search by "owners" (PrevUser many 2 many relationship) fields: full_name, phone, id - owners is a relationship, full_name is a custom accessor using: ["first_name", "last_name", "first_name_en", "last_name_en"] 
+                // create filters to select and search by "owners" (PrevUser many 2 many relationship) fields: full_name, phone, id - owners is a relationship, full_name is a custom accessor using: ["first_name", "last_name", "first_name_en", "last_name_en"]
                 Filter::make('owners')
                     ->form([
                         Select::make('owners')
@@ -787,7 +787,7 @@ class PrevDogResource extends Resource
                             fn (Builder $q, $owners) => $q->whereHas('owners', fn (Builder $q2) => $q2->whereIn('users.id', $owners)),
                         );
                     }),
-                // bulean filters for: IsMagPass, IsMagPass_2, not_relevant, red_pedigree 
+                // bulean filters for: IsMagPass, IsMagPass_2, not_relevant, red_pedigree
                 // Tables\Filters\TernaryFilter::make('red_pedigree')
                 //     ->label(__('Red Pedigree'))
                 //     ->placeholder('All')
@@ -861,9 +861,9 @@ class PrevDogResource extends Resource
                         true: fn (Builder $query) => $query->has('duplicates', '>', 1),
                         false: fn (Builder $query) => $query->has('duplicates', '<=', 1),
                         blank: fn (Builder $query) => $query,
-                    ),    
+                    ),
 
-            
+
             ], layout: FiltersLayout::AboveContentCollapsible)
             ->filtersFormColumns(3)
             ->actions([
@@ -909,10 +909,10 @@ class PrevDogResource extends Resource
                             InfolistGrid::make(4)->schema([
                                 TextEntry::make('gender')
                                     ->label(__('Gender'))
-                                    ->state(fn(PrevDog $record): string => 
-                                        $record->gender 
-                                        . (!empty($record->Sex) 
-                                            ? " ({$record->Sex})" 
+                                    ->state(fn(PrevDog $record): string =>
+                                        $record->gender
+                                        . (!empty($record->Sex)
+                                            ? " ({$record->Sex})"
                                             : ''
                                         )
                                     ),
@@ -999,7 +999,7 @@ class PrevDogResource extends Resource
                                 TextEntry::make('ShowsCount')->label(__('Shows Count')),
                             ])
                             ->label(__('Titles & Shows')),
-                            TextEntry::make('TitleName')->label(__('Titles (pre‑2010)')),   
+                            TextEntry::make('TitleName')->label(__('Titles (pre‑2010)')),
                         ])
                         ->label(__('Pedigree & Titles')),
 
@@ -1038,7 +1038,7 @@ class PrevDogResource extends Resource
                                 ImageEntry::make('Image2')->label(__('Image 2')),
                             ]),
                         ]),
-                        
+
                         /***** 7. Metadata *****/
                         Tab::make('Metadata')->schema([
                             InfolistGrid::make(5)->schema([
@@ -1067,11 +1067,11 @@ class PrevDogResource extends Resource
                     ])
                     ->columnSpanFull()
                     ->persistTabInQueryString(),
-                
+
             ]);
     }
 
-    
+
     public static function getRelations(): array
     {
         return [

@@ -10,7 +10,7 @@ class PrevColor extends Model
 {
     use SoftDeletes;
 
-    
+
     /**
      * The connection name for the model.
      *
@@ -35,5 +35,9 @@ class PrevColor extends Model
         'ColorNameEN',
         'OldCode',
         'Remark',
+    ];
+
+    protected $casts = [
+        'OldCode' => 'integer',
     ];
 }
