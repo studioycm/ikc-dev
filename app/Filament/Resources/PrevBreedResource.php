@@ -3,7 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PrevBreedResource\Pages;
-use App\Filament\Resources\PrevBreedResource\RelationManagers;
+//use App\Filament\Resources\PrevBreedResource\RelationManagers;
 use App\Models\PrevColor;
 use App\Models\PrevDog;
 use App\Models\PrevBreed;
@@ -52,7 +52,7 @@ class PrevBreedResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return (string) static::$model::count();
     }
 
     public static function form(Form $form): Form

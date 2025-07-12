@@ -3,7 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PrevTitleResource\Pages;
-use App\Filament\Resources\PrevTitleResource\RelationManagers;
+//use App\Filament\Resources\PrevTitleResource\RelationManagers;
 use App\Models\PrevTitle;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -47,7 +47,7 @@ class PrevTitleResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return (string) static::$model::count();
     }
 
     public static function form(Form $form): Form
@@ -93,20 +93,20 @@ class PrevTitleResource extends Resource
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('TitleName')
                     ->label(__('Title Name'))
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('TitleDesc')
                     ->label(__('Description'))
                     ->searchable(isIndividual: true, isGlobal: false)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('Remark')
                     ->label(__('Remark'))
                     ->searchable(isIndividual: true, isGlobal: false)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 // Tables\Columns\TextColumn::make('dogs_count')
                 //     ->label(__('Dogs Count'))
                 //     ->counts('dogs')
@@ -140,8 +140,8 @@ class PrevTitleResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
-            ], 
+                Tables\Filters\TrashedFilter::make('trashed_filter'),
+            ],
                 layout: FiltersLayout::AboveContentCollapsible
             )
             ->actions([
@@ -173,9 +173,9 @@ class PrevTitleResource extends Resource
                     ->chunkSize(50)
                     ->modifyQueryUsing(fn (Builder $query) => $query->withCount('dogs')),
             ])
-            ->paginated([10, 25, 50, 100, 200, 250, 'all'])
+            ->paginated([10, 25, 50, 100, 200, 250, 300])
             ->defaultPaginationPageOption(10)
-            ->defaultSort('TitleName', 'asc')
+            ->defaultSort('TitleName')
             ->searchOnBlur()
             ->striped()
             ->deferLoading()

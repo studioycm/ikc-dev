@@ -3,18 +3,18 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PrevColorResource\Pages;
-use App\Filament\Resources\PrevColorResource\RelationManagers;
+//use App\Filament\Resources\PrevColorResource\RelationManagers;
 use App\Models\PrevColor;
-use App\Models\PrevDog;
-use App\Models\PrevBreed;
+//use App\Models\PrevDog;
+//use App\Models\PrevBreed;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Support\Colors\Color;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+//use Filament\Support\Colors\Color;
+//use Illuminate\Database\Eloquent\Builder;
+//use Illuminate\Database\Eloquent\SoftDeletingScope;
 // use App\Filament\Exports\DogExporter;
 // use App\Filament\Imports\DogImporter;
 // use Filament\Tables\Actions\ExportAction;
@@ -47,7 +47,7 @@ class PrevColorResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return (string) static::$model::count();
     }
 
     public static function form(Form $form): Form
@@ -78,7 +78,7 @@ class PrevColorResource extends Resource
                 Tables\Columns\TextColumn::make('DataID')
                     ->numeric()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('ModificationDateTime')
                     ->dateTime()
                     ->sortable()

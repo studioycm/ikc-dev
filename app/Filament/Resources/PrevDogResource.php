@@ -7,9 +7,6 @@ use App\Models\PrevHair;
 use App\Models\PrevUser;
 use App\Models\PrevBreed;
 use App\Models\PrevColor;
-use App\Models\PrevTitle;
-use App\Models\PrevUserDog;
-use App\Models\PrevDogTitle;
 use Filament\Resources\Resource;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -50,7 +47,7 @@ use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Grid as InfolistGrid;
 use Filament\Infolists\Components\Section as InfolistSection;
-use Filament\Infolists\Components\Split as InfolistSplit;
+//use Filament\Infolists\Components\Split as InfolistSplit;
 
 // use App\Filament\Exports\DogExporter;
 // use App\Filament\Imports\DogImporter;
@@ -67,7 +64,7 @@ class PrevDogResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return (string) static::$model::count();
     }
 
     public static function getModelLabel(): string
@@ -263,21 +260,21 @@ class PrevDogResource extends Resource
                         return $record->breed?->BreedNameEN ?? '~';
                     }, position: 'under')
                     ->sortable(['BreedName'])
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('color.ColorNameHE')
                     ->label(__('Color'))
                     ->description(function (PrevDog $record): string {
                         return $record->color?->ColorNameEN ?? '~';
                     }, position: 'under')
                     ->sortable(['ColorNameHE'])
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('hair.HairNameHE')
                     ->label(__('Hair'))
                     ->description(function (PrevDog $record): string {
                         return $record->hair?->HairNameEN ?? '~';
                     }, position: 'under')
                     ->sortable(['HairNameHE'])
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 // Tables\Columns\TextColumn::make('Sex')
                 //     ->badge()
                 //     ->color(fn (string $state): string => match ($state) {
@@ -306,7 +303,7 @@ class PrevDogResource extends Resource
                     ->date()
                     ->sinceTooltip()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('titles.name')
                     ->label(__('Titles'))
                     ->listWithLineBreaks()
@@ -319,43 +316,43 @@ class PrevDogResource extends Resource
                         )
                     )
                     ->searchable(['dogs_titles_db.TitleName'], isIndividual: true, isGlobal: false)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('owners.full_name')
                     ->label(__('Owners'))
                     ->description(function (PrevDog $record): string {
                         // Get the first two owners' names
                         return $record->owners?->pluck('id')->implode(', ');
                     })
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('father.full_name')
                     ->label(__('Father'))
                     ->description(function (PrevDog $record): string {
                         return $record->father?->SagirID ?? 'n/a';
                     }, position: 'under')
                     ->searchable(['Eng_Name','Heb_Name','SagirID'], isIndividual: true, isGlobal: false)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('mother.full_name')
                     ->label(__('Mother'))
                     ->description(function (PrevDog $record): string {
                         return $record->mother?->SagirID ?? 'n/a';
                     }, position: 'under')
                     ->searchable(['Eng_Name','Heb_Name','SagirID'], isIndividual: true, isGlobal: false)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('Chip')
                     ->label(__('Chip'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->searchable(isIndividual: true, isGlobal: false)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('DnaID')
                     ->label(__('DNA ID'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->searchable(isIndividual: true, isGlobal: false)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('ImportNumber')
                     ->label(__('Import Number'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->searchable(isIndividual: true, isGlobal: false)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('Chip_2')
                     ->label(__('Chip 2'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
@@ -374,7 +371,7 @@ class PrevDogResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 //                Tables\Columns\TextColumn::make('CurrentOwnerId')
-//                    ->label(__('Owner (depracted)'))
+//                    ->label(__('Owner (deprecated)'))
 //                    ->wrapHeader()
 //                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
 //                    ->getStateUsing(function (PrevDog $record): string {
@@ -392,7 +389,7 @@ class PrevDogResource extends Resource
 //                    ->sortable(['CurrentOwnerId'])
 //                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('Breeder_Name')
-                    ->label(__('Breeder Name - depracted'))
+                    ->label(__('Breeder Name - deprecated'))
                     ->wrapHeader()
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false)
@@ -459,7 +456,7 @@ class PrevDogResource extends Resource
                 Tables\Columns\TextColumn::make('TitleName')
                     ->label(__('Titles (pre ~2010)'))
                     ->wrapHeader()
-                    ->separator(',')
+                    ->separator()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('GroupID')
@@ -787,7 +784,7 @@ class PrevDogResource extends Resource
                             fn (Builder $q, $owners) => $q->whereHas('owners', fn (Builder $q2) => $q2->whereIn('users.id', $owners)),
                         );
                     }),
-                // bulean filters for: IsMagPass, IsMagPass_2, not_relevant, red_pedigree
+                // boolean filters for: IsMagPass, IsMagPass_2, not_relevant, red_pedigree
                 // Tables\Filters\TernaryFilter::make('red_pedigree')
                 //     ->label(__('Red Pedigree'))
                 //     ->placeholder('All')

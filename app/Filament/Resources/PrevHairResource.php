@@ -3,15 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PrevHairResource\Pages;
-use App\Filament\Resources\PrevHairResource\RelationManagers;
 use App\Models\PrevHair;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+//use Illuminate\Database\Eloquent\Builder;
+//use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PrevHairResource extends Resource
 {
@@ -40,7 +39,7 @@ class PrevHairResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return (string) static::$model::count();
     }
 
     public static function form(Form $form): Form

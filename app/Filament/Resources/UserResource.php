@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,14 +10,12 @@ use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
-use Filament\Notifications\Actions\Action;
+//use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Auth\VerifyEmail;
-use Filament\Pages\Auth\EmailVerification\EmailVerificationPrompt;
+//use Filament\Pages\Auth\EmailVerification\EmailVerificationPrompt;
 
 class UserResource extends Resource
 {
@@ -51,7 +48,7 @@ class UserResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return (string) static::$model::count();
     }
 
     public static function form(Form $form): Form
@@ -96,10 +93,11 @@ class UserResource extends Resource
                     ->copyable()
                     ->copyMessage('Email address copied')
                     ->copyMessageDuration(1500),
-                Tables\Columns\BooleanColumn::make('email_verified_at')
+                Tables\Columns\IconColumn::make('email_verified_at')
                     ->label('Verified')
+                    ->boolean()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('roles.name')
                     ->label('Role')
                     ->badge()
@@ -141,7 +139,7 @@ class UserResource extends Resource
                         $user->notify($notification);
                         Notification::make()
                             ->title('Email verification link sent')
-                            ->body('Email verification link sent to ' . $user->email . 
+                            ->body('Email verification link sent to ' . $user->email .
                             '<br>' . $notification->url)
                             ->success()
                             ->icon('heroicon-o-shield-check')
