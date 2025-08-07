@@ -46,25 +46,25 @@ class PrevUserResource extends Resource
     protected static ?string $slug = 'prev-users';
     protected static ?string $navigationIcon = 'fas-user';
     protected static ?int $navigationSort = 3;
-    // protected static ?string $recordTitleAttribute = 'first_name';
+     protected static ?string $recordTitleAttribute = 'first_name';
 
-    // public static function getGlobalSearchResultTitle(Model $record): Htmlable | string
-    // {
-    //     return $record->name;
-    // }
+     public static function getGlobalSearchResultTitle(Model $record): Htmlable | string
+     {
+         return $record->name;
+     }
 
-    // public static function getGloballySearchableAttributes(): array
-    // {
-    //     return ['first_name', 'last_name', 'first_name_en', 'last_name_en'];
-    // }
+     public static function getGloballySearchableAttributes(): array
+     {
+         return ['first_name', 'last_name', 'first_name_en', 'last_name_en'];
+     }
 
-    // public static function getGlobalSearchResultDetails(Model $record): array
-    // {
-    //     return [
-    //         'Email' => $record->Email,
-    //         'Phone' => $record->mobile_phone,
-    //     ];
-    // }
+     public static function getGlobalSearchResultDetails(Model $record): array
+     {
+         return [
+             'Email' => $record->Email,
+             'Phone' => $record->mobile_phone,
+         ];
+     }
 
     public static function getNavigationBadge(): ?string
     {
@@ -246,7 +246,7 @@ class PrevUserResource extends Resource
                 Tables\Columns\TextColumn::make('last_name_en')
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('email')
-                    ->searchable(isGlobal: false, isIndividual: true)
+                    ->searchable(isIndividual: true, isGlobal: false)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('email_verified_at')

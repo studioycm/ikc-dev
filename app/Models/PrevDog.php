@@ -135,8 +135,11 @@ class PrevDog extends Model
 
     public function duplicates(): HasMany
     {
-        return $this->hasMany(self::class, 'SagirID', 'SagirID')
-        ->withTrashed();
+        $relation = $this->hasMany(self::class, 'SagirID', 'SagirID');
+
+        $relation->withTrashed();
+
+        return $relation;
     }
 
     protected $appends = ['full_name', 'sagir_prefix', 'prefixed_sagir', 'gender'];
