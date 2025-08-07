@@ -7,7 +7,7 @@ use Filament\Tables;
 use App\Models\PrevUser;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Model;
@@ -482,7 +482,7 @@ class PrevUserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Filter::make('trashed')
+                Filters\Filter::make('trashed')
                     ->form([
                         Forms\Components\ToggleButtons::make('trashed')
                             ->label(__('Deleted Status'))
@@ -508,7 +508,7 @@ class PrevUserResource extends Resource
                             'not_deleted' => $query->withoutTrashed(),
                         };
                     }),
-                Filter::make('record_type')
+                Filters\Filter::make('record_type')
                     ->form([
                         Forms\Components\ToggleButtons::make('record_type')
                             ->label(__('User Type'))
@@ -541,7 +541,7 @@ class PrevUserResource extends Resource
                             'without' => $query->whereNull('record_type'),
                         };
                     }),
-                    Filter::make('created_at')
+                    Filters\Filter::make('created_at')
                         ->form([
                             Forms\Components\Section::make(__('Created Dates'))
                                 ->columns(2)
@@ -573,7 +573,7 @@ class PrevUserResource extends Resource
                             }
                             return $query;
                         }),
-                        Filter::make('updated_at')
+                        Filters\Filter::make('updated_at')
                         ->form([
                             Forms\Components\Section::make(__('Updated Dates'))
                                 ->columns(2)
