@@ -760,31 +760,32 @@ class PrevDogResource extends Resource
                             ->hint('Name \ Sagir')
                             ->helperText('Search by Hebrew\English Name or Sagir'),
                     ]),
-                // create filters to select and search by "owners" (PrevUser many 2 many relationship) fields: full_name, phone, id - owners is a relationship, full_name is a custom accessor using: ["first_name", "last_name", "first_name_en", "last_name_en"]
+                // create filters to select and search by "owners" (PrevUser many 2 many relationship) fields: first_name, last_name, first_name_en, last_name_en, mobile_phone, id and custom attributes: full_name, name - owners is a relationship, full_name is a custom accessor using: ["first_name", "last_name", "first_name_en", "last_name_en"]
                 Filter::make('owners')
                     ->form([
                         Select::make('owners')
                             ->label(__('Owners'))
                             ->multiple()
+                            ->searchable()
+                            ->searchDebounce(3000)
+                            ->getSearchResultsUsing(fn ($term) => PrevUser::selectOptions($term,40))
+                            ->getOptionLabelUsing(fn ($id)    => PrevUser::find($id)?->search_label)
                             ->relationship(
                                 'owners',
                                 'id',
-                                modifyQueryUsing: fn (Builder $query) => $query
-                                    ->whereNull('users.deleted_at')
-                                    ->where(function (Builder $q) {
-                                        $q->has('dogs');
-                                    })
-                                    ->orderBy('users.first_name')
-                                    ->orderBy('users.last_name'),
-                            )
-                            ->getOptionLabelFromRecordUsing(fn (PrevUser $record): string => $record->name)
-                            ->searchable(['users.first_name', 'users.last_name', 'users.first_name_en', 'users.last_name_en', 'users.id'])
-                            ->searchDebounce(2000),
+                                modifyQueryUsing: fn ($q) => $q->orderByRaw("
+                                    COALESCE(NULLIF(first_name, ''), first_name_en) ASC,
+                                    COALESCE(NULLIF(last_name , ''), last_name_en ) ASC
+                                ")
+                            ),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query->when(
+                    ->query(function (Builder $dogs, array $data): Builder {
+                        return $dogs->when(
                             $data['owners'] ?? null,
-                            fn (Builder $q, $owners) => $q->whereHas('owners', fn (Builder $q2) => $q2->whereIn('users.id', $owners)),
+                            fn ($q, $ids) => $q->whereHas(
+                                'owners',
+                                fn ($o) => $o->whereIn('users.id', $ids)
+                            )
                         );
                     }),
                 // bulean filters for: IsMagPass, IsMagPass_2, not_relevant, red_pedigree

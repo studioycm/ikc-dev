@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -35,7 +37,7 @@ class PrevUser extends Model implements HasName
 
     public function dogs(): BelongsToMany
     {
-        return $this->belongsToMany(PrevDog::class, 'dogs2users', 'user_id', 'SagirID', 'id', 'SagirID')
+        return $this->belongsToMany(PrevDog::class, 'dogs2users', 'user_id', 'sagir_id', 'id', 'SagirID')
         ->withTimestamps()
         ->using(PrevUserDog::class)
         ->as('ownership')
@@ -120,6 +122,59 @@ class PrevUser extends Model implements HasName
     public function getFilamentName(): string
     {
         return $this->name;
+    }
+
+    /* ---------------- name / phone presentation ---------------- */
+
+    // label accessor – used by Filament and anywhere else
+    protected function searchLabel(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => collect([$this->full_name, $this->mobile_phone])
+                ->filter()
+                ->join(' | ')
+        );
+    }
+
+    /* ---------------- tokenised full-name search ---------------- */
+
+    #[Scope]
+    private function searchName(Builder $q, ?string $term): Builder
+
+    {
+        if ($term === null || $term === '') {
+            return $q;
+        }
+
+        $tokens = preg_split('/[\s,]+/u', $term, -1, PREG_SPLIT_NO_EMPTY);
+
+        foreach ($tokens as $t) {
+            $t = '%'.$t.'%';
+            $q->where(function ($q) use ($t) {
+                $q->whereRaw("CONCAT_WS(' ', first_name, last_name) LIKE ?", [$t])
+                    ->orWhereRaw("CONCAT_WS(' ', first_name_en, last_name_en) LIKE ?", [$t]);
+            });
+        }
+
+        return $q;
+    }
+
+    /* ------------- “prepared query” helper for selects ---------- */
+
+    /** Return id => label pairs for a Select component */
+    public static function selectOptions(?string $search = null, int $limit = 30): array
+    {
+        return static::query()
+            ->searchName($search)
+            ->orderByRaw("
+                COALESCE(NULLIF(first_name, ''), first_name_en) ASC,
+                COALESCE(NULLIF(last_name , ''), last_name_en ) ASC
+            ")
+            ->limit($limit)
+            ->get(['id', 'first_name', 'last_name',
+                'first_name_en', 'last_name_en', 'mobile_phone'])
+            ->pluck('search_label', 'id')
+            ->toArray();
     }
 
 }
