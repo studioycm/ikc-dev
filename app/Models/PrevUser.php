@@ -2,18 +2,17 @@
 
 namespace App\Models;
 
-use App\Models\PrevDog;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Filament\Models\Contracts\HasName;
 
-
-class PrevUser extends Model
+class PrevUser extends Model implements HasName
 {
     use SoftDeletes;
+
     /**
      * The connection name for the model.
      *
@@ -30,7 +29,7 @@ class PrevUser extends Model
 
     protected $primaryKey = 'id';
 
-    protected $appends = ['full_name', 'name'];
+    protected $appends = ['full_name', 'full_name_heb', 'full_name_eng', 'name'];
 
     // relationship with dogs
 
@@ -51,44 +50,76 @@ class PrevUser extends Model
         ->where('deleted_at', null);
     }
 
-    
-    // get hebrew full name and english full name - from first and last name, add checks which exist and then try to have both 
-    public function getFullNameHebAttribute()
-    {
-        $firstName = $this->first_name ?? '';
-        $lastName = $this->last_name ?? '';
 
-        return trim($firstName . ' ' . $lastName);
-    }
-    public function getFullNameEngAttribute()
-    {
-        $firstName = $this->first_name_en ?? '';
-        $lastName = $this->last_name_en ?? '';
-
-        return trim($firstName . ' ' . $lastName);
-    }
-    
-    public function fullName(): Attribute
+    /**
+     * Get the user's full name in Hebrew.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function fullNameHeb(): Attribute
     {
         return Attribute::make(
-            get: fn () => ($this->first_name || $this->last_name)
-                    ? $this->first_name . ' ' . $this->last_name
-                    : (($this->first_name_en || $this->last_name_en)
-                        ? $this->first_name_en . ' ' . $this->last_name_en
-                        : '<< Name Not Found >>')
-            );
-    }
-
-    public function name(): Attribute
-    {
-        return Attribute::make(
-            get: fn() => tap(
-                // try Hebrew first
-                trim(implode(' ', array_filter([$this->first_name, $this->last_name]))),
-                fn(&$n) => $n || $n = trim(implode(' ', array_filter([$this->first_name_en, $this->last_name_en])))
-            ) ?: '---'
+            get: fn () => trim(implode(' ', array_filter([$this->first_name, $this->last_name])))
         );
     }
 
+    /**
+     * Get the user's full name in English.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function fullNameEng(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => trim(implode(' ', array_filter([$this->first_name_en, $this->last_name_en])))
+        );
+    }
+
+    /**
+     * Get the user's combined full name.
+     *
+     * This accessor combines the Hebrew and English full names,
+     * which is useful for comprehensive searching.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function fullName(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $names = array_unique(array_filter([
+                    $this->full_name_heb,
+                    $this->full_name_eng
+                ]));
+
+                return !empty($names) ? implode(' | ', $names) : '<< Name Not Found >>';
+            }
+        );
+    }
+
+    /**
+     * Get the user's primary display name.
+     *
+     * This accessor provides a fallback mechanism, preferring the Hebrew name,
+     * then the English name, and finally a default placeholder.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->full_name_heb ?: $this->full_name_eng ?: '---'
+        );
+    }
+
+    /**
+     * Get the name of the user for Filament.
+     *
+     * @return string
+     */
+    public function getFilamentName(): string
+    {
+        return $this->name;
+    }
 
 }
