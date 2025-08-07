@@ -9,12 +9,11 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.2 <8.5",
         "bezhansalleh/filament-language-switch": "^3.1",
         "bezhansalleh/filament-shield": "^3.3",
         "filament/filament": "^3.3",
         "laravel/framework": "^12.7",
-        "laravel/horizon": "^5.31",
         "laravel/tinker": "^2.10.1",
         "owenvoke/blade-fontawesome": "^2.9"
     },

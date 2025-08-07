@@ -28,7 +28,7 @@ class PrevUserDog extends Pivot
     // relationship with the dogs
     public function dog(): BelongsTo
     {
-        return $this->belongsTo(PrevDog::class, 'SagirID', 'SagirID');
+        return $this->belongsTo(PrevDog::class, 'sagir_id', 'SagirID');
     }
     // relationship with the users
     public function owner(): BelongsTo
@@ -36,7 +36,7 @@ class PrevUserDog extends Pivot
         return $this->belongsTo(PrevUser::class, 'user_id', 'id');
     }
 
-    
+
 
 
 

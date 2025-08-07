@@ -100,7 +100,7 @@ class PrevDog extends Model
     // users that are dog owners using dogs2users table or PrevUserDog model
     public function owners(): BelongsToMany
     {
-        return $this->belongsToMany(PrevUser::class, 'dogs2users', 'SagirID', 'user_id', 'SagirID', 'id')
+        return $this->belongsToMany(PrevUser::class, 'dogs2users', 'sagir_id', 'user_id', 'SagirID', 'id')
             ->withTimestamps()
             ->using(PrevUserDog::class)
             ->as('ownership')
@@ -133,11 +133,11 @@ class PrevDog extends Model
         return $this->belongsTo(PrevUser::class, 'CurrentOwnerId', 'owner_code');
     }
 
-//    public function duplicates(): HasMany
-//    {
-//        return $this->hasMany(self::class, 'SagirID', 'SagirID')
-//        ->withTrashed();
-//    }
+    public function duplicates(): HasMany
+    {
+        return $this->hasMany(self::class, 'SagirID', 'SagirID')
+        ->withTrashed();
+    }
 
     protected $appends = ['full_name', 'sagir_prefix', 'prefixed_sagir', 'gender'];
 

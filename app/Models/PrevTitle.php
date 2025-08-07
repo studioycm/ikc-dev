@@ -25,7 +25,8 @@ class PrevTitle extends Model
     protected $table = 'dogs_titles_db';
 
     protected $fillable = [
-        
+        'TitleCode',
+        'TitleName',
         'created_at',
         'updated_at',
         'deleted_at'
@@ -41,7 +42,7 @@ class PrevTitle extends Model
 
     // revers many to many relationship with the PrevDog model with count using the pivot model PrevDogTitle
     public function dogs(): BelongsToMany
-    {   
+    {
         // 'Dogs_ScoresDB', 'SagirID', 'AwardID', 'SagirID', 'TitleCode'
         return $this->belongsToMany(PrevDog::class, 'Dogs_ScoresDB', 'AwardID', 'SagirID', 'TitleCode', 'SagirID')
             ->using(PrevDogTitle::class)
@@ -49,8 +50,15 @@ class PrevTitle extends Model
             ->where('DogsDB.deleted_at', null);
     }
 
+    // relationship of many scores (titles) given by Dogs_ScoresDB.AwardID and dogs_titles_db.TitleCode
+
+    public function awarding(): HasMany
+    {
+        return $this->hasMany(PrevDogTitle::class, 'AwardID', 'TitleCode');
+    }
+
     // count the number of dogs with this title
-    
+
 
     // get name using TitleName attribute
     public function name(): Attribute
@@ -60,5 +68,5 @@ class PrevTitle extends Model
         );
     }
 
-    
+
 }
