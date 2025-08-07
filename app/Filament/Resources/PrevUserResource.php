@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Resources\PrevUserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PrevUserResource\RelationManagers;
+//use App\Filament\Resources\PrevUserResource\RelationManagers;
 
 class PrevUserResource extends Resource
 {
