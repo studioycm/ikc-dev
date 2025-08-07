@@ -75,11 +75,11 @@ class PrevTitleResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            // ->modifyQueryUsing(function (Builder $query) {
-            //     return $query
-            //     ->withCount('dogs')
-            //     ;
-            // })
+            ->modifyQueryUsing(function (Builder $query) {
+                 return $query
+                 ->withCount('awarding')
+                 ;
+             })
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->sortable()
@@ -97,22 +97,22 @@ class PrevTitleResource extends Resource
                 Tables\Columns\TextColumn::make('TitleName')
                     ->label(__('Title Name'))
                     ->sortable()
-                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->searchable(isIndividual: true)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('TitleDesc')
                     ->label(__('Description'))
-                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->searchable(isIndividual: true)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('Remark')
                     ->label(__('Remark'))
-                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->searchable(isIndividual: true)
                     ->toggleable(),
-                // Tables\Columns\TextColumn::make('dogs_count')
-                //     ->label(__('Dogs Count'))
-                //     ->counts('dogs')
-                //     ->numeric()
-                //     ->sortable(['dogs_count'])
-                //     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('awarding_count')
+                     ->label(__('Awarded'))
+                     ->counts('awarding')
+                     ->numeric()
+                     ->sortable(['awarding_count'])
+                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('CreationDateTime')
                     ->label(__('Create Date'))
                     ->dateTime()

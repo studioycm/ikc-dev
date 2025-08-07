@@ -217,8 +217,8 @@ class PrevDogResource extends Resource
                 ->with('father')
                 ->with('mother')
                 ->with('owners')
-                ->with('titles');
-//                ->with('duplicates');
+                ->with('titles')
+               ->with('duplicates');
 //                ->with('currentOwner')
 //                ->withCount('duplicates')
             })
@@ -228,25 +228,25 @@ class PrevDogResource extends Resource
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-//                Tables\Columns\TextColumn::make('duplicates_count')
-//                    ->label(__('Duplicates Count'))
-//                    ->numeric()
-//                    ->counts('duplicates')
-//                    ->sortable(['duplicates_count'])
-//                    ->toggleable(isToggledHiddenByDefault: true),
-//                Tables\Columns\TextColumn::make('duplicates')
-//                    ->label(__('Other Duplicate IDs'))
-//                    ->formatStateUsing(function (PrevDog $record): HtmlString {
-//                        // format the related duplicates so each of the duplicates array items will be a link to the route of PrevDogResource view page using the id as the parameter
-//                        $duplicatesLinks = $record->duplicates?->pluck('id')->map(fn ($id) =>
-//                            '<a href="' . route('filament.admin.resources.prev-dogs.view', ['record' => $id]) . '" target="_blank">' . $id . '</a>'
-//                        )->implode(', ');
-//                        return new HtmlString($duplicatesLinks);
-//                    })
-//                    ->wrap()
-////                    ->words(5)
-//                    // ->getStateUsing(fn (PrevDog $record): string =>$record->duplicates->pluck('id')->implode(', '))
-//                    ->toggleable(isToggledHiddenByDefault: true),
+               Tables\Columns\TextColumn::make('duplicates_count')
+                   ->label(__('Duplicates Count'))
+                   ->numeric()
+                   ->counts('duplicates')
+                   ->sortable(['duplicates_count'])
+                   ->toggleable(isToggledHiddenByDefault: true),
+               Tables\Columns\TextColumn::make('duplicates')
+                   ->label(__('Other Duplicate IDs'))
+                   ->formatStateUsing(function (PrevDog $record): HtmlString {
+                       // format the related duplicates so each of the duplicates array items will be a link to the route of PrevDogResource view page using the id as the parameter
+                       $duplicatesLinks = $record->duplicates?->pluck('id')->map(fn ($id) =>
+                           '<a href="' . route('filament.admin.resources.prev-dogs.view', ['record' => $id]) . '" target="_blank">' . $id . '</a>'
+                       )->implode(', ');
+                       return new HtmlString($duplicatesLinks);
+                   })
+                   ->wrap()
+                   // ->words(5)
+                   // ->getStateUsing(fn (PrevDog $record): string =>$record->duplicates->pluck('id')->implode(', '))
+                   ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('prefixed_sagir')
                     ->label(__('Sagir'))
                     ->searchable(['SagirID'], isIndividual: true, isGlobal: false)
