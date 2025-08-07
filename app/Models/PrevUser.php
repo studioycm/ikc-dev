@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -138,9 +137,7 @@ class PrevUser extends Model implements HasName
 
     /* ---------------- tokenised full-name search ---------------- */
 
-    #[Scope]
-    private function searchName(Builder $q, ?string $term): Builder
-
+    public function scopeSearchName(Builder $q, ?string $term): Builder
     {
         if ($term === null || $term === '') {
             return $q;
