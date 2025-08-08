@@ -61,7 +61,7 @@ class PrevUserResource extends Resource
      public static function getGlobalSearchResultDetails(Model $record): array
      {
          return [
-             'Email' => $record->Email,
+             'Email' => $record->email,
              'Phone' => $record->mobile_phone,
          ];
      }

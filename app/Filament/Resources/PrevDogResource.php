@@ -19,6 +19,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables;
+
 use Filament\Tables\Table;
 use Filament\Tables\Filters\Filter;
 //use Filament\Tables\Filters\QueryBuilder;
@@ -761,33 +762,32 @@ class PrevDogResource extends Resource
                             ->helperText('Search by Hebrew\English Name or Sagir'),
                     ]),
                 // create filters to select and search by "owners" (PrevUser many 2 many relationship) fields: first_name, last_name, first_name_en, last_name_en, mobile_phone, id and custom attributes: full_name, name - owners is a relationship, full_name is a custom accessor using: ["first_name", "last_name", "first_name_en", "last_name_en"]
-                Filter::make('owners')
-                    ->form([
-                        Select::make('owners')
-                            ->label(__('Owners'))
-                            ->multiple()
-                            ->searchable()
-                            ->searchDebounce(3000)
-                            ->getSearchResultsUsing(fn ($term) => PrevUser::selectOptions($term,40))
-                            ->getOptionLabelUsing(fn ($id)    => PrevUser::find($id)?->search_label)
-                            ->relationship(
-                                'owners',
-                                'id',
-                                modifyQueryUsing: fn ($q) => $q->orderByRaw("
-                                    COALESCE(NULLIF(first_name, ''), first_name_en) ASC,
-                                    COALESCE(NULLIF(last_name , ''), last_name_en ) ASC
-                                ")
-                            ),
-                    ])
-                    ->query(function (Builder $dogs, array $data): Builder {
-                        return $dogs->when(
-                            $data['owners'] ?? null,
-                            fn ($q, $ids) => $q->whereHas(
-                                'owners',
-                                fn ($o) => $o->whereIn('users.id', $ids)
-                            )
-                        );
+                Tables\Filters\SelectFilter::make('owners')
+                    ->label(__('Owners'))
+                    ->multiple()
+                    ->relationship('owners', 'id') // Defines the relationship to query against
+                    ->searchable(false) // We provide a custom search, so disable the default
+
+                    // What to do when the user types in the search box
+                    ->getSearchResultsUsing(
+                        fn (?string $search): array => PrevUser::selectOptions($search)
+                    )
+
+                    // How to get labels for already-selected options when the form loads
+                    ->getOptionLabelsUsing(
+                        fn (array $values): array => PrevUser::whereIn('id', $values)->get()->pluck('search_label', 'id')->toArray()
+                    )
+
+                    // This is ALREADY handled by ->relationship(), but left for clarity
+                    // on how to apply the final filter to the main table query.
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (empty($data['values'])) {
+                            return $query;
+                        }
+
+                        return $query->whereHas('owners', fn(Builder $q): Builder => $q->whereIn('users.id', $data['values']));
                     }),
+
                 // bulean filters for: IsMagPass, IsMagPass_2, not_relevant, red_pedigree
                 // Tables\Filters\TernaryFilter::make('red_pedigree')
                 //     ->label(__('Red Pedigree'))

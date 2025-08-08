@@ -137,19 +137,19 @@ class PrevUser extends Model implements HasName
 
     /* ---------------- tokenised full-name search ---------------- */
 
-    public function scopeSearchName(Builder $q, ?string $term): Builder
+    public function scopeSearchName(Builder $q, ?string $fullTerm): Builder
     {
-        if ($term === null || $term === '') {
+        if ($fullTerm === null || $fullTerm === '') {
             return $q;
         }
 
-        $tokens = preg_split('/[\s,]+/u', $term, -1, PREG_SPLIT_NO_EMPTY);
+        $tokens = preg_split('/[\s,]+/u', $fullTerm, -1, PREG_SPLIT_NO_EMPTY);
 
         foreach ($tokens as $t) {
-            $t = '%'.$t.'%';
-            $q->where(function ($q) use ($t) {
-                $q->whereRaw("CONCAT_WS(' ', first_name, last_name) LIKE ?", [$t])
-                    ->orWhereRaw("CONCAT_WS(' ', first_name_en, last_name_en) LIKE ?", [$t]);
+            $tLike = '%'.$t.'%';
+            $q->where(function (Builder $sq) use ($tLike) {
+                $sq->whereRaw("CONCAT_WS(' ', first_name, last_name) LIKE ?", [$tLike])
+                    ->orWhereRaw("CONCAT_WS(' ', first_name_en, last_name_en) LIKE ?", [$tLike]);
             });
         }
 
