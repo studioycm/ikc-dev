@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class PrevUserDog extends Pivot
 {
@@ -25,7 +23,7 @@ class PrevUserDog extends Pivot
      */
     protected $table = 'dogs2users';
 
-    // relationship with the dogs
+    // relationship with the dogs by dog Sagir id - dogs2users field is sagir_id, DogsDB field is SagirID
     public function dog(): BelongsTo
     {
         return $this->belongsTo(PrevDog::class, 'sagir_id', 'SagirID');

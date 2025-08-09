@@ -51,7 +51,7 @@ class AdminPanelProvider extends PanelProvider
             // ->spa()
             ->databaseNotifications()
             // ->databaseNotificationsPolling('60s')
-            ->maxContentWidth(MaxWidth::Full)    
+            ->maxContentWidth(MaxWidth::Full)
             ->colors([
                 'primary' => Color::hex('#5566aa'),
                 'pink' => Color::Pink,
@@ -107,7 +107,7 @@ class AdminPanelProvider extends PanelProvider
             // ->renderHook(
             //         'panels::footer',
             //         fn (): View => view('filament.components.loading-indicator')
-                        
+
             // )
             ->navigationGroups([
                 NavigationGroup::make()
@@ -144,7 +144,7 @@ class AdminPanelProvider extends PanelProvider
                     ->label(fn (): string => __('Authorisation Management'))
                     ->icon('fas-shield-dog'),
             ])
-            ->navigationItems([                
+            ->navigationItems([
                 NavigationItem::make('shows')
                     ->label(fn (): string => __('Shows'))
                     ->url(fn (): string => Pages\Dashboard::getUrl())
@@ -166,12 +166,12 @@ class AdminPanelProvider extends PanelProvider
                     ->group(fn (): string => __('Shows Management'))
                     ->sort(50),
 
-                NavigationItem::make('clubs')
-                    ->label(fn (): string => __('Clubs'))
-                    ->url(fn (): string => Pages\Dashboard::getUrl())
-                    ->icon('heroicon-o-flag')
-                    ->group(fn (): string => __('Clubs Management'))
-                    ->sort(70),
+//                NavigationItem::make('clubs')
+//                    ->label(fn (): string => __('Clubs'))
+//                    ->url(fn (): string => Pages\Dashboard::getUrl())
+//                    ->icon('heroicon-o-flag')
+//                    ->group(fn (): string => __('Clubs Management'))
+//                    ->sort(70),
 
                 NavigationItem::make('kennels')
                     ->label(fn (): string => __('Kennels'))

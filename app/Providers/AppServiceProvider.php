@@ -7,6 +7,10 @@ use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\HtmlString;
+use App\Models\PrevDog;
+use App\Models\PrevBreed;
+use App\Observers\PrevDogObserver;
+use App\Observers\PrevBreedObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,6 +32,10 @@ class AppServiceProvider extends ServiceProvider
             $switch
                 ->locales(['he','en']); // also accepts a closure
         });
+
+        // Register observers that clear club counts cache when dogs/breeds change.
+        PrevDog::observe(PrevDogObserver::class);
+        PrevBreed::observe(PrevBreedObserver::class);
 
         // Register a custom render hook to add a script for scrolling to the topof table (e.g. after pagination change)
         FilamentView::registerRenderHook(
