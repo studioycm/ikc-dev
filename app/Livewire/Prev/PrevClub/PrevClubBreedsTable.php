@@ -6,6 +6,8 @@ use App\Filament\Resources\PrevBreedResource;
 use App\Models\PrevBreed;
 use App\Models\PrevClub;
 use Filament\Facades\Filament;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Support\Contracts\TranslatableContentDriver;
 use Filament\Tables;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -17,9 +19,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 
-class PrevClubBreedsTable extends Component implements HasTable
+class PrevClubBreedsTable extends Component implements HasTable, HasForms
+
 {
     use InteractsWithTable;
+    use InteractsWithForms;
+
 
     public int $clubId;
 
@@ -83,13 +88,21 @@ class PrevClubBreedsTable extends Component implements HasTable
             ]);
     }
 
-    public function makeFilamentTranslatableContentDriver(): ?TranslatableContentDriver
-    {
-        return Filament::getCurrentPanel()?->makeTranslatableContentDriver();
-    }
+//    public function makeFilamentTranslatableContentDriver(): ?TranslatableContentDriver
+//    {
+//        $panel = Filament::getCurrentPanel();
+//
+//        if ($panel && method_exists($panel, 'makeTranslatableContentDriver')) {
+//            return $panel->makeTranslatableContentDriver();
+//        }
+//
+//        return null;
+//    }
+
 
     public function render(): View
     {
-        return view('filament.resources.prev-club.prev-club-breeds-table');
+        return view('livewire.resources.prev-club.prev-club-breeds-table');
+
     }
 }

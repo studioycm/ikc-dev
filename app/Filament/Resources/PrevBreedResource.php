@@ -234,9 +234,10 @@ class PrevBreedResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPrevBreeds::route('/'),
+            'index'  => Pages\ListPrevBreeds::route('/'),
             'create' => Pages\CreatePrevBreed::route('/create'),
-            'edit' => Pages\EditPrevBreed::route('/{record}/edit'),
+            'edit'   => Pages\EditPrevBreed::route('/{record}/edit'),
+            'view'   => Pages\ViewPrevBreed::route('/{record}'),
         ];
     }
 

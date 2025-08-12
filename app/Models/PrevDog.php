@@ -85,7 +85,7 @@ class PrevDog extends Model
     {
         return $this->hasOne(PrevHair::class, 'OldCode', 'HairID');
     }
-    // eloquent relationships with PrevDog
+    // eloquent relationships with self PrevDog model as a father and mother
 
     public function father(): HasOne
     {

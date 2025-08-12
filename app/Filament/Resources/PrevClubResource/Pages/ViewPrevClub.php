@@ -5,23 +5,24 @@ namespace App\Filament\Resources\PrevClubResource\Pages;
 use App\Filament\Resources\PrevClubResource;
 use App\Models\PrevClub;
 use Filament\Resources\Pages\ViewRecord;
-use Illuminate\Contracts\View\View;
 
 class ViewPrevClub extends ViewRecord
 {
     protected static string $resource = PrevClubResource::class;
 
-    public function render(): View
+    // Let Filament handle the layout and page rendering.
+    protected static string $view = 'filament.resources.prev-club.view';
+
+    protected function getViewData(): array
     {
-        // Ensure we pass a fully-hydrated model instance to the resource builder.
-        $club = PrevClub::findOrFail((int) $this->record->id);
+        $club = $this->getRecord();
+        // Ensure type for clarity; Filament resolves the record already.
+        \assert($club instanceof PrevClub);
 
-        $infolist = PrevClubResource::getInfolistForRecord($club);
-
-        return view('filament.resources.prev-club.view', [
+        return [
             'record'   => $club,
-            'infolist' => $infolist,
+            'infolist' => PrevClubResource::getInfolistForRecord($club),
             'resource' => static::getResource(),
-        ]);
+        ];
     }
 }

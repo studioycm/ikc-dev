@@ -62,8 +62,5 @@ class PrevBreed extends Model
         return $this->hasMany(PrevDog::class, 'RaceID', 'BreedCode');
     }
 
-    public function dogsScoped(): HasMany
-    {
-        return $this->dogs()->withoutGlobalScopes([SoftDeletingScope::class]);
-    }
+
 }

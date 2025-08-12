@@ -173,15 +173,15 @@ class PrevClubResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('ClubCode')
-                    ->label(__('Club Code'))
-                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+//                TextColumn::make('ClubCode')
+//                    ->label(__('Club Code'))
+//                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
+//                    ->sortable()
+//                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('managers.name')
                     ->label(__('Manager'))
                     ->listWithLineBreaks()
-                    ->limitList(2)
+                    ->limitList(3)
                     ->expandableLimitedList()
                     ->tooltip(function (PrevClub $record): string {
                         return $record->managers->map(function ($manager) {
@@ -198,7 +198,7 @@ class PrevClubResource extends Resource
                             return $initials . ': ' . $contact;
                         })->join(', ');
                     })
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
                 TextColumn::make('Email')
                     ->label(__('Email'))
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -211,12 +211,12 @@ class PrevClubResource extends Resource
                     ->counts('breeds')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(['breeds_count'])
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 TextColumn::make('dogs_count')
                     ->label(__('Dogs Count'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(['dogs_count'])
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(),
                 TextColumn::make('RegistrationPrice')
                     ->label(__('Registration Price'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
@@ -254,7 +254,7 @@ class PrevClubResource extends Resource
                 IconColumn::make('status')
                     ->label(__('Status'))
                     ->icons([
-                        'heroicon-o-x-circle' => fn($state): bool => $state === 'not for use',
+                        'heroicon-o-x-circle' => fn($state): bool => $state === 'not for use' || empty($state),
                         'heroicon-o-check-circle' => fn($state): bool => $state === 'for use',
                     ])
                     ->colors([
@@ -294,14 +294,19 @@ class PrevClubResource extends Resource
             ->record($record)
             ->schema([
                 Tabs::make('ClubTabs')->tabs([
-                    Tab::make(__('General'))->schema([
+                    Tab::make(__('Main'))->schema([
                         InfolistSection::make(__('General'))
                             ->schema([
                                 TextEntry::make('Name')
                                     ->label(__('Name')),
-                                TextEntry::make('club_code')
-                                    ->label(__('Club Code'))
+                                TextEntry::make('EngName')
+                                    ->label(__('English Name')),
+                                TextEntry::make('id')
+                                    ->label(__('Club ID'))
                                     ->state(fn (PrevClub $record): string => (string) ($record->ClubCode ?? '')),
+                                TextEntry::make('total_dogs')
+                                    ->label(__('Club Dogs Total'))
+                                    ->state(fn (PrevClub $record): string => (string) $record->totalDogsCount()),
                                 TextEntry::make('managers.full_name')
                                     ->label(__('Manager'))
                                     ->state(function (PrevClub $record): string {
@@ -313,10 +318,10 @@ class PrevClubResource extends Resource
                                         $phone = (string)($manager->mobile_phone ?? '');
                                         return trim($name . ($phone ? " ($phone)" : '')) ?: __('n/a');
                                     }),
-                                TextEntry::make('email')
+                                TextEntry::make('Email')
                                     ->label(__('Email'))
                                     ->state(fn (PrevClub $record): string => (string) ($record->Email ?? '')),
-                                TextEntry::make('address')
+                                TextEntry::make('full_address')
                                     ->label(__('Address'))
                                     ->state(fn (PrevClub $record): string => (string) ($record->full_address ?? '')),
                                 TextEntry::make('created')
@@ -326,8 +331,6 @@ class PrevClubResource extends Resource
                                     ->label(__('Modified On'))
                                     ->state(fn (PrevClub $record): string => (string) ($record->ModificationDateTime ?? '')),
                             ]),
-                    ]),
-                    Tab::make(__('Prices'))->schema([
                         InfolistSection::make(__('Prices'))
                             ->schema([
                                 TextEntry::make('registration_price')
@@ -351,7 +354,7 @@ class PrevClubResource extends Resource
                             ]),
                     ]),
                     Tab::make(__('Breeds'))->schema([
-                        InfolistSection::make(__('Breeds'))
+                        InfolistSection::make(__('Breeds in Club'))
                             ->schema([
                                 LivewireEntry::make(PrevClubBreedsTable::class)
                                     ->key('prev-club-breeds')
@@ -359,9 +362,6 @@ class PrevClubResource extends Resource
                                         'clubId' => (int) $record->id,
                                     ])
                                     ->columnSpanFull(),
-                                TextEntry::make('total_dogs')
-                                    ->label(__('Club Dogs Total'))
-                                    ->state(fn (PrevClub $record): string => (string) $record->totalDogsCount()),
                             ]),
                     ]),
                 ]),

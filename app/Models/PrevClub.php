@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -35,19 +36,21 @@ class PrevClub extends Model
         'status' => 'integer',
     ];
 
-    protected $appends = ['full_address'];
+//    protected $appends = ['full_address'];
 
+    // Pivot: clubs ↔ breeds
     public function breeds(): BelongsToMany
     {
-        return $this->belongsToMany(
-            PrevBreed::class,
-            'breed_club',
-            'club_id',
-            'breed_id',
-            'id',
-            'id'
-        )->withTimestamps();
+        return $this->belongsToMany(PrevBreed::class, 'breed_club', 'club_id', 'breed_id')
+            ->withoutTrashed();
     }
+
+    public function breedsWithDogs(): Collection
+    {
+        return $this->breeds()->withCount('dogs')->get();
+    }
+
+
 
     public function managers(): BelongsToMany
     {
