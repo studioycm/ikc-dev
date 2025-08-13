@@ -2,31 +2,28 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Pages;
-use Filament\Panel;
-use Filament\Widgets;
-use Filament\PanelProvider;
-use Filament\Facades\Filament;
-use Filament\Support\Colors\Color;
-use Illuminate\Contracts\View\View;
-use Filament\Support\Enums\MaxWidth;
-use Illuminate\Support\Facades\Auth;
-use Filament\Navigation\NavigationItem;
-use Filament\Navigation\NavigationGroup;
-use Illuminate\Validation\Rules\Password;
-use Filament\Http\Middleware\Authenticate;
-use Filament\FontProviders\GoogleFontProvider;
-use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Filament\Http\Middleware\AuthenticateSession;
-use Illuminate\Notifications\DatabaseNotification;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\Facades\Filament;
+use Filament\FontProviders\GoogleFontProvider;
+use Filament\Http\Middleware\Authenticate;
+use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationItem;
+use Filament\Pages;
+use Filament\Panel;
+use Filament\PanelProvider;
+use Filament\Support\Colors\Color;
+use Filament\Support\Enums\MaxWidth;
+use Filament\Widgets;
+use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -90,7 +87,7 @@ class AdminPanelProvider extends PanelProvider
                     ->gridColumns([
                         'default' => 1,
                         'sm' => 2,
-                        'lg' => 3
+                        'lg' => 3,
                     ])
                     ->sectionColumnSpan(1)
                     ->checkboxListColumns([
@@ -145,33 +142,12 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('fas-shield-dog'),
             ])
             ->navigationItems([
-                NavigationItem::make('shows')
-                    ->label(fn (): string => __('Shows'))
-                    ->url(fn (): string => Pages\Dashboard::getUrl())
-                    ->icon('fas-scale-balanced')
-                    ->group(fn (): string => __('Shows Management'))
-                    ->sort(5),
-
                 NavigationItem::make('Breedings')
                     ->label(fn (): string => __('Breedings'))
                     ->url(fn (): string => Pages\Dashboard::getUrl())
                     ->icon('fas-seedling')
                     ->group(fn (): string => __('Breedings Management'))
                     ->sort(40),
-
-                NavigationItem::make('Judges')
-                    ->label(fn (): string => __('Judges'))
-                    ->url(fn (): string => Pages\Dashboard::getUrl())
-                    ->icon('fas-gavel')
-                    ->group(fn (): string => __('Shows Management'))
-                    ->sort(50),
-
-//                NavigationItem::make('clubs')
-//                    ->label(fn (): string => __('Clubs'))
-//                    ->url(fn (): string => Pages\Dashboard::getUrl())
-//                    ->icon('heroicon-o-flag')
-//                    ->group(fn (): string => __('Clubs Management'))
-//                    ->sort(70),
 
                 NavigationItem::make('kennels')
                     ->label(fn (): string => __('Kennels'))

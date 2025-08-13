@@ -16,4 +16,6 @@ class PrevJudge extends Model
      * @var string
      */
     protected $table = 'JudgesDB';
+
+    protected $primaryKey = 'DataID';
 }

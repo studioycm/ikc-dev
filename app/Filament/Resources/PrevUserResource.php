@@ -2,25 +2,25 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\PrevUser;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Tables\Filters;
-use Filament\Tables\Enums\FiltersLayout;
-use Filament\Resources\Resource;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Resources\PrevUserResource\Pages;
+use App\Models\PrevUser;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters;
+use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-//use App\Filament\Resources\PrevUserResource\RelationManagers;
+
+// use App\Filament\Resources\PrevUserResource\RelationManagers;
 
 class PrevUserResource extends Resource
 {
     protected static ?string $model = PrevUser::class;
-
 
     public static function getModelLabel(): string
     {
@@ -42,34 +42,36 @@ class PrevUserResource extends Resource
         return __('Owners');
     }
 
-
     protected static ?string $slug = 'prev-users';
+
     protected static ?string $navigationIcon = 'fas-user';
+
     protected static ?int $navigationSort = 3;
-     protected static ?string $recordTitleAttribute = 'first_name';
 
-     public static function getGlobalSearchResultTitle(Model $record): Htmlable | string
-     {
-         return $record->name;
-     }
+    protected static ?string $recordTitleAttribute = 'first_name';
 
-     public static function getGloballySearchableAttributes(): array
-     {
-         return ['first_name', 'last_name', 'first_name_en', 'last_name_en'];
-     }
-
-     public static function getGlobalSearchResultDetails(Model $record): array
-     {
-         return [
-             'Email' => $record->email,
-             'Phone' => $record->mobile_phone,
-         ];
-     }
-
-    public static function getNavigationBadge(): ?string
+    public static function getGlobalSearchResultTitle(Model $record): Htmlable|string
     {
-        return (string) static::$model::count();
+        return $record->name;
     }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['first_name', 'last_name', 'first_name_en', 'last_name_en'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Email' => $record->email,
+            'Phone' => $record->mobile_phone,
+        ];
+    }
+
+    //    public static function getNavigationBadge(): ?string
+    //    {
+    //        return (string) static::$model::count();
+    //    }
 
     public static function form(Form $form): Form
     {
@@ -230,12 +232,12 @@ class PrevUserResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->label('Name')
                     ->sortable(['last_name', 'first_name'])
-                    ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en'],isIndividual: true, isGlobal: false)
+                    ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en'], isIndividual: true, isGlobal: false)
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('full_name')
                     ->label('Full Name')
                     ->sortable(['last_name', 'first_name'])
-                    ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en'],isIndividual: true, isGlobal: false)
+                    ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en'], isIndividual: true, isGlobal: false)
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('first_name')
                     ->toggleable(isToggledHiddenByDefault: false),
@@ -330,10 +332,10 @@ class PrevUserResource extends Resource
                     ->label(__('User Type'))
                     ->badge()
                     ->color(fn (PrevUser $record): string => match ($record->record_type) {
-                        'Native'  => 'success',
-                        'Owners'  => 'warning',
+                        'Native' => 'success',
+                        'Owners' => 'warning',
                         'Members' => 'blue',
-                        default   => 'gray',
+                        default => 'gray',
                     })
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
@@ -488,13 +490,13 @@ class PrevUserResource extends Resource
                             ->label(__('Deleted Status'))
                             ->options([
                                 'not_deleted' => __('Not Deleted'),
-                                'deleted'     => __('Deleted'),
-                                'all'         => __('All'),
+                                'deleted' => __('Deleted'),
+                                'all' => __('All'),
                             ])
                             ->colors([
                                 'not_deleted' => 'success',
-                                'deleted'     => 'danger',
-                                'all'         => 'gray',
+                                'deleted' => 'danger',
+                                'all' => 'gray',
                             ])
                             ->default('not_deleted')
                             ->grouped(),
@@ -503,8 +505,9 @@ class PrevUserResource extends Resource
                         if (empty($data['trashed']) || $data['trashed'] === 'all') {
                             return $query;
                         }
+
                         return match ($data['trashed']) {
-                            'deleted'     => $query->onlyTrashed(),
+                            'deleted' => $query->onlyTrashed(),
                             'not_deleted' => $query->withoutTrashed(),
                         };
                     }),
@@ -514,15 +517,15 @@ class PrevUserResource extends Resource
                             ->label(__('User Type'))
                             ->options([
                                 'all' => __('All'),
-                                'Native'  => 'Native',
-                                'Owners'  => __('Owners'),
+                                'Native' => 'Native',
+                                'Owners' => __('Owners'),
                                 'Members' => __('Members'),
                                 'without' => __('-without-'),
                             ])
                             ->colors([
                                 'all' => 'gray',
-                                'Native'  => 'success',
-                                'Owners'  => 'warning',
+                                'Native' => 'success',
+                                'Owners' => 'warning',
                                 'Members' => 'danger',
                                 'without' => 'gray',
                             ])
@@ -533,66 +536,69 @@ class PrevUserResource extends Resource
                         if (empty($data['record_type']) || $data['record_type'] === 'all') {
                             return $query;
                         }
+
                         return match ($data['record_type']) {
                             'all' => $query,
-                            'Native'  => $query->where('record_type', 'Native'),
-                            'Owners'  => $query->where('record_type', 'Owners'),
+                            'Native' => $query->where('record_type', 'Native'),
+                            'Owners' => $query->where('record_type', 'Owners'),
                             'Members' => $query->where('record_type', 'Members'),
                             'without' => $query->whereNull('record_type'),
                         };
                     }),
-                    Filters\Filter::make('created_at')
-                        ->form([
-                            Forms\Components\Section::make(__('Created Dates'))
-                                ->columns(2)
-                                ->schema([
-                                    Forms\Components\DatePicker::make('created_at_from')
-                                        ->label(__('Created From'))
-                                        ->native(true)
-                                        ->format('d/m/Y')
-                                        ->displayFormat('d/m/Y')
-                                        ->locale('he')
-                                        ->weekStartsOnSunday()
-                                        ->closeOnDateSelection(),
-                                    Forms\Components\DatePicker::make('created_at_to')
-                                        ->label(__('Created To'))
-                                        ->native(false)
-                                        ->format('d/m/Y')
-                                        ->displayFormat('d/m/Y')
-                                        ->locale('he')
-                                        ->weekStartsOnSunday()
-                                        ->closeOnDateSelection(),
-                                ]),
-                        ])
-                        ->query(function (Builder $query, array $data) {
-                            if (!empty($data['created_at_from'])) {
-                                $query->where('created_at', '>=', $data['created_at_from']);
-                            }
-                            if (!empty($data['created_at_to'])) {
-                                $query->where('created_at', '<=', $data['created_at_to']);
-                            }
-                            return $query;
-                        }),
-                        Filters\Filter::make('updated_at')
-                        ->form([
-                            Forms\Components\Section::make(__('Updated Dates'))
-                                ->columns(2)
-                                ->schema([
-                                    Forms\Components\DatePicker::make('updated_at_from')
-                                        ->label(__('Updated From')),
-                                    Forms\Components\DatePicker::make('updated_at_to')
-                                        ->label(__('Updated To')),
-                                ]),
-                        ])
-                        ->query(function (Builder $query, array $data) {
-                            if (!empty($data['updated_at_from'])) {
-                                $query->where('updated_at', '>=', $data['updated_at_from']);
-                            }
-                            if (!empty($data['updated_at_to'])) {
-                                $query->where('updated_at', '<=', $data['updated_at_to']);
-                            }
-                            return $query;
-                        }),
+                Filters\Filter::make('created_at')
+                    ->form([
+                        Forms\Components\Section::make(__('Created Dates'))
+                            ->columns(2)
+                            ->schema([
+                                Forms\Components\DatePicker::make('created_at_from')
+                                    ->label(__('Created From'))
+                                    ->native(true)
+                                    ->format('d/m/Y')
+                                    ->displayFormat('d/m/Y')
+                                    ->locale('he')
+                                    ->weekStartsOnSunday()
+                                    ->closeOnDateSelection(),
+                                Forms\Components\DatePicker::make('created_at_to')
+                                    ->label(__('Created To'))
+                                    ->native(false)
+                                    ->format('d/m/Y')
+                                    ->displayFormat('d/m/Y')
+                                    ->locale('he')
+                                    ->weekStartsOnSunday()
+                                    ->closeOnDateSelection(),
+                            ]),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (! empty($data['created_at_from'])) {
+                            $query->where('created_at', '>=', $data['created_at_from']);
+                        }
+                        if (! empty($data['created_at_to'])) {
+                            $query->where('created_at', '<=', $data['created_at_to']);
+                        }
+
+                        return $query;
+                    }),
+                Filters\Filter::make('updated_at')
+                    ->form([
+                        Forms\Components\Section::make(__('Updated Dates'))
+                            ->columns(2)
+                            ->schema([
+                                Forms\Components\DatePicker::make('updated_at_from')
+                                    ->label(__('Updated From')),
+                                Forms\Components\DatePicker::make('updated_at_to')
+                                    ->label(__('Updated To')),
+                            ]),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (! empty($data['updated_at_from'])) {
+                            $query->where('updated_at', '>=', $data['updated_at_from']);
+                        }
+                        if (! empty($data['updated_at_to'])) {
+                            $query->where('updated_at', '<=', $data['updated_at_to']);
+                        }
+
+                        return $query;
+                    }),
             ], layout: FiltersLayout::AboveContentCollapsible)
             ->filtersFormColumns(4)
             ->actions([

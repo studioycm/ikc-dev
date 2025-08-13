@@ -49,10 +49,10 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::count();
-    }
+//    public static function getNavigationBadge(): ?string
+//    {
+//        return static::getModel()::count();
+//    }
 
     public static function form(Form $form): Form
     {
@@ -141,7 +141,7 @@ class UserResource extends Resource
                         $user->notify($notification);
                         Notification::make()
                             ->title('Email verification link sent')
-                            ->body('Email verification link sent to ' . $user->email . 
+                            ->body('Email verification link sent to ' . $user->email .
                             '<br>' . $notification->url)
                             ->success()
                             ->icon('heroicon-o-shield-check')

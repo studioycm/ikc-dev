@@ -6,10 +6,13 @@ use App\Filament\Resources\PrevClubResource\Pages;
 use App\Filament\Resources\PrevClubResource\RelationManagers\BreedsRelationManager;
 use App\Livewire\Prev\PrevClub\PrevClubBreedsTable;
 use App\Models\PrevClub;
+use App\Models\PrevUser;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Grid as InfolistGrid;
 use Filament\Infolists\Components\Livewire as LivewireEntry;
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\Tabs\Tab;
@@ -38,10 +41,10 @@ class PrevClubResource extends Resource
 
     protected static ?int $navigationSort = 70;
 
-    public static function getNavigationBadge(): ?string
-    {
-        return (string) static::$model::count();
-    }
+    //    public static function getNavigationBadge(): ?string
+    //    {
+    //        return (string) static::$model::count();
+    //    }
 
     public static function getModelLabel(): string
     {
@@ -173,11 +176,11 @@ class PrevClubResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
-//                TextColumn::make('ClubCode')
-//                    ->label(__('Club Code'))
-//                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-//                    ->sortable()
-//                    ->toggleable(isToggledHiddenByDefault: true),
+                //              TextColumn::make('ClubCode')
+                //                    ->label(__('Club Code'))
+                //                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
+                //                    ->sortable()
+                //                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('managers.name')
                     ->label(__('Manager'))
                     ->listWithLineBreaks()
@@ -187,15 +190,14 @@ class PrevClubResource extends Resource
                         return $record->managers->map(function ($manager) {
                             $initials = collect(explode(' ', trim($manager->full_name_heb ?: $manager->full_name_eng)))
                                 ->filter()
-                                ->map(fn($n) => mb_substr($n, 0, 1))
+                                ->map(fn ($n) => mb_substr($n, 0, 1))
                                 ->join('.');
 
-                            $contact = $manager->mobile_phone
-                                ?? $manager->phone
+                            $contact = $manager->normalised_phone
                                 ?? $manager->email
                                 ?? '';
 
-                            return $initials . ': ' . $contact;
+                            return $initials.': '.$contact;
                         })->join(', ');
                     })
                     ->toggleable(),
@@ -254,12 +256,12 @@ class PrevClubResource extends Resource
                 IconColumn::make('status')
                     ->label(__('Status'))
                     ->icons([
-                        'heroicon-o-x-circle' => fn($state): bool => $state === 'not for use' || empty($state),
-                        'heroicon-o-check-circle' => fn($state): bool => $state === 'for use',
+                        'heroicon-o-x-circle' => fn ($state): bool => $state === 'not for use' || empty($state),
+                        'heroicon-o-check-circle' => fn ($state): bool => $state === 'for use',
                     ])
                     ->colors([
-                        'danger' => fn($state): bool => $state === 'not for use',
-                        'success' => fn($state): bool => $state === 'for use',
+                        'danger' => fn ($state): bool => $state === 'not for use',
+                        'success' => fn ($state): bool => $state === 'for use',
                     ])
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -290,12 +292,15 @@ class PrevClubResource extends Resource
     public static function getInfolistForRecord(PrevClub $record): Infolist
     {
         $record->loadMissing('managers');
+
         return Infolist::make()
             ->record($record)
             ->schema([
                 Tabs::make('ClubTabs')->tabs([
-                    Tab::make(__('Main'))->schema([
-                        InfolistSection::make(__('General'))
+                    Tab::make(__('General'))->schema([
+                        // Use a grid layout to organise the main/general and pricing sections as columns
+                        InfolistGrid::make()
+                            ->columns(5)
                             ->schema([
                                 TextEntry::make('Name')
                                     ->label(__('Name')),
@@ -303,64 +308,90 @@ class PrevClubResource extends Resource
                                     ->label(__('English Name')),
                                 TextEntry::make('id')
                                     ->label(__('Club ID'))
-                                    ->state(fn (PrevClub $record): string => (string) ($record->ClubCode ?? '')),
+                                    ->state(fn (PrevClub $record): string => (string) ($record->id ?? '')),
                                 TextEntry::make('total_dogs')
                                     ->label(__('Club Dogs Total'))
-                                    ->state(fn (PrevClub $record): string => (string) $record->totalDogsCount()),
-                                TextEntry::make('managers.full_name')
-                                    ->label(__('Manager'))
-                                    ->state(function (PrevClub $record): string {
-                                        $rel = $record->getRelationValue('managers');
-                                        if (!$rel || !isset($rel[0])) return __('n/a');
-
-                                        $manager = $rel[0];
-                                        $name = (string)($manager->full_name ?? '');
-                                        $phone = (string)($manager->mobile_phone ?? '');
-                                        return trim($name . ($phone ? " ($phone)" : '')) ?: __('n/a');
-                                    }),
+                                    ->state(fn (PrevClub $record): int => (int) $record->totalDogsCount()),
                                 TextEntry::make('Email')
                                     ->label(__('Email'))
                                     ->state(fn (PrevClub $record): string => (string) ($record->Email ?? '')),
                                 TextEntry::make('full_address')
                                     ->label(__('Address'))
                                     ->state(fn (PrevClub $record): string => (string) ($record->full_address ?? '')),
-                                TextEntry::make('created')
-                                    ->label(__('Created On'))
-                                    ->state(fn (PrevClub $record): string => (string) ($record->CreationDateTime ?? '')),
-                                TextEntry::make('modified')
-                                    ->label(__('Modified On'))
-                                    ->state(fn (PrevClub $record): string => (string) ($record->ModificationDateTime ?? '')),
+                                // Managers as a repeatable block (like titles in PrevDogResource)
+                                RepeatableEntry::make('managers')
+                                    ->label(fn (PrevClub $record): string => __('Managers').' ('.($record->managers?->count() ?? 0).')')
+                                    ->schema([
+                                        TextEntry::make('full_name')
+                                            ->label('')
+                                            ->hiddenLabel()
+                                            ->size(TextEntry\TextEntrySize::Large)
+                                            ->weight(\Filament\Support\Enums\FontWeight::Bold)
+                                            ->color(\Filament\Support\Colors\Color::Blue)
+                                            ->columnSpan(1)
+                                            ->formatStateUsing(fn ($state, ?PrevUser $manager = null) => $manager?->full_name ?? $state),
+                                        TextEntry::make('normalised_phone')
+                                            ->label('')
+                                            ->hiddenLabel()
+                                            ->size(TextEntry\TextEntrySize::Medium)
+                                            ->color('success')
+                                            ->columnSpan(1)
+                                            ->formatStateUsing(fn ($state, ?PrevUser $manager = null) => $manager?->normalised_phone ?? $state),
+                                        TextEntry::make('email')
+                                            ->label('')
+                                            ->hiddenLabel()
+                                            ->columnSpan(1)
+                                            ->formatStateUsing(fn ($state, ?PrevUser $manager = null) => $manager?->email ?? $state),
+                                    ])
+                                    ->columns(1)
+                                    ->grid(4)
+                                    ->columnSpan(5),
                             ]),
+
+                        // Prices section placed below the grid, organised as 3 columns
                         InfolistSection::make(__('Prices'))
                             ->schema([
-                                TextEntry::make('registration_price')
-                                    ->label(__('Registration Price'))
-                                    ->state(fn (PrevClub $record): string => (string) ($record->RegistrationPrice ?? '')),
-                                TextEntry::make('general_review_fee')
-                                    ->label(__('General Review Fee'))
-                                    ->state(fn (PrevClub $record): string => (string) ($record->GeneralReviewFee ?? '')),
-                                TextEntry::make('dog_review_fee')
-                                    ->label(__('Dog Review Fee'))
-                                    ->state(fn (PrevClub $record): string => (string) ($record->DogReviewFee ?? '')),
-                                TextEntry::make('breed_nonreg_price')
-                                    ->label(__('Breed NonReg Price'))
-                                    ->state(fn (PrevClub $record): string => (string) ($record->Breed_NonReg_Price ?? '')),
-                                TextEntry::make('perdog_nonreg_price')
-                                    ->label(__('Per Dog NonReg Price'))
-                                    ->state(fn (PrevClub $record): string => (string) ($record->PerDog_NonReg_Price ?? '')),
-                                TextEntry::make('test_price')
-                                    ->label(__('Test Price'))
-                                    ->state(fn (PrevClub $record): string => (string) ($record->TestPrice ?? '')),
+                                InfolistGrid::make()
+                                    ->columns(3)
+                                    ->schema([
+                                        TextEntry::make('registration_price')
+                                            ->label(__('Registration Price'))
+                                            ->state(fn (PrevClub $record): string => (string) ($record->RegistrationPrice ?? ''))
+                                            ->columnSpan(1),
+                                        TextEntry::make('general_review_fee')
+                                            ->label(__('General Review Fee'))
+                                            ->state(fn (PrevClub $record): string => (string) ($record->GeneralReviewFee ?? ''))
+                                            ->columnSpan(1),
+                                        TextEntry::make('dog_review_fee')
+                                            ->label(__('Dog Review Fee'))
+                                            ->state(fn (PrevClub $record): string => (string) ($record->DogReviewFee ?? ''))
+                                            ->columnSpan(1),
+
+                                        TextEntry::make('breed_nonreg_price')
+                                            ->label(__('Breed NonReg Price'))
+                                            ->state(fn (PrevClub $record): string => (string) ($record->Breed_NonReg_Price ?? ''))
+                                            ->columnSpan(1),
+                                        TextEntry::make('perdog_nonreg_price')
+                                            ->label(__('Per Dog NonReg Price'))
+                                            ->state(fn (PrevClub $record): string => (string) ($record->PerDog_NonReg_Price ?? ''))
+                                            ->columnSpan(1),
+                                        TextEntry::make('test_price')
+                                            ->label(__('Test Price'))
+                                            ->state(fn (PrevClub $record): string => (string) ($record->TestPrice ?? ''))
+                                            ->columnSpan(1),
+                                    ]),
                             ]),
                     ]),
+
+                    // Breeds tab unchanged (keeps Livewire entry)
                     Tab::make(__('Breeds'))->schema([
                         InfolistSection::make(__('Breeds in Club'))
                             ->schema([
                                 LivewireEntry::make(PrevClubBreedsTable::class)
                                     ->key('prev-club-breeds')
-                                    ->data(fn (PrevClub $record): array => [
-                                        'clubId' => (int) $record->id,
-                                    ])
+//                                    ->data(fn (PrevClub $record): array => [
+//                                        'clubId' => (int) $record->id,
+//                                    ])
                                     ->columnSpanFull(),
                             ]),
                     ]),
@@ -378,10 +409,10 @@ class PrevClubResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListPrevClubs::route('/'),
+            'index' => Pages\ListPrevClubs::route('/'),
             'create' => Pages\CreatePrevClub::route('/create'),
-            'edit'   => Pages\EditPrevClub::route('/{record}/edit'),
-            'view'   => Pages\ViewPrevClub::route('/{record}'),
+            'edit' => Pages\EditPrevClub::route('/{record}/edit'),
+            'view' => Pages\ViewPrevClub::route('/{record}'),
         ];
     }
 }

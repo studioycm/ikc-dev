@@ -130,7 +130,7 @@ class PrevClub extends Model
         }
 
         // short cache (30s) — adjust based on your sync frequency
-        return Cache::remember($cacheKey, now()->addSeconds(30), $fetch);
+        return Cache::remember($cacheKey, now()->addSeconds(120), $fetch);
     }
 
     public function totalDogsCount(bool $useCache = true): int

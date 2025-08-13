@@ -66,10 +66,10 @@ class PrevDogResource extends Resource
 
     protected static ?string $navigationIcon = 'fas-paw';
 
-    public static function getNavigationBadge(): ?string
-    {
-        return (string) static::$model::count();
-    }
+//    public static function getNavigationBadge(): ?string
+//    {
+//        return (string) static::$model::count();
+//    }
 
     public static function getModelLabel(): string
     {

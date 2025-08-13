@@ -4,7 +4,6 @@ namespace App\Livewire\Prev\PrevClub;
 
 use App\Filament\Resources\PrevBreedResource;
 use App\Models\PrevBreed;
-use App\Models\PrevClub;
 use Filament\Facades\Filament;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -16,28 +15,26 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 use Livewire\Component;
 
-class PrevClubBreedsTable extends Component implements HasTable, HasForms
-
+class PrevClubBreedsTable extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
     use InteractsWithForms;
+    use InteractsWithTable;
 
+    public Model $record;
 
-    public int $clubId;
+    protected int $clubId;
 
-    public function mount(?int $clubId = null): void
+    public function mount(Model $record): void
     {
         // Ensure we have a scalar id, fail fast if missing.
-        $this->clubId = (int) ($clubId ?? 0);
+        $this->clubId = (int) ($record->id ?? 0);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->heading(__('Breeds'))
             ->query($this->getTableQuery())
             ->columns([
                 Tables\Columns\TextColumn::make('BreedName')
@@ -76,7 +73,7 @@ class PrevClubBreedsTable extends Component implements HasTable, HasForms
             ->join('breed_club as bc', 'bc.breed_id', '=', 'BreedsDB.id')
             ->leftJoin('DogsDB as d', function ($join) {
                 $join->on('d.RaceID', '=', 'BreedsDB.BreedCode')
-                     ->whereNull('d.deleted_at'); // keep LEFT JOIN behavior
+                    ->whereNull('d.deleted_at'); // keep LEFT JOIN behavior
             })
             ->where('bc.club_id', $this->clubId)
             ->whereNull('bc.deleted_at')
@@ -88,17 +85,16 @@ class PrevClubBreedsTable extends Component implements HasTable, HasForms
             ]);
     }
 
-//    public function makeFilamentTranslatableContentDriver(): ?TranslatableContentDriver
-//    {
-//        $panel = Filament::getCurrentPanel();
-//
-//        if ($panel && method_exists($panel, 'makeTranslatableContentDriver')) {
-//            return $panel->makeTranslatableContentDriver();
-//        }
-//
-//        return null;
-//    }
-
+    //    public function makeFilamentTranslatableContentDriver(): ?TranslatableContentDriver
+    //    {
+    //        $panel = Filament::getCurrentPanel();
+    //
+    //        if ($panel && method_exists($panel, 'makeTranslatableContentDriver')) {
+    //            return $panel->makeTranslatableContentDriver();
+    //        }
+    //
+    //        return null;
+    //    }
 
     public function render(): View
     {

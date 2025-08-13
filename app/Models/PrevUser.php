@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Filament\Models\Contracts\HasName;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PrevUser extends Model implements HasName
 {
@@ -30,32 +30,29 @@ class PrevUser extends Model implements HasName
 
     protected $primaryKey = 'id';
 
-    protected $appends = ['full_name', 'full_name_heb', 'full_name_eng', 'name'];
+    protected $appends = ['full_name', 'full_name_heb', 'full_name_eng', 'name', 'normalised_phone'];
 
     // relationship with dogs
 
     public function dogs(): BelongsToMany
     {
         return $this->belongsToMany(PrevDog::class, 'dogs2users', 'user_id', 'sagir_id', 'id', 'SagirID')
-        ->withTimestamps()
-        ->using(PrevUserDog::class)
-        ->as('ownership')
-        ->withPivot('status', 'created_at', 'updated_at', 'deleted_at')
-        ->wherePivot('deleted_at', null)
-        ->wherePivot('status', 'current');
+            ->withTimestamps()
+            ->using(PrevUserDog::class)
+            ->as('ownership')
+            ->withPivot('status', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivot('deleted_at', null)
+            ->wherePivot('status', 'current');
     }
 
     public function history_dogs(): HasMany
     {
         return $this->hasMany(PrevDog::class, 'CurrentOwnerId', 'owner_code')
-        ->where('deleted_at', null);
+            ->where('deleted_at', null);
     }
-
 
     /**
      * Get the user's full name in Hebrew.
-     *
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
     protected function fullNameHeb(): Attribute
     {
@@ -66,8 +63,6 @@ class PrevUser extends Model implements HasName
 
     /**
      * Get the user's full name in English.
-     *
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
     protected function fullNameEng(): Attribute
     {
@@ -81,8 +76,6 @@ class PrevUser extends Model implements HasName
      *
      * This accessor combines the Hebrew and English full names,
      * which is useful for comprehensive searching.
-     *
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
     protected function fullName(): Attribute
     {
@@ -90,10 +83,10 @@ class PrevUser extends Model implements HasName
             get: function () {
                 $names = array_unique(array_filter([
                     $this->full_name_heb,
-                    $this->full_name_eng
+                    $this->full_name_eng,
                 ]));
 
-                return !empty($names) ? implode(' | ', $names) : '<< Name Not Found >>';
+                return ! empty($names) ? implode(' | ', $names) : '<< Name Not Found >>';
             }
         );
     }
@@ -103,8 +96,6 @@ class PrevUser extends Model implements HasName
      *
      * This accessor provides a fallback mechanism, preferring the Hebrew name,
      * then the English name, and finally a default placeholder.
-     *
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
     protected function name(): Attribute
     {
@@ -115,8 +106,6 @@ class PrevUser extends Model implements HasName
 
     /**
      * Get the name of the user for Filament.
-     *
-     * @return string
      */
     public function getFilamentName(): string
     {
@@ -174,4 +163,52 @@ class PrevUser extends Model implements HasName
             ->toArray();
     }
 
+    /**
+     * Clean “mobile_phone” first; if it can’t be normalised,
+     * try “phone”.  Returns null when both fail.
+     */
+    protected function normalisedPhone(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $mobile = static::normaliseMsisdn($this->attributes['mobile_phone'] ?? null);
+
+                if ($mobile !== null) {
+                    return $mobile;
+                }
+
+                return static::normaliseMsisdn($this->attributes['phone'] ?? null);
+            }
+        );
+    }
+
+    /**
+     * Utility that turns any phone-like input into
+     * a 10-digit Israeli mobile number (05XXXXXXXX) or null.
+     *
+     * Rules (in order):
+     *   1. Strip every non-digit character.
+     *   2. Remove leading “00972” or “972”.
+     *   3. Ensure exactly one leading “0”.
+     *   4. Result must match /^05\d{8}$/.
+     */
+    protected static function normaliseMsisdn(?string $raw): ?string
+    {
+        if ($raw === null || $raw === '') {
+            return null;
+        }
+
+        // 1. keep digits only
+        $digits = preg_replace('/\D+/', '', $raw);
+
+        // 2. strip international prefixes
+        $digits = preg_replace('/^(00972|972)/', '', $digits);
+
+        // 3. guarantee a single leading zero
+        $digits = ltrim($digits, '0');
+        $digits = $digits === '' ? '' : '0'.$digits;
+
+        // 4. final validation
+        return preg_match('/^05\d{8}$/', $digits) ? $digits : null;
+    }
 }

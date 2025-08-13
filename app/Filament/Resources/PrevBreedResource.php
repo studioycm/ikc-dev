@@ -3,19 +3,16 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PrevBreedResource\Pages;
-use App\Filament\Resources\PrevBreedResource\RelationManagers;
-use App\Models\PrevColor;
-use App\Models\PrevDog;
 use App\Models\PrevBreed;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Filters\Filter;
-use Filament\Support\Colors\Color;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+
 // use App\Filament\Exports\DogExporter;
 // use App\Filament\Imports\DogImporter;
 // use Filament\Tables\Actions\ExportAction;
@@ -24,7 +21,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class PrevBreedResource extends Resource
 {
     protected static ?string $model = PrevBreed::class;
-
 
     public static function getModelLabel(): string
     {
@@ -50,10 +46,10 @@ class PrevBreedResource extends Resource
 
     protected static ?string $navigationIcon = 'fas-dna';
 
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::count();
-    }
+    //    public static function getNavigationBadge(): ?string
+    //    {
+    //        return static::getModel()::count();
+    //    }
 
     public static function form(Form $form): Form
     {
@@ -185,13 +181,13 @@ class PrevBreedResource extends Resource
                             ->label(__('Trashed'))
                             ->options([
                                 'not_deleted' => 'Not Deleted',
-                                'deleted'     => 'Deleted',
-                                'all'         => 'All',
+                                'deleted' => 'Deleted',
+                                'all' => 'All',
                             ])
                             ->colors([
                                 'not_deleted' => 'success',
-                                'deleted'     => 'danger',
-                                'all'         => 'gray',
+                                'deleted' => 'danger',
+                                'all' => 'gray',
                             ])
                             ->default('not_deleted')
                             ->grouped(),
@@ -200,8 +196,9 @@ class PrevBreedResource extends Resource
                         if (empty($data['trashed']) || $data['trashed'] === 'all') {
                             return $query;
                         }
+
                         return match ($data['trashed']) {
-                            'deleted'     => $query->onlyTrashed(),
+                            'deleted' => $query->onlyTrashed(),
                             'not_deleted' => $query->withoutTrashed(),
                         };
                     }),
@@ -234,10 +231,10 @@ class PrevBreedResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListPrevBreeds::route('/'),
+            'index' => Pages\ListPrevBreeds::route('/'),
             'create' => Pages\CreatePrevBreed::route('/create'),
-            'edit'   => Pages\EditPrevBreed::route('/{record}/edit'),
-            'view'   => Pages\ViewPrevBreed::route('/{record}'),
+            'edit' => Pages\EditPrevBreed::route('/{record}/edit'),
+            'view' => Pages\ViewPrevBreed::route('/{record}'),
         ];
     }
 
