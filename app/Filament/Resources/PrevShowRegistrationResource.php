@@ -32,7 +32,29 @@ class PrevShowRegistrationResource extends Resource
 
     protected static ?string $slug = 'prev-show-registrations';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-clipboard-check';
+
+    protected static ?int $navigationSort = 63;
+
+    public static function getModelLabel(): string
+    {
+        return __('Show Registration');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Show Registrations');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return __('Shows Management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Registrations');
+    }
 
     public static function form(Form $form): Form
     {

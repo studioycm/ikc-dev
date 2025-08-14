@@ -29,7 +29,29 @@ class PrevShowArenaResource extends Resource
 
     protected static ?string $slug = 'prev-show-arenas';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-border-all';
+
+    protected static ?int $navigationSort = 61;
+
+    public static function getModelLabel(): string
+    {
+        return __('Show Arena');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Show Arenas');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return __('Shows Management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Arenas');
+    }
 
     public static function form(Form $form): Form
     {

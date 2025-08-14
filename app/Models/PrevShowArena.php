@@ -20,30 +20,39 @@ class PrevShowArena extends Model
      */
     protected $table = 'Shows_Structure';
 
+    protected $guarded = [];
+
+    protected $casts = [
+        'DataID' => 'integer',
+        'ShowID' => 'integer',
+        'ClassID' => 'integer',
+        'ArenaType' => 'integer',
+        'GroupParentID' => 'integer',
+        'OrderID' => 'integer',
+        'JudgeID' => 'integer',
+        'arena_date' => 'datetime',
+        'OrderTime' => 'datetime',
+    ];
+
     public function show(): BelongsTo
     {
-        return $this->belongsTo(PrevShow::class, 'ShowID');
+        return $this->belongsTo(PrevShow::class, 'ShowID', 'id');
     }
 
-    public function showClasses(): HasMany
+    public function judge(): BelongsTo
     {
-        return $this->hasMany(PrevShowClass::class, 'ShowArenaID');
+        return $this->belongsTo(PrevJudge::class, 'JudgeID', 'DataID');
     }
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array
-     */
-    protected function casts(): array
+    public function classes(): HasMany
     {
-        return [
-            'ShowID' => 'integer',
-            'ClassID' => 'integer',
-            'ArenaType' => 'integer',
-            'GroupParentID' => 'integer',
-            'OrderID' => 'integer',
-            'JudgeID' => 'integer',
-        ];
+        return $this->hasMany(PrevShowClass::class, 'ShowArenaID', 'id');
     }
+
+    public function breeds(): HasMany
+    {
+        return $this->hasMany(PrevShowBreed::class, 'ArenaID', 'id')
+            ->with('breed');
+    }
+
 }

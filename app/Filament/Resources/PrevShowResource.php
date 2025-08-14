@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PrevShowResource\Pages;
+use App\Filament\Resources\PrevShowResource\RelationManagers;
 use App\Models\PrevShow;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Placeholder;
@@ -30,7 +31,29 @@ class PrevShowResource extends Resource
 
     protected static ?string $slug = 'prev-shows';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-trophy';
+
+    protected static ?int $navigationSort = 60;
+
+    public static function getModelLabel(): string
+    {
+        return __('Show');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Shows');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return __('Shows Management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Shows');
+    }
 
     public static function form(Form $form): Form
     {
@@ -168,7 +191,41 @@ class PrevShowResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                return $query->with(['club'])->withCount(['showArenas', 'showClasses', 'registrations', 'showDogs', 'results']);
+            })
             ->columns([
+                TextColumn::make('TitleName')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('club.Name')
+                    ->label('Club')
+                    ->toggleable(),
+                TextColumn::make('show_arenas_count')
+                    ->label('Arenas')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('show_classes_count')
+                    ->label('Classes')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('registrations_count')
+                    ->label('Registrations')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('show_dogs_count')
+                    ->label('Show Dogs')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('results_count')
+                    ->label('Results')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('DataID'),
 
                 TextColumn::make('ModificationDateTime')
@@ -282,6 +339,14 @@ class PrevShowResource extends Resource
             'index' => Pages\ListPrevShows::route('/'),
             'create' => Pages\CreatePrevShow::route('/create'),
             'edit' => Pages\EditPrevShow::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\ArenasRelationManager::class,
+            RelationManagers\ClassesRelationManager::class,
         ];
     }
 

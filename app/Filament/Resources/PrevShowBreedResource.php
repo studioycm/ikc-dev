@@ -21,7 +21,29 @@ class PrevShowBreedResource extends Resource
 
     protected static ?string $slug = 'prev-show-breeds';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-dna';
+
+    protected static ?int $navigationSort = 67;
+
+    public static function getModelLabel(): string
+    {
+        return __('Show Breed');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Show Breeds');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return __('Shows Management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Show Breeds');
+    }
 
     public static function form(Form $form): Form
     {

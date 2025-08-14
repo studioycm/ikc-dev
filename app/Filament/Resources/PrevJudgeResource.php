@@ -4,8 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PrevJudgeResource\Pages;
 use App\Models\PrevJudge;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -14,6 +13,8 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Tables\Filters;
+use Illuminate\Database\Eloquent\Builder;
 
 class PrevJudgeResource extends Resource
 {
@@ -21,7 +22,31 @@ class PrevJudgeResource extends Resource
 
     protected static ?string $slug = 'prev-judges';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-gavel';
+
+    protected static ?int $navigationSort = 60;
+
+    public static function getModelLabel(): string
+    {
+        return __('Judge');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Judges');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return __('Shows Management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Judges');
+    }
+
+
 
     public static function form(Form $form): Form
     {
@@ -53,27 +78,70 @@ class PrevJudgeResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function ($query) {
+                return $query
+                    ->withCount(['arenas']);
+            })
             ->columns([
-                TextColumn::make('DataID'),
+                TextColumn::make('JudgeNameHE')
+                    ->searchable(isGlobal: false, isIndividual: true)
+                    ->sortable()
+                    ->label(__('Name Hebrew')),
+
+                TextColumn::make('JudgeNameEN')
+                    ->searchable(isGlobal: false, isIndividual: true)
+                    ->sortable()
+                    ->label(__('Name English')),
+
+                TextColumn::make('Country')
+                    ->searchable(isGlobal: false, isIndividual: true)
+                    ->sortable()
+                    ->label(__('Country')),
+
+                TextColumn::make('Email')
+                    ->searchable(isGlobal: false, isIndividual: true)
+                    ->sortable()
+                    ->label(__('Email')),
+
+                TextColumn::make('arenas_count')
+                    ->counts('arenas')
+                    ->numeric()
+                    ->sortable(['arenas_count'])
+                    ->label(__('Arenas')),
 
                 TextColumn::make('ModificationDateTime')
-                    ->date(),
+                    ->date()
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->sortable(),
 
                 TextColumn::make('CreationDateTime')
-                    ->date(),
+                    ->date()
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->sortable(),
 
-                TextColumn::make('JudgeNameHE'),
-
-                TextColumn::make('JudgeNameEN'),
-
-                TextColumn::make('Country'),
-
-                TextColumn::make('BreedID'),
-
-                TextColumn::make('Email'),
+                TextColumn::make('DataID')
+                    ->numeric()
+                    ->label(__('DataID'))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
-                //
+                // arenas count filter
+                Filters\Filter::make('arenas_count')
+                    ->label(__('Arenas Count'))
+                    ->form([
+                        Components\TextInput::make('arenas_count')
+                        ->numeric()
+                        ->default(1)
+                        ->required()
+                        ->minValue(1)
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['arenas_count'],
+                            fn(Builder $query, $arenas_count): Builder => $query->has('arenas', $data['operator'], $arenas_count)
+                        );
+                    })
             ])
             ->actions([
                 EditAction::make(),
@@ -84,6 +152,7 @@ class PrevJudgeResource extends Resource
                     DeleteBulkAction::make(),
                 ]),
             ]);
+
     }
 
     public static function getPages(): array

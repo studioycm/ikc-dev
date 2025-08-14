@@ -31,7 +31,29 @@ class PrevShowDogResource extends Resource
 
     protected static ?string $slug = 'show-dogs';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-dog';
+
+    protected static ?int $navigationSort = 64;
+
+    public static function getModelLabel(): string
+    {
+        return __('Show Dog');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Show Dogs');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return __('Shows Management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Show Dogs');
+    }
 
     public static function form(Form $form): Form
     {
