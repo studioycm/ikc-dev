@@ -173,6 +173,7 @@ class PrevClubResource extends Resource
                 TextColumn::make('Name')
                     ->label(__('Name'))
                     ->description(fn (PrevClub $record): string => $record->EngName ?? '')
+                    ->wrap()
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),

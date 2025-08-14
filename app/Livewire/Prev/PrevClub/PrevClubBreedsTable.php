@@ -75,7 +75,7 @@ class PrevClubBreedsTable extends Component implements HasForms, HasTable
                 $join->on('d.RaceID', '=', 'BreedsDB.BreedCode')
                     ->whereNull('d.deleted_at'); // keep LEFT JOIN behavior
             })
-            ->where('bc.club_id', $this->clubId)
+            ->where('bc.club_id', $this->record->id)
             ->whereNull('bc.deleted_at')
             ->groupBy([
                 'BreedsDB.id',
