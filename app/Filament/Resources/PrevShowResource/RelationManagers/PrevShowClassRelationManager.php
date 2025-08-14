@@ -2,27 +2,27 @@
 
 namespace App\Filament\Resources\PrevShowResource\RelationManagers;
 
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
-class ArenasRelationManager extends RelationManager
+class PrevShowClassRelationManager extends RelationManager
 {
-    protected static string $relationship = 'showArenas';
+    protected static string $relationship = 'classes';
 
-    public static function getTitle(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): string
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return __('Arenas');
+        return __('Classes');
     }
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                // Minimal for now; arenas are managed in their own resource
+                // Minimal; classes are managed in their own resource
             ]);
     }
 
@@ -31,7 +31,8 @@ class ArenasRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')->label('ID')->toggleable(),
-                Tables\Columns\TextColumn::make('GroupName')->label('Name')->toggleable(),
+                Tables\Columns\TextColumn::make('ClassID')->label('Code')->toggleable(),
+                Tables\Columns\TextColumn::make('arena.GroupName')->label('Arena')->toggleable(),
                 Tables\Columns\TextColumn::make('judge.JudgeNameEN')->label('Judge')->toggleable(),
                 Tables\Columns\TextColumn::make('OrderID')->label('Order')->numeric()->toggleable(),
             ])

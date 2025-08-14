@@ -3,7 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PrevShowResource\Pages;
-use App\Filament\Resources\PrevShowResource\RelationManagers;
+use App\Filament\Resources\PrevShowResource\RelationManagers\PrevShowArenaRelationManager;
+use App\Filament\Resources\PrevShowResource\RelationManagers\PrevShowClassRelationManager;
 use App\Models\PrevShow;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Placeholder;
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PrevShowResource extends Resource
 {
+
     protected static ?string $model = PrevShow::class;
 
     protected static ?string $slug = 'prev-shows';
@@ -192,72 +194,100 @@ class PrevShowResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function (Builder $query) {
-                return $query->with(['club'])->withCount(['showArenas', 'showClasses', 'registrations', 'showDogs', 'results']);
+                return $query->with(['club'])->withCount(['arenas', 'classes', 'registrations', 'showDogs', 'results']);
             })
             ->columns([
+                TextColumn::make('id')
+                    ->label(__('ID'))
+                    ->sortable()
+                ->toggleable()
+                ->searchable(),
                 TextColumn::make('TitleName')
+                    ->label(__('Title'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('club.Name')
-                    ->label('Club')
+                    ->label(__('Club'))
                     ->toggleable(),
-                TextColumn::make('show_arenas_count')
-                    ->label('Arenas')
+                TextColumn::make('arenas_count')
+                    ->label(__('Arenas'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(),
-                TextColumn::make('show_classes_count')
-                    ->label('Classes')
+                TextColumn::make('classes_count')
+                    ->label(__('Classes'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('registrations_count')
-                    ->label('Registrations')
+                    ->label(__('Registrations'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('show_dogs_count')
-                    ->label('Show Dogs')
+                    ->label(__('Show Dogs'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('results_count')
-                    ->label('Results')
+                    ->label(__('Results'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(),
-                TextColumn::make('DataID'),
+                TextColumn::make('DataID')
+                ->numeric()
+                ->label(__('Data ID'))
+                ->sortable()
+                ->toggleable(),
 
                 TextColumn::make('ModificationDateTime')
-                    ->date(),
+                    ->date()
+                ->label(__('Last Modified Date'))
+                ->sortable()
+                ->toggleable(),
 
                 TextColumn::make('CreationDateTime')
-                    ->date(),
-
-                TextColumn::make('TitleName'),
-
-                TextColumn::make('StartDate')
-                    ->date(),
-
-                TextColumn::make('ShortDesc'),
-
-                TextColumn::make('LongDesc'),
-
-                TextColumn::make('TopImage'),
-
-                TextColumn::make('MaxRegisters'),
-
-                TextColumn::make('ShowType'),
-
-                TextColumn::make('ClubID'),
+                    ->date()
+                ->label(__('Created Date'))
+                ->sortable()
+                ->toggleable(),
 
                 TextColumn::make('EndRegistrationDate')
-                    ->date(),
+                    ->date()
+                    ->label(__('Registration Ending at'))
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('StartDate')
+                    ->date()
+                    ->label(__('Starting at'))
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('EndDate')
+                    ->label(__('Ending at'))
+                    ->date()
+                    ->sortable()
+                    ->toggleable(),
+
+//                TextColumn::make('ShortDesc'),
+
+                TextColumn::make('LongDesc')
+                ->label(__('Description'))
+                ->searchable()
+                ->sortable()
+                ->toggleable()
+                ->wrap()
+                ->limit(100)
+                ->tooltip(fn ($state): ?string => $state),
+                TextColumn::make('MaxRegisters')
+                ->label(__('Max. Registrations'))
+                ->numeric()
+                ->sortable()
+                ->toggleable(),
+
+                TextColumn::make('ShowType')
+                ->label(__('Show Type')),
 
                 TextColumn::make('ShowStatus'),
-
-                TextColumn::make('EndDate')
-                    ->date(),
 
                 TextColumn::make('ShowPrice'),
 
@@ -316,7 +346,7 @@ class PrevShowResource extends Resource
                 TextColumn::make('Check_all_members'),
             ])
             ->filters([
-                TrashedFilter::make(),
+                TrashedFilter::make('trashed'),
             ])
             ->actions([
                 EditAction::make(),
@@ -330,7 +360,12 @@ class PrevShowResource extends Resource
                     RestoreBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort(function (Builder $query): Builder {
+                return $query
+                    ->orderBy(\DB::raw('MONTH(StartDate)'), 'desc')
+                    ->orderBy('registrations_count', 'desc');
+            });
     }
 
     public static function getPages(): array
@@ -345,8 +380,8 @@ class PrevShowResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\ArenasRelationManager::class,
-            RelationManagers\ClassesRelationManager::class,
+            PrevShowArenaRelationManager::class,
+            PrevShowClassRelationManager::class,
         ];
     }
 

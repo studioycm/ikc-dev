@@ -134,12 +134,12 @@ class PrevJudgeResource extends Resource
                         ->numeric()
                         ->default(1)
                         ->required()
-                        ->minValue(1)
+                        ->minValue(0)
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['arenas_count'],
-                            fn(Builder $query, $arenas_count): Builder => $query->has('arenas', $data['operator'], $arenas_count)
+                            fn(Builder $query, $arenas_count): Builder => $query->has('arenas', '=', $arenas_count)
                         );
                     })
             ])

@@ -20,7 +20,6 @@ class PrevShowArena extends Model
      */
     protected $table = 'Shows_Structure';
 
-    protected $guarded = [];
 
     protected $casts = [
         'DataID' => 'integer',

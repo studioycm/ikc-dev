@@ -18,7 +18,7 @@ class PrevShowResultPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_prev::show_dog_result');
+        return $user->can('view_any_prev::show_result');
     }
 
     /**
@@ -30,7 +30,7 @@ class PrevShowResultPolicy
      */
     public function view(User $user, PrevShowResult $prevShowResult): bool
     {
-        return $user->can('view_prev::show_dog_result');
+        return $user->can('view_prev::show_result');
     }
 
     /**
@@ -41,7 +41,7 @@ class PrevShowResultPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_prev::show_dog_result');
+        return $user->can('create_prev::show_result');
     }
 
     /**
@@ -53,7 +53,7 @@ class PrevShowResultPolicy
      */
     public function update(User $user, PrevShowResult $prevShowResult): bool
     {
-        return $user->can('update_prev::show_dog_result');
+        return $user->can('update_prev::show_result');
     }
 
     /**
@@ -65,7 +65,7 @@ class PrevShowResultPolicy
      */
     public function delete(User $user, PrevShowResult $prevShowResult): bool
     {
-        return $user->can('delete_prev::show_dog_result');
+        return $user->can('delete_prev::show_result');
     }
 
     /**
@@ -77,7 +77,7 @@ class PrevShowResultPolicy
      */
     public function restore(User $user, PrevShowResult $prevShowResult): bool
     {
-        return $user->can('restore_prev::show_dog_result');
+        return $user->can('restore_prev::show_result');
     }
 
     /**
@@ -89,6 +89,6 @@ class PrevShowResultPolicy
      */
     public function forceDelete(User $user, PrevShowResult $prevShowResult): bool
     {
-        return $user->can('force_delete_prev::show_dog_result');
+        return $user->can('force_delete_prev::show_result');
     }
 }

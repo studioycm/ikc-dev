@@ -6,20 +6,16 @@ use App\Filament\Resources\PrevShowResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
+use Filament\Resources\Pages\Concerns\HasRelationManagers;
 use Filament\Resources\Pages\EditRecord;
 
 class EditPrevShow extends EditRecord
 {
-    protected static string $resource = PrevShowResource::class;
+    use hasRelationManagers;
 
-    protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
-    }
-    protected function getSavedNotificationTitle(): ?string
-    {
-        return __('Show updated');
-    }
+    protected static string $resource = PrevShowResource::class;
+    protected static bool $hasRelationManagers = true;
+
     public function hasCombinedRelationManagerTabsWithContent(): bool
     {
         return true;
@@ -27,7 +23,7 @@ class EditPrevShow extends EditRecord
 
     public function getContentTabLabel(): ?string
     {
-        return __('Show');
+        return __('Edit Show');
     }
 
 

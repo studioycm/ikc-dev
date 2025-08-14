@@ -22,8 +22,6 @@ class PrevJudge extends Model
     public $incrementing = true;
     protected $keyType = 'int';
 
-    protected $guarded = [];
-
     protected $casts = [
         'DataID' => 'integer',
         'BreedID' => 'integer',

@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Attributes\Attribute;
 
 class PrevShow extends Model
 {
@@ -64,73 +66,86 @@ class PrevShow extends Model
         'deleted_at' => 'datetime',
     ];
 
+    protected function showType(): Attribute
+    {
+        return Attribute::make(
+            get: fn(int $value) => match ($value) {
+                1 => __('International Show'),
+                2 => __('Clubs Show'),
+                3 => __('National Show'),
+                4 => __('Breeding Qualification Test'),
+                default => __('Not set'),
+            }
+        );
+    }
+
+
     // Relations
     public function club(): BelongsTo
     {
-        return $this->belongsTo(PrevClub::class, 'ClubID');
+        return $this->belongsTo(PrevClub::class, 'ClubID', 'id');
     }
 
-    public function showClasses(): HasMany
+    public function classes(): HasMany
     {
-        return $this->hasMany(PrevShowClass::class, 'ShowID');
+        return $this->hasMany(PrevShowClass::class, 'ShowID', 'id');
     }
 
-    public function showArenas(): HasMany
+    public function arenas(): HasMany
     {
-        return $this->hasMany(PrevShowArena::class, 'ShowID');
-    }
-
-    public function showArenasWithClasses(): HasMany
-    {
-        return $this->hasMany(PrevShowArena::class, 'ShowID')->with('showClasses');
+        return $this->hasMany(PrevShowArena::class, 'ShowID', 'id');
     }
 
     public function registrations(): HasMany
     {
-        return $this->hasMany(PrevShowRegistration::class, 'ShowID');
+        return $this->hasMany(PrevShowRegistration::class, 'ShowID', 'id');
     }
 
     public function showDogs(): HasMany
     {
-        return $this->hasMany(PrevShowDog::class, 'ShowID');
+        return $this->hasMany(PrevShowDog::class, 'ShowID', 'id');
     }
 
     public function results(): HasMany
     {
-        return $this->hasMany(PrevShowResult::class, 'ShowID');
+        return $this->hasMany(PrevShowResult::class, 'ShowID', 'id');
     }
 
     public function payments(): HasMany
     {
-        return $this->hasMany(PrevShowPayment::class, 'ShowID');
+        return $this->hasMany(PrevShowPayment::class, 'ShowID', 'id');
     }
 
-    public function breedEntries(): HasMany
+    public function breeds(): HasMany
     {
-        return $this->hasMany(PrevShowBreed::class, 'ShowID');
+        return $this->hasMany(PrevShowBreed::class, 'ShowID', 'id');
     }
 
     // Scopes
-    public function scopeActive(Builder $q): Builder
-    {
-        return $q->where('ShowStatus', 1);
+    #[Scope]
+    protected function activeShow (Builder $q): void {
+
+        $q->where('ShowStatus', '=', 2);
     }
 
-    public function scopeUpcoming(Builder $q): Builder
+    #[Scope]
+    protected function upcoming(Builder $q): void
     {
-        return $q->whereDate('StartDate', '>', now());
+        $q->whereDate('StartDate', '>', now());
     }
 
-    public function scopePast(Builder $q): Builder
+    #[Scope]
+    protected function past(Builder $q): void
     {
-        return $q->whereDate('EndDate', '<', now());
+        $q->whereDate('EndDate', '<', now());
     }
+
 
     public function scopeWithCountsForResource(Builder $q): Builder
     {
         return $q->withCount([
-            'showArenas',
-            'showClasses',
+            'arenas',
+            'classes',
             'registrations',
             'showDogs',
             'results',
