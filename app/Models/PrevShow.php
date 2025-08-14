@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Attributes\Attribute;
 
 class PrevShow extends Model
 {
@@ -23,10 +23,8 @@ class PrevShow extends Model
      */
     protected $table = 'ShowsDB';
 
-    protected $guarded = [];
 
     protected $casts = [
-        'id' => 'integer',
         'DataID' => 'integer',
         'ShowID' => 'integer',
         'MaxRegisters' => 'integer',
@@ -66,18 +64,24 @@ class PrevShow extends Model
         'deleted_at' => 'datetime',
     ];
 
-    protected function showType(): Attribute
+    protected function ShowType(): Attribute
     {
         return Attribute::make(
-            get: fn(int $value) => match ($value) {
-                1 => __('International Show'),
-                2 => __('Clubs Show'),
-                3 => __('National Show'),
-                4 => __('Breeding Qualification Test'),
-                default => __('Not set'),
+            get: function ($value): ?string {
+                $code = (int) ($value ?? 0);
+
+                return match ($code) {
+                    1 => __('International Show'),
+                    2 => __('Clubs Show'),
+                    3 => __('National Show'),
+                    4 => __('Breeding Qualification Test'),
+                    default => __('Not set'),
+                };
             }
         );
     }
+
+
 
 
     // Relations

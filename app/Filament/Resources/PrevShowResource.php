@@ -19,12 +19,15 @@ use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 
 class PrevShowResource extends Resource
 {
@@ -194,7 +197,7 @@ class PrevShowResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function (Builder $query) {
-                return $query->with(['club'])->withCount(['arenas', 'classes', 'registrations', 'showDogs', 'results']);
+                return $query->with(['club','arenas','classes'])->withCount(['registrations', 'showDogs', 'results']);
             })
             ->columns([
                 TextColumn::make('id')
@@ -204,59 +207,18 @@ class PrevShowResource extends Resource
                 ->searchable(),
                 TextColumn::make('TitleName')
                     ->label(__('Title'))
+                    ->description(fn(PrevShow $record): HtmlString => new HtmlString('<p><span>' . $record->club->Name . '</span><br><span>' . $record->ShowType .  '</span>, <span>' . $record->location . '</span></p>'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('club.Name')
-                    ->label(__('Club'))
-                    ->toggleable(),
-                TextColumn::make('arenas_count')
-                    ->label(__('Arenas'))
-                    ->numeric()
-                    ->sortable()
-                    ->toggleable(),
-                TextColumn::make('classes_count')
-                    ->label(__('Classes'))
-                    ->numeric()
-                    ->sortable()
-                    ->toggleable(),
-                TextColumn::make('registrations_count')
-                    ->label(__('Registrations'))
-                    ->numeric()
-                    ->sortable()
-                    ->toggleable(),
-                TextColumn::make('show_dogs_count')
-                    ->label(__('Show Dogs'))
-                    ->numeric()
-                    ->sortable()
-                    ->toggleable(),
-                TextColumn::make('results_count')
-                    ->label(__('Results'))
-                    ->numeric()
-                    ->sortable()
-                    ->toggleable(),
-                TextColumn::make('DataID')
-                ->numeric()
-                ->label(__('Data ID'))
-                ->sortable()
-                ->toggleable(),
 
-                TextColumn::make('ModificationDateTime')
-                    ->date()
-                ->label(__('Last Modified Date'))
-                ->sortable()
-                ->toggleable(),
-
-                TextColumn::make('CreationDateTime')
-                    ->date()
-                ->label(__('Created Date'))
-                ->sortable()
-                ->toggleable(),
-
-                TextColumn::make('EndRegistrationDate')
-                    ->date()
-                    ->label(__('Registration Ending at'))
+                TextColumn::make('LongDesc')
+                    ->label(__('Description'))
+                    ->searchable()
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable()
+                    ->html()
+                    ->wrap(),
+
                 TextColumn::make('StartDate')
                     ->date()
                     ->label(__('Starting at'))
@@ -268,62 +230,155 @@ class PrevShowResource extends Resource
                     ->sortable()
                     ->toggleable(),
 
-//                TextColumn::make('ShortDesc'),
+                TextColumn::make('EndRegistrationDate')
+                    ->date()
+                    ->label(__('Registration Ending at'))
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('LongDesc')
-                ->label(__('Description'))
-                ->searchable()
-                ->sortable()
-                ->toggleable()
-                ->wrap()
-                ->limit(100)
-                ->tooltip(fn ($state): ?string => $state),
+//                TextColumn::make('FreeTextDesc')
+//                    ->label(__('Additional Information')),
+
                 TextColumn::make('MaxRegisters')
                 ->label(__('Max. Registrations'))
                 ->numeric()
                 ->sortable()
                 ->toggleable(),
 
-                TextColumn::make('ShowType')
-                ->label(__('Show Type')),
 
-                TextColumn::make('ShowStatus'),
+                IconColumn::make('ShowStatus')
+                ->label(__('Show Status'))
+                ->boolean(fn ($state): bool => $state === 2)
+                ->color(fn ($state): string => $state === 2 ? 'success' : 'danger')
+                ->toggleable()
+                ->sortable(),
 
-                TextColumn::make('ShowPrice'),
+                TextColumn::make('arenas_count')
+                    ->label(__('Arenas'))
+                    ->counts('arenas')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('classes_count')
+                    ->label(__('Classes'))
+                    ->counts('classes')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('registrations_count')
+                    ->label(__('Registrations'))
+                    ->counts('registrations')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('show_dogs_count')
+                    ->label(__('Show Dogs'))
+                    ->counts('showDogs')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('results_count')
+                    ->label(__('Results'))
+                    ->counts('results')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('Dog2Price1'),
 
-                TextColumn::make('Dog2Price2'),
+                TextColumn::make('ShowPrice')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('Dog2Price3'),
+                TextColumn::make('Dog2Price1')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('Dog2Price4'),
+                TextColumn::make('Dog2Price2')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('Dog2Price5'),
+                TextColumn::make('Dog2Price3')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('Dog2Price6'),
+                TextColumn::make('Dog2Price4')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('Dog2Price7'),
+                TextColumn::make('Dog2Price5')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('Dog2Price8'),
+                TextColumn::make('Dog2Price6')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('Dog2Price9'),
+                TextColumn::make('Dog2Price7')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('Dog2Price10'),
+                TextColumn::make('Dog2Price8')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('CouplesPrice'),
+                TextColumn::make('Dog2Price9')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('BGidulPrice'),
+                TextColumn::make('Dog2Price10')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('ZezaimPrice'),
+                TextColumn::make('CouplesPrice')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('YoungPrice'),
+                TextColumn::make('BGidulPrice')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('MoreDogsPrice'),
+                TextColumn::make('ZezaimPrice')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('MoreDogsPrice2'),
+                TextColumn::make('YoungPrice')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('TicketCost'),
+                TextColumn::make('MoreDogsPrice')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('MoreDogsPrice2')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('PeototCost')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('TicketCost')
+                    ->money('ILS')
+                    ->sortable()
+                    ->toggleable(),
 
                 TextColumn::make('IsExtraTickets'),
 
@@ -333,17 +388,30 @@ class PrevShowResource extends Resource
 
                 TextColumn::make('ParkingSelect'),
 
-                TextColumn::make('PeototCost'),
-
-                TextColumn::make('FreeTextDesc'),
-
                 TextColumn::make('start_from_index'),
 
-                TextColumn::make('location'),
+                TextColumn::make('Check_all_members'),
+
+                TextColumn::make('DataID')
+                    ->numeric()
+                    ->label(__('Data ID'))
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('ModificationDateTime')
+                    ->date()
+                    ->label(__('Last Modified Date'))
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('CreationDateTime')
+                    ->date()
+                    ->label(__('Created Date'))
+                    ->sortable()
+                    ->toggleable(),
 
                 ImageColumn::make('banner_image'),
 
-                TextColumn::make('Check_all_members'),
             ])
             ->filters([
                 TrashedFilter::make('trashed'),
@@ -363,8 +431,9 @@ class PrevShowResource extends Resource
             ])
             ->defaultSort(function (Builder $query): Builder {
                 return $query
+                    ->orderBy(\DB::raw('YEAR(StartDate)'), 'desc')
                     ->orderBy(\DB::raw('MONTH(StartDate)'), 'desc')
-                    ->orderBy('registrations_count', 'desc');
+                    ->orderBy('id', 'desc');
             });
     }
 
