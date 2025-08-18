@@ -6,8 +6,8 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Table;
 
 class PrevShowArenaRelationManager extends RelationManager
 {
@@ -22,7 +22,18 @@ class PrevShowArenaRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                // Minimal for now; arenas are managed in their own resource
+                Forms\Components\TextInput::make('GroupName')
+                    ->required()
+                    ->maxLength(255)
+                    ->label('Name'),
+                Forms\Components\Select::make('JudgeID')
+                    ->relationship('judge', 'JudgeNameEN')
+                    ->required()
+                    ->label('Judge'),
+                Forms\Components\TextInput::make('OrderID')
+                    ->required()
+                    ->numeric()
+                    ->label('Order'),
             ]);
     }
 

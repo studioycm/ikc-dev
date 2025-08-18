@@ -20,13 +20,30 @@ class PrevShowClass extends Model
      */
     protected $table = 'Shows_Classes';
 
+    protected $primaryKey = 'id';
+
     protected $casts = [
         'DataID' => 'integer',
+        'Age_FromMonths' => 'integer',
+        'Age_TillMonths' => 'integer',
         'ShowID' => 'integer',
         'ShowArenaID' => 'integer',
-        'ClassID' => 'integer',
+        'SpecialClassID' => 'integer',
         'OrderID' => 'integer',
         'JudgeID' => 'integer',
+        'ShowRaceID' => 'integer',
+        'BreedID' => 'integer',
+        'Status' => 'integer',
+        'GenderID' => 'integer',
+        'AwardIDClass' => 'integer',
+        'IsChampClass' => 'integer',
+        'IsWorkingClass' => 'integer',
+        'IsOpenClass' => 'integer',
+        'IsVeteranClass' => 'integer',
+        'IsCouplesClass' => 'integer',
+        'IsZezaimClass' => 'integer',
+        'IsYoungDriverClass' => 'integer',
+        'IsBgidulClass' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
@@ -47,5 +64,4 @@ class PrevShowClass extends Model
     {
         return $this->hasMany(PrevShowDog::class, 'ClassID', 'id');
     }
-
 }

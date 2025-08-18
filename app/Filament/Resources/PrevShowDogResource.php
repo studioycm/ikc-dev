@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PrevShowDogResource\Pages;
 use App\Models\PrevShowDog;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -19,17 +18,14 @@ use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PrevShowDogResource extends Resource
 {
     protected static ?string $model = PrevShowDog::class;
 
-    protected static ?string $slug = 'show-dogs';
+    protected static ?string $slug = 'prev-show-dogs';
 
     protected static ?string $navigationIcon = 'fas-dog';
 
@@ -162,100 +158,68 @@ class PrevShowDogResource extends Resource
                     ->required()
                     ->integer(),
 
-                Placeholder::make('created_at')
-                    ->label('Created Date')
-                    ->content(fn (?PrevShowDog $record): string => $record?->created_at?->diffForHumans() ?? '-'),
-
-                Placeholder::make('updated_at')
-                    ->label('Last Modified Date')
-                    ->content(fn (?PrevShowDog $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                return $query->with(['show', 'result']);
+            })
             ->columns([
-                TextColumn::make('DataID'),
+                TextColumn::make('id')
+                    ->label(__('id'))
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
 
-                TextColumn::make('ModificationDateTime')
-                    ->date(),
-
-                TextColumn::make('CreationDateTime')
-                    ->date(),
-
-                TextColumn::make('ShowID'),
-
-                TextColumn::make('SagirID'),
-
-                TextColumn::make('GlobalSagirID'),
-
-                TextColumn::make('OrderID'),
-
-                TextColumn::make('ownerID.name')
+                TextColumn::make('show.TitleName')
+                    ->label(__('Show Title'))
+                    ->description(fn(PrevShowDog $record): int => (int)$record->ShowID),
+                TextColumn::make('dog_summary')
+                    ->label(__('Dog name'))
+                    ->state(fn(PrevShowDog $r) => $r->dog?->full_name ?? ($r->DogName ?: '—'))
+                    ->description(fn(PrevShowDog $r) => ($r->SagirID ?? '—'))
+                    ->url(fn(PrevShowDog $r) => $r->dog ? PrevDogResource::getUrl('view', ['record' => $r->dog->getKey()]) : null)
+                    ->openUrlInNewTab()
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('BirthDate')
-                    ->date(),
+                TextColumn::make('arena_summary')
+                    ->label(__('Arena name'))
+                    ->state(fn(PrevShowDog $r) => $r->arena?->GroupName ?? '—')
+                    ->description(fn(PrevShowDog $r) => ($r->ArenaID ?? '—'))
+                    ->url(fn(PrevShowDog $r) => $r->ArenaID ? PrevShowArenaResource::getUrl('view', ['record' => $r->ArenaID]) : null)
+                    ->openUrlInNewTab()
+                    ->toggleable(),
 
-                TextColumn::make('BreedID'),
+                TextColumn::make('class_summary')
+                    ->label(__('Class type'))
+                    ->state(fn(PrevShowDog $r) => $r->showClass?->ClassName ?? '—')
+                    ->description(fn(PrevShowDog $r) => ($r->ClassID ?? '—'))
+                    ->url(fn(PrevShowDog $r) => $r->ClassID ? PrevShowClassResource::getUrl('view', ['record' => $r->ClassID]) : null)
+                    ->openUrlInNewTab()
+                    ->toggleable(),
 
-                TextColumn::make('SizeID'),
+                TextColumn::make('breed_summary')
+                    ->label(__('Breed'))
+                    ->state(fn(PrevShowDog $r) => $r->breed?->BreedNameEN ?: ($r->breed?->BreedName ?: '—'))
+                    ->description(fn(PrevShowDog $r) => __('Breed Code') . ': ' . ($r->breed?->BreedCode ?? '—'))
+                    ->url(fn(PrevShowDog $r) => $r->ShowBreedID ? PrevShowBreedResource::getUrl('view', ['record' => $r->ShowBreedID]) : null)
+                    ->openUrlInNewTab()
+                    ->toggleable(),
 
-                TextColumn::make('GenderID'),
+                TextColumn::make('result.DataID')
+                    ->label(__('Result'))
+                    ->url(function ($state) {
+                        return $state ? PrevShowResultResource::getUrl('edit', ['record' => $state]) : null;
+                    })
+                    ->searchable(isGlobal: false, isIndividual: true)
+                    ->toggleable(),
 
-                TextColumn::make('DogName'),
-
-                TextColumn::make('ShowRegistrationID'),
-
-                TextColumn::make('ClassID'),
-
-                TextColumn::make('OwnerName'),
-
-                TextColumn::make('OwnerMobile'),
-
-                TextColumn::make('BeitGidulName'),
-
-                TextColumn::make('HairID'),
-
-                TextColumn::make('ColorID'),
-
-                TextColumn::make('MainArenaID'),
-
-                TextColumn::make('ArenaID'),
-
-                TextColumn::make('ShowBreedID'),
-
-                TextColumn::make('MobileNumber'),
-
-                TextColumn::make('OwnerEmail'),
-
-                TextColumn::make('new_show_registration_id'),
-
-                TextColumn::make('present')
-                    ->date(),
-
-                TextColumn::make('SagirID'),
-
-                TextColumn::make('ShowID'),
-
-                TextColumn::make('ArenaID'),
-
-                TextColumn::make('ShowRegistrationID'),
-
-                TextColumn::make('ClassID'),
-
-                TextColumn::make('ownerID.name')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('new_show_registration_id'),
-
-                TextColumn::make('BreedID'),
             ])
             ->filters([
-                TrashedFilter::make(),
             ])
             ->actions([
                 EditAction::make(),
@@ -269,7 +233,8 @@ class PrevShowDogResource extends Resource
                     RestoreBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('id', 'desc');
     }
 
     public static function getPages(): array
@@ -283,30 +248,7 @@ class PrevShowDogResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
+        return parent::getEloquentQuery();
     }
 
-    //    public static function getGlobalSearchEloquentQuery(): Builder
-    //    {
-    //        return parent::getGlobalSearchEloquentQuery()->with(['ownerID']);
-    //    }
-    //
-    //    public static function getGloballySearchableAttributes(): array
-    //    {
-    //        return ['ownerID.name'];
-    //    }
-    //
-    //    public static function getGlobalSearchResultDetails(Model $record): array
-    //    {
-    //        $details = [];
-    //
-    //        if ($record->ownerID) {
-    //            $details['OwnerID'] = $record->ownerID->name;
-    //        }
-    //
-    //        return $details;
-    //    }
 }

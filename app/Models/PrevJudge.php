@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class PrevJudge extends Model
 {
@@ -19,8 +20,8 @@ class PrevJudge extends Model
     protected $table = 'JudgesDB';
 
     protected $primaryKey = 'DataID';
+
     public $incrementing = true;
-    protected $keyType = 'int';
 
     protected $casts = [
         'DataID' => 'integer',
@@ -39,4 +40,9 @@ class PrevJudge extends Model
         return $this->hasMany(PrevShowArena::class, 'JudgeID', 'DataID');
     }
 
+    // judge relation to show (PrevShow) through show arena (PrevShowArena)
+    public function shows(): HasManyThrough
+    {
+        return $this->hasManyThrough(PrevShow::class, PrevShowArena::class, 'JudgeID', 'ShowArenaID', 'DataID', 'id');
+    }
 }

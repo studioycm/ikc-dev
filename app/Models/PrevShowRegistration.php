@@ -20,8 +20,6 @@ class PrevShowRegistration extends Model
      */
     protected $table = 'shows_registration';
 
-    protected $guarded = [];
-
     protected $casts = [
         'id' => 'integer',
         'DataID' => 'integer',
@@ -37,15 +35,49 @@ class PrevShowRegistration extends Model
     ];
 
     // Normalized relations
-    public function show(): BelongsTo { return $this->belongsTo(PrevShow::class, 'ShowID'); }
-    public function dog(): BelongsTo { return $this->belongsTo(PrevDog::class, 'SagirID'); }
-    public function class(): BelongsTo { return $this->belongsTo(PrevShowClass::class, 'ClassID'); }
-    public function owner(): BelongsTo { return $this->belongsTo(PrevUser::class, 'registered_by'); }
-    public function payments(): HasMany { return $this->hasMany(PrevShowPayment::class, 'RegistrationID'); }
+    public function show(): BelongsTo
+    {
+        return $this->belongsTo(PrevShow::class, 'ShowID');
+    }
+
+    public function dog(): BelongsTo
+    {
+        return $this->belongsTo(PrevDog::class, 'SagirID');
+    }
+
+    public function class(): BelongsTo
+    {
+        return $this->belongsTo(PrevShowClass::class, 'ClassID');
+    }
+
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(PrevUser::class, 'registered_by');
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(PrevShowPayment::class, 'RegistrationID');
+    }
 
     // Legacy wrappers
-    public function showID(): BelongsTo { return $this->show(); }
-    public function sagirID(): BelongsTo { return $this->dog(); }
-    public function classID(): BelongsTo { return $this->class(); }
-    public function registeredBy(): BelongsTo { return $this->owner(); }
+    public function showID(): BelongsTo
+    {
+        return $this->show();
+    }
+
+    public function sagirID(): BelongsTo
+    {
+        return $this->dog();
+    }
+
+    public function classID(): BelongsTo
+    {
+        return $this->class();
+    }
+
+    public function registeredBy(): BelongsTo
+    {
+        return $this->owner();
+    }
 }

@@ -7,9 +7,15 @@ use App\Filament\Resources\PrevShowResource\RelationManagers\PrevShowArenaRelati
 use App\Filament\Resources\PrevShowResource\RelationManagers\PrevShowClassRelationManager;
 use App\Models\PrevShow;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Grid as InfolistGrid;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\Section as InfolistSection;
+use Filament\Infolists\Components\Tabs;
+use Filament\Infolists\Components\Tabs\Tab;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -19,6 +25,7 @@ use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -27,11 +34,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\HtmlString;
-use Illuminate\Support\Str;
 
 class PrevShowResource extends Resource
 {
-
     protected static ?string $model = PrevShow::class;
 
     protected static ?string $slug = 'prev-shows';
@@ -183,13 +188,7 @@ class PrevShowResource extends Resource
                     ->required()
                     ->integer(),
 
-                Placeholder::make('created_at')
-                    ->label('Created Date')
-                    ->content(fn (?PrevShow $record): string => $record?->created_at?->diffForHumans() ?? '-'),
 
-                Placeholder::make('updated_at')
-                    ->label('Last Modified Date')
-                    ->content(fn (?PrevShow $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
             ]);
     }
 
@@ -197,17 +196,17 @@ class PrevShowResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function (Builder $query) {
-                return $query->with(['club','arenas','classes'])->withCount(['registrations', 'showDogs', 'results']);
+                return $query->with(['club', 'arenas', 'classes'])->withCount(['registrations', 'showDogs', 'results']);
             })
             ->columns([
                 TextColumn::make('id')
                     ->label(__('ID'))
                     ->sortable()
-                ->toggleable()
-                ->searchable(),
+                    ->toggleable()
+                    ->searchable(),
                 TextColumn::make('TitleName')
                     ->label(__('Title'))
-                    ->description(fn(PrevShow $record): HtmlString => new HtmlString('<p><span>' . $record->club->Name . '</span><br><span>' . $record->ShowType .  '</span>, <span>' . $record->location . '</span></p>'))
+                    ->description(fn(PrevShow $record): HtmlString => new HtmlString('<p><span>' . $record->club->Name . '</span><br><span>' . $record->ShowType . '</span>, <span>' . $record->location . '</span></p>'))
                     ->searchable()
                     ->sortable(),
 
@@ -236,22 +235,21 @@ class PrevShowResource extends Resource
                     ->sortable()
                     ->toggleable(),
 
-//                TextColumn::make('FreeTextDesc')
-//                    ->label(__('Additional Information')),
+                //                TextColumn::make('FreeTextDesc')
+                //                    ->label(__('Additional Information')),
 
                 TextColumn::make('MaxRegisters')
-                ->label(__('Max. Registrations'))
-                ->numeric()
-                ->sortable()
-                ->toggleable(),
-
+                    ->label(__('Max. Registrations'))
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(),
 
                 IconColumn::make('ShowStatus')
-                ->label(__('Show Status'))
-                ->boolean(fn ($state): bool => $state === 2)
-                ->color(fn ($state): string => $state === 2 ? 'success' : 'danger')
-                ->toggleable()
-                ->sortable(),
+                    ->label(__('Show Status'))
+                    ->boolean(fn($state): bool => $state === 2)
+                    ->color(fn($state): string => $state === 2 ? 'success' : 'danger')
+                    ->toggleable()
+                    ->sortable(),
 
                 TextColumn::make('arenas_count')
                     ->label(__('Arenas'))
@@ -283,7 +281,6 @@ class PrevShowResource extends Resource
                     ->numeric()
                     ->sortable()
                     ->toggleable(),
-
 
                 TextColumn::make('ShowPrice')
                     ->money('ILS')
@@ -417,6 +414,7 @@ class PrevShowResource extends Resource
                 TrashedFilter::make('trashed'),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
                 RestoreAction::make(),
@@ -437,11 +435,66 @@ class PrevShowResource extends Resource
             });
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Tabs::make('ShowTabs')
+                    ->tabs([
+                        Tab::make(__('Overview'))
+                            ->schema([
+                                InfolistGrid::make(3)->schema([
+                                    TextEntry::make('TitleName')->label(__('Title'))->columnSpan(2),
+                                    TextEntry::make('club.Name')->label(__('Club')),
+                                    TextEntry::make('ShowType')->label(__('Type')),
+                                    TextEntry::make('location')->label(__('Location')),
+                                    IconEntry::make('ShowStatus')->label(__('Active'))->boolean(),
+                                ]),
+                                InfolistSection::make(__('Counts'))
+                                    ->schema([
+                                        TextEntry::make('arenas_count')->label(__('Arenas'))->state(fn(PrevShow $record) => $record->arenas()->count()),
+                                        TextEntry::make('classes_count')->label(__('Classes'))->state(fn(PrevShow $record) => $record->classes()->count()),
+                                        TextEntry::make('registrations_count')->label(__('Registrations'))->state(fn(PrevShow $record) => $record->registrations()->count()),
+                                        TextEntry::make('show_dogs_count')->label(__('Show Dogs'))->state(fn(PrevShow $record) => $record->showDogs()->count()),
+                                        TextEntry::make('results_count')->label(__('Results'))->state(fn(PrevShow $record) => $record->results()->count()),
+                                    ])->columns(5),
+                            ]),
+                        Tab::make(__('Dates'))
+                            ->schema([
+                                InfolistGrid::make(2)->schema([
+                                    TextEntry::make('StartDate')->date()->label(__('Starting at')),
+                                    TextEntry::make('EndDate')->date()->label(__('Ending at')),
+                                    TextEntry::make('EndRegistrationDate')->date()->label(__('Registration ends')),
+                                    TextEntry::make('CreationDateTime')->since()->label(__('Created')),
+                                    TextEntry::make('ModificationDateTime')->since()->label(__('Updated')),
+                                ]),
+                            ]),
+                        Tab::make(__('Pricing'))
+                            ->schema([
+                                InfolistGrid::make(3)->schema([
+                                    TextEntry::make('ShowPrice')->money('ILS'),
+                                    TextEntry::make('Dog2Price1')->money('ILS'),
+                                    TextEntry::make('Dog2Price2')->money('ILS'),
+                                    TextEntry::make('Dog2Price3')->money('ILS'),
+                                    TextEntry::make('Dog2Price4')->money('ILS'),
+                                    TextEntry::make('Dog2Price5')->money('ILS'),
+                                    TextEntry::make('Dog2Price6')->money('ILS'),
+                                    TextEntry::make('Dog2Price7')->money('ILS'),
+                                    TextEntry::make('Dog2Price8')->money('ILS'),
+                                    TextEntry::make('Dog2Price9')->money('ILS'),
+                                    TextEntry::make('Dog2Price10')->money('ILS'),
+                                ]),
+                            ]),
+                    ])->columnSpanFull(),
+            ]);
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListPrevShows::route('/'),
             'create' => Pages\CreatePrevShow::route('/create'),
+            'view' => Pages\ViewPrevShow::route('/{record}'),
             'edit' => Pages\EditPrevShow::route('/{record}/edit'),
         ];
     }

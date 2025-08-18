@@ -14,8 +14,8 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Table;
 use Filament\Tables\Filters;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 class PrevJudgeResource extends Resource
@@ -47,8 +47,6 @@ class PrevJudgeResource extends Resource
     {
         return __('Judges');
     }
-
-
 
     public static function form(Form $form): Form
     {
@@ -103,7 +101,8 @@ class PrevJudgeResource extends Resource
                 TextColumn::make('Email')
                     ->searchable(isGlobal: false, isIndividual: true)
                     ->sortable()
-                    ->label(__('Email')),
+                    ->label(__('Email'))
+                    ->toggleable(),
 
                 TextColumn::make('arenas_count')
                     ->counts('arenas')
@@ -113,12 +112,12 @@ class PrevJudgeResource extends Resource
 
                 TextColumn::make('ModificationDateTime')
                     ->date()
-                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->toggleable()
                     ->sortable(),
 
                 TextColumn::make('CreationDateTime')
                     ->date()
-                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->toggleable()
                     ->sortable(),
 
                 TextColumn::make('DataID')
@@ -133,17 +132,17 @@ class PrevJudgeResource extends Resource
                     ->label(__('Arenas Count'))
                     ->form([
                         Components\TextInput::make('arenas_count')
-                        ->numeric()
-                        ->default(1)
-                        ->required()
-                        ->minValue(0)
+                            ->numeric()
+                            ->default(1)
+                            ->required()
+                            ->minValue(0),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['arenas_count'],
                             fn(Builder $query, $arenas_count): Builder => $query->has('arenas', '=', $arenas_count)
                         );
-                    })
+                    }),
             ])
             ->actions([
                 EditAction::make(),

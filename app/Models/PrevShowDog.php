@@ -19,43 +19,60 @@ class PrevShowDog extends Model
      */
     protected $table = 'Shows_Dogs_DB';
 
-    protected $guarded = [];
-
     protected $casts = [
-        'id' => 'integer',
         'DataID' => 'integer',
         'ShowID' => 'integer',
         'ArenaID' => 'integer',
         'ClassID' => 'integer',
         'ShowRegistrationID' => 'integer',
+        'new_show_registration_id' => 'integer',
         'OwnerID' => 'integer',
         'BreedID' => 'integer',
         'SagirID' => 'integer',
-        'new_show_registration_id' => 'integer',
-        'present' => 'datetime',
-        'present_time' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
     ];
 
     // Normalized relation names
-    public function show(): BelongsTo { return $this->belongsTo(PrevShow::class, 'ShowID'); }
-    public function arena(): BelongsTo { return $this->belongsTo(PrevShowArena::class, 'ArenaID'); }
-    public function showClass(): BelongsTo { return $this->belongsTo(PrevShowClass::class, 'ClassID'); }
-    public function registration(): BelongsTo { return $this->belongsTo(PrevShowRegistration::class, 'ShowRegistrationID'); }
-    public function newRegistration(): BelongsTo { return $this->belongsTo(PrevShowRegistration::class, 'new_show_registration_id'); }
-    public function dog(): BelongsTo { return $this->belongsTo(PrevDog::class, 'SagirID', 'SagirID'); }
-    public function owner(): BelongsTo { return $this->belongsTo(PrevUser::class, 'O', 'id'); }
-    public function breed(): BelongsTo { return $this->belongsTo(PrevBreed::class, 'BreedID', 'BreedCode'); }
+    public function show(): BelongsTo
+    {
+        return $this->belongsTo(PrevShow::class, 'ShowID', 'id');
+    }
 
-    // Legacy wrappers
-    public function sagirID(): BelongsTo { return $this->dog(); }
-    public function showID(): BelongsTo { return $this->show(); }
-    public function arenaID(): BelongsTo { return $this->arena(); }
-    public function classID(): BelongsTo { return $this->showClass(); }
-    public function showRegistrationID(): BelongsTo { return $this->registration(); }
-    public function ownerID(): BelongsTo { return $this->owner(); }
-    public function newShowRegistration(): BelongsTo { return $this->newRegistration(); }
-    public function breedID(): BelongsTo { return $this->breed(); }
+    public function arena(): BelongsTo
+    {
+        return $this->belongsTo(PrevShowArena::class, 'ArenaID', 'id');
+    }
+
+    public function showClass(): BelongsTo
+    {
+        return $this->belongsTo(PrevShowClass::class, 'ClassID', 'id');
+    }
+
+    public function registration(): BelongsTo
+    {
+        return $this->belongsTo(PrevShowRegistration::class, 'ShowRegistrationID');
+    }
+
+    public function newRegistration(): BelongsTo
+    {
+        return $this->belongsTo(PrevShowRegistration::class, 'new_show_registration_id');
+    }
+
+    public function dog(): BelongsTo
+    {
+        return $this->belongsTo(PrevDog::class, 'SagirID', 'SagirID');
+    }
+
+    public function breed(): BelongsTo
+    {
+        return $this->belongsTo(PrevBreed::class, 'BreedID', 'BreedCode');
+    }
+
+    // revers relation with PrevShowResult
+    public function result(): BelongsTo
+    {
+        return $this->belongsTo(PrevShowResult::class, 'SagirID', 'SagirID')
+            ->where('ShowID', $this->ShowID)
+            ->where('MainArenaID', $this->ArenaID)
+            ->where('ClassID', $this->ClassID);
+    }
 }

@@ -20,10 +20,8 @@ class PrevShowPayment extends Model
     protected $table = 'shows_payments_info';
 
     protected $primaryKey = 'DataID';
-    public $incrementing = true;
-    protected $keyType = 'int';
 
-    protected $guarded = [];
+    public $incrementing = true;
 
     protected $casts = [
         'DataID' => 'integer',

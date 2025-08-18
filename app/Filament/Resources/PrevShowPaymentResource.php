@@ -31,50 +31,86 @@ class PrevShowPaymentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?int $navigationSort = 60;
+
+    public static function getModelLabel(): string
+    {
+        return __('Show Payment');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Show Payments');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return __('Shows Management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Show Payments');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 TextInput::make('DataID')
+                    ->label(__('ID'))
                     ->required()
                     ->integer(),
 
-                DatePicker::make('ModificationDateTime'),
+                DatePicker::make('ModificationDateTime')
+                    ->label(__('Modified')),
 
-                DatePicker::make('CreationDateTime'),
+                DatePicker::make('CreationDateTime')
+                    ->label(__('Created')),
 
                 TextInput::make('SagirID')
+                    ->label(__('Sagir ID'))
                     ->numeric(),
 
                 TextInput::make('RegistrationID')
+                    ->label(__('Registration'))
                     ->numeric(),
 
                 TextInput::make('DogID')
+                    ->label(__('Dog'))
                     ->numeric(),
 
                 TextInput::make('PaymentAmount')
+                    ->label(__('Amount'))
                     ->numeric(),
 
-                TextInput::make('Last4Digits'),
+                TextInput::make('Last4Digits')
+                    ->label(__('Last 4 Digits')),
 
-                TextInput::make('OwnerSocialID'),
+                TextInput::make('OwnerSocialID')
+                    ->label(__('Owner Social ID')),
 
-                TextInput::make('NameOnCard'),
+                TextInput::make('NameOnCard')
+                    ->label(__('Name on Card')),
 
-                TextInput::make('BuyerIP'),
+                TextInput::make('BuyerIP')
+                    ->label(__('Buyer IP')),
 
-                TextInput::make('PaymentSubject'),
+                TextInput::make('PaymentSubject')
+                    ->label(__('Payment Subject')),
 
-                TextInput::make('CartKey'),
+                TextInput::make('CartKey')
+                    ->label(__('Cart Key')),
 
-                TextInput::make('PaymentStatus'),
+                TextInput::make('PaymentStatus')
+                    ->label(__('Status')),
 
                 Placeholder::make('created_at')
-                    ->label('Created Date')
+                    ->label(__('Created Date'))
                     ->content(fn(?PrevShowPayment $record): string => $record?->created_at?->diffForHumans() ?? '-'),
 
                 Placeholder::make('updated_at')
-                    ->label('Last Modified Date')
+                    ->label(__('Last Modified Date'))
                     ->content(fn(?PrevShowPayment $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
             ]);
     }
@@ -83,35 +119,37 @@ class PrevShowPaymentResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('DataID'),
+                TextColumn::make('DataID')->label(__('ID')),
 
                 TextColumn::make('ModificationDateTime')
-                    ->date(),
+                    ->date()
+                    ->label(__('Modified')),
 
                 TextColumn::make('CreationDateTime')
-                    ->date(),
+                    ->date()
+                    ->label(__('Created')),
 
-                TextColumn::make('SagirID'),
+                TextColumn::make('SagirID')->label(__('Sagir ID')),
 
-                TextColumn::make('RegistrationID'),
+                TextColumn::make('RegistrationID')->label(__('Registration')),
 
-                TextColumn::make('DogID'),
+                TextColumn::make('DogID')->label(__('Dog')),
 
-                TextColumn::make('PaymentAmount'),
+                TextColumn::make('PaymentAmount')->label(__('Amount')),
 
-                TextColumn::make('Last4Digits'),
+                TextColumn::make('Last4Digits')->label(__('Last 4 Digits')),
 
-                TextColumn::make('OwnerSocialID'),
+                TextColumn::make('OwnerSocialID')->label(__('Owner Social ID')),
 
-                TextColumn::make('NameOnCard'),
+                TextColumn::make('NameOnCard')->label(__('Name on Card')),
 
-                TextColumn::make('BuyerIP'),
+                TextColumn::make('BuyerIP')->label(__('Buyer IP')),
 
-                TextColumn::make('PaymentSubject'),
+                TextColumn::make('PaymentSubject')->label(__('Payment Subject')),
 
-                TextColumn::make('CartKey'),
+                TextColumn::make('CartKey')->label(__('Cart Key')),
 
-                TextColumn::make('PaymentStatus'),
+                TextColumn::make('PaymentStatus')->label(__('Status')),
             ])
             ->filters([
                 TrashedFilter::make(),
@@ -146,10 +184,5 @@ class PrevShowPaymentResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
-    }
-
-    public static function getGloballySearchableAttributes(): array
-    {
-        return [];
     }
 }

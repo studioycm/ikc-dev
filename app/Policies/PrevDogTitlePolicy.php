@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\PrevDogTitle;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class PrevDogTitlePolicy
 {
@@ -13,7 +12,7 @@ class PrevDogTitlePolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isSuperAdmin();
     }
 
     /**
@@ -21,7 +20,7 @@ class PrevDogTitlePolicy
      */
     public function view(User $user, PrevDogTitle $prevDogTitle): bool
     {
-        return false;
+        return $user->isSuperAdmin();
     }
 
     /**
@@ -29,7 +28,7 @@ class PrevDogTitlePolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->isSuperAdmin();
     }
 
     /**
@@ -37,7 +36,7 @@ class PrevDogTitlePolicy
      */
     public function update(User $user, PrevDogTitle $prevDogTitle): bool
     {
-        return false;
+        return $user->isSuperAdmin();
     }
 
     /**
@@ -45,7 +44,7 @@ class PrevDogTitlePolicy
      */
     public function delete(User $user, PrevDogTitle $prevDogTitle): bool
     {
-        return false;
+        return $user->isSuperAdmin();
     }
 
     /**
@@ -53,7 +52,7 @@ class PrevDogTitlePolicy
      */
     public function restore(User $user, PrevDogTitle $prevDogTitle): bool
     {
-        return false;
+        return $user->isSuperAdmin();
     }
 
     /**
@@ -61,6 +60,6 @@ class PrevDogTitlePolicy
      */
     public function forceDelete(User $user, PrevDogTitle $prevDogTitle): bool
     {
-        return false;
+        return $user->isSuperAdmin();
     }
 }

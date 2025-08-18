@@ -1,0 +1,176 @@
+table,column,window,total,empty_count,non_empty_count,non_empty_pct,distinct_non_empty,notes
+ShowsDB,DataID,W1,343,14,329,95.92,329,Legacy DataID used pre-2022
+ShowsDB,CreationDateTime,W1,343,14,329,95.92,,
+ShowsDB,TitleName,W1,343,0,343,100.00,,avg_len≈24.83
+ShowsDB,LongDesc,W1,343,319,24,6.99,,
+ShowsDB,MaxRegisters,W1,343,319,24,6.99,,
+ShowsDB,ShowType,W1,343,19,324,94.46,,
+ShowsDB,ClubID,W1,343,262,81,23.62,,
+ShowsDB,ShowStatus,W1,343,33,310,90.38,,
+ShowsDB,FreeTextDesc,W1,343,343,0,0.00,,Unused
+ShowsDB,created_at,W1,343,329,14,4.08,,
+ShowsDB,start_from_index,W1,343,0,343,100.00,,
+ShowsDB,location,W1,343,342,1,0.29,,
+ShowsDB,Check_all_members,W1,343,343,0,0.00,,
+ShowsDB,DataID,W2,559,559,0,0.00,0,Legacy DataID unused post-2022
+ShowsDB,CreationDateTime,W2,559,559,0,0.00,,
+ShowsDB,TitleName,W2,559,0,559,100.00,,avg_len≈36.87
+ShowsDB,LongDesc,W2,559,0,559,100.00,,avg_len≈135.67
+ShowsDB,MaxRegisters,W2,559,0,559,100.00,,
+ShowsDB,ShowType,W2,559,0,559,100.00,,
+ShowsDB,ClubID,W2,559,0,559,100.00,,
+ShowsDB,ShowStatus,W2,559,0,559,100.00,,
+ShowsDB,FreeTextDesc,W2,559,559,0,0.00,,Unused
+ShowsDB,created_at,W2,559,0,559,100.00,,
+ShowsDB,start_from_index,W2,559,97,462,82.65,,
+ShowsDB,location,W2,559,38,521,93.21,,
+ShowsDB,Check_all_members,W2,559,527,32,5.73,,
+Shows_Structure,DataID,W1,1479,31,1448,97.90,1448,
+Shows_Structure,CreationDateTime,W1,1479,31,1448,97.90,,
+Shows_Structure,ShowID,W1,1479,0,1479,100.00,330,
+Shows_Structure,GroupName,W1,1479,2,1477,99.86,,
+Shows_Structure,GroupParentID,W1,1479,755,724,48.96,,
+Shows_Structure,ClassID,W1,1479,1479,0,0.00,,
+Shows_Structure,ArenaType,W1,1479,1436,43,2.91,,
+Shows_Structure,created_at,W1,1479,0,1479,100.00,,
+Shows_Structure,JudgeID,W1,1479,1478,1,0.07,,matches Judges=1
+Shows_Structure,arena_date,W1,1479,1479,0,0.00,,
+Shows_Structure,OrderTime,W1,1479,1479,0,0.00,,
+Shows_Structure,DataID,W2,1207,1207,0,0.00,0,
+Shows_Structure,CreationDateTime,W2,1207,1207,0,0.00,,
+Shows_Structure,ShowID,W2,1207,0,1207,100.00,560,
+Shows_Structure,GroupName,W2,1207,0,1207,100.00,,
+Shows_Structure,GroupParentID,W2,1207,1207,0,0.00,,
+Shows_Structure,ClassID,W2,1207,1207,0,0.00,,
+Shows_Structure,ArenaType,W2,1207,0,1207,100.00,,
+Shows_Structure,created_at,W2,1207,0,1207,100.00,,
+Shows_Structure,JudgeID,W2,1207,907,300,24.85,,matches Judges=299
+Shows_Structure,arena_date,W2,1207,1164,43,3.56,,
+Shows_Structure,OrderTime,W2,1207,1124,83,6.88,,
+Shows_Breeds,RaceID,W1,7482,0,7482,100.00,212,100% → BreedCode
+Shows_Breeds,ArenaID,W1,7482,0,7482,100.00,560,
+Shows_Breeds,ShowID,W1,7482,0,7482,100.00,254,
+Shows_Breeds,JudgeID,W1,7482,697,6785,90.68,265,
+Shows_Breeds,RaceID,W2,14107,0,14107,100.00,253,100% → BreedCode
+Shows_Breeds,ArenaID,W2,14107,0,14107,100.00,1019,
+Shows_Breeds,ShowID,W2,14107,0,14107,100.00,560,
+Shows_Breeds,JudgeID,W2,14107,9826,4281,30.34,185,
+Shows_Classes,DataID,W1,137306,34,137272,99.98,137272,
+Shows_Classes,ClassName,W1,137306,8,137298,99.99,,
+Shows_Classes,Age_FromMonths,W1,137306,16,137290,99.99,16,
+Shows_Classes,Age_TillMonths,W1,137306,16,137290,99.99,27,
+Shows_Classes,SpecialClassID,W1,137306,137306,0,0.00,0,
+Shows_Classes,ShowRaceID,W1,137306,34,137272,99.98,8550,
+Shows_Classes,ShowID,W1,137306,0,137306,100.00,326,
+Shows_Classes,ShowArenaID,W1,137306,8,137298,99.99,684,
+Shows_Classes,Status,W1,137306,42,137264,99.97,2,
+Shows_Classes,IsChampClass,W1,137306,120164,17142,12.48,,flag sparse
+Shows_Classes,IsWorkingClass,W1,137306,120164,17142,12.48,,
+Shows_Classes,IsOpenClass,W1,137306,120164,17142,12.48,,
+Shows_Classes,IsVeteranClass,W1,137306,120164,17142,12.48,,
+Shows_Classes,BreedID,W1,137306,0,137306,100.00,219,
+Shows_Classes,GenderID,W1,137306,8,137298,99.99,2,
+Shows_Classes,HairID,W1,137306,42,137264,99.97,1,
+Shows_Classes,ColorID,W1,137306,42,137264,99.97,2,
+Shows_Classes,ShowMainArenaID,W1,137306,202,137104,99.85,671,
+Shows_Classes,AwardIDClass,W1,137306,137306,0,0.00,0,
+Shows_Classes,created_at,W1,137306,0,137306,100.00,,
+Shows_Classes,DataID,W2,303775,0,303775,100.00,287974,
+Shows_Classes,ClassName,W2,303775,0,303775,100.00,,
+Shows_Classes,Age_FromMonths,W2,303775,0,303775,100.00,7,
+Shows_Classes,Age_TillMonths,W2,303775,0,303775,100.00,11,
+Shows_Classes,SpecialClassID,W2,303775,303775,0,0.00,0,
+Shows_Classes,ShowRaceID,W2,303775,0,303775,100.00,18090,
+Shows_Classes,ShowID,W2,303775,0,303775,100.00,555,
+Shows_Classes,ShowArenaID,W2,303775,0,303775,100.00,1155,
+Shows_Classes,Status,W2,303775,0,303775,100.00,2,
+Shows_Classes,IsChampClass,W2,303775,265843,37932,12.49,,flag sparse
+Shows_Classes,IsWorkingClass,W2,303775,265843,37932,12.49,,
+Shows_Classes,IsOpenClass,W2,303775,265843,37932,12.49,,
+Shows_Classes,IsVeteranClass,W2,303775,265843,37932,12.49,,
+Shows_Classes,BreedID,W2,303775,0,303775,100.00,255,
+Shows_Classes,GenderID,W2,303775,0,303775,100.00,2,
+Shows_Classes,HairID,W2,303775,0,303775,100.00,1,
+Shows_Classes,ColorID,W2,303775,0,303775,100.00,2,
+Shows_Classes,ShowMainArenaID,W2,303775,303775,0,0.00,0,Unused post-2022
+Shows_Classes,AwardIDClass,W2,303775,303775,0,0.00,0,
+Shows_Classes,created_at,W2,303775,0,303775,100.00,,
+Shows_Dogs_DB,BreedID,W1,43072,2,43070,99.99,204,Authoritative → BreedCode
+Shows_Dogs_DB,SagirID,W1,43072,0,43072,100.00,12337,
+Shows_Dogs_DB,ShowRegistrationID,W1,43072,0,43072,100.00,43007,
+Shows_Dogs_DB,GlobalSagirID,W1,43072,12,43060,99.97,2538,
+Shows_Dogs_DB,OwnerID,W1,43072,43072,0,0.00,0,Unused here
+Shows_Dogs_DB,ShowID,W1,43072,0,43072,100.00,321,
+Shows_Dogs_DB,ClassID,W1,43072,0,43072,100.00,28550,
+Shows_Dogs_DB,GenderID,W1,43072,12,43060,99.97,2,
+Shows_Dogs_DB,MainArenaID,W1,43072,12,43060,99.97,681,
+Shows_Dogs_DB,ArenaID,W1,43072,7,43065,99.98,688,
+Shows_Dogs_DB,ShowBreedID,W1,43072,43072,0,0.00,0,
+Shows_Dogs_DB,new_show_registration_id,W1,43072,43060,12,0.03,11,
+Shows_Dogs_DB,OwnerEmail,W1,43072,23866,19206,44.60,,avg_len≈19.65
+Shows_Dogs_DB,OwnerMobile,W1,43072,27139,15933,36.99,,avg_len≈10.20
+Shows_Dogs_DB,created_at,W1,43072,43060,12,0.03,,
+Shows_Dogs_DB,BreedID,W2,23823,0,23823,100.00,184,Authoritative → BreedCode
+Shows_Dogs_DB,SagirID,W2,23823,0,23823,100.00,5759,
+Shows_Dogs_DB,ShowRegistrationID,W2,23823,0,23823,100.00,23656,
+Shows_Dogs_DB,GlobalSagirID,W2,23823,23823,0,0.00,0,
+Shows_Dogs_DB,OwnerID,W2,23823,23823,0,0.00,0,Unused here
+Shows_Dogs_DB,ShowID,W2,23823,0,23823,100.00,531,
+Shows_Dogs_DB,ClassID,W2,23823,3,23820,99.99,15990,
+Shows_Dogs_DB,GenderID,W2,23823,0,23823,100.00,2,
+Shows_Dogs_DB,MainArenaID,W2,23823,23823,0,0.00,0,Unused post-2022
+Shows_Dogs_DB,ArenaID,W2,23823,1130,22693,95.26,835,
+Shows_Dogs_DB,ShowBreedID,W2,23823,23226,597,2.51,126,Sparse
+Shows_Dogs_DB,new_show_registration_id,W2,23823,3,23820,99.99,23656,
+Shows_Dogs_DB,OwnerEmail,W2,23823,106,23717,99.56,,avg_len≈20.50
+Shows_Dogs_DB,OwnerMobile,W2,23823,4,23819,99.98,,avg_len≈8.99
+shows_results,RegDogID,W1,8307,0,8307,100.00,,match to registration id = 0
+shows_results,SagirID,W1,8307,0,8307,100.00,,match to DogsDB = 165
+shows_results,ClassID,W1,8307,0,8307,100.00,,match to Classes = 8307
+shows_results,ShowID,W1,8307,0,8307,100.00,,match to Shows = 8307
+shows_results,MainArenaID,W1,8307,0,8307,100.00,,match to Arenas = 8307
+shows_results,SubArenaID,W1,8307,8307,0,0.00,,Unused
+shows_results,BreedID,W1,8307,25,8282,99.70,,match to BreedCode = 8282
+shows_results,RegDogID,W2,21561,0,21561,100.00,,match to registration id = 0
+shows_results,SagirID,W2,21561,0,21561,100.00,,match to DogsDB = 21560
+shows_results,ClassID,W2,21561,0,21561,100.00,,match to Classes = 21561
+shows_results,ShowID,W2,21561,0,21561,100.00,,match to Shows = 21561
+shows_results,MainArenaID,W2,21561,0,21561,100.00,,match to Arenas = 21561
+shows_results,SubArenaID,W2,21561,21561,0,0.00,,Unused
+shows_results,BreedID,W2,21561,0,21561,100.00,,match to BreedCode = 21561
+shows_registration,ClassID,W1,460,460,0,0.00,,match to Classes = 0
+shows_registration,registered_by,W1,460,460,0,0.00,,
+shows_registration,SagirID,W1,460,0,460,100.00,,match to DogsDB = 445
+shows_registration,ShowID,W1,460,0,460,100.00,,
+shows_registration,Owner_Email,W1,460,32,428,93.04,,avg_len≈20.20
+shows_registration,Owner_City,W1,460,244,216,46.96,,
+shows_registration,ClassID,W2,27849,2159,25690,92.25,,match to Classes = 25690
+shows_registration,registered_by,W2,27849,6534,21315,76.53,,
+shows_registration,SagirID,W2,27849,119,27730,99.57,,match to DogsDB = 27744
+shows_registration,ShowID,W2,27849,0,27849,100.00,,
+shows_registration,Owner_Email,W2,27849,142,27707,99.49,,avg_len≈20.50
+shows_registration,Owner_City,W2,27849,2037,25812,92.68,,
+shows_payments_info,SagirID,W1,377,1,376,99.73,351,match DogsDB=377
+shows_payments_info,RegistrationID,W1,377,0,377,100.00,374,match Registration=323
+shows_payments_info,PaymentAmount,W1,377,0,377,100.00,,min=115,max=1050,avg≈256.72
+shows_payments_info,SagirID,W2,20634,2,20632,99.99,5325,match DogsDB=20634
+shows_payments_info,RegistrationID,W2,20634,0,20634,100.00,20634,match Registration=20632
+shows_payments_info,PaymentAmount,W2,20634,0,20634,100.00,,min=5,max=3300,avg≈262.49
+JudgesDB,BreedID,W1,284,277,7,2.46,7,Rare usage
+JudgesDB,Country,W1,284,0,284,100.00,56,
+JudgesDB,JudgeNameHE,W1,284,0,284,100.00,,
+JudgesDB,JudgeNameEN,W1,284,0,284,100.00,,
+JudgesDB,BreedID,W2,93,93,0,0.00,0,Rare/unused
+JudgesDB,Country,W2,93,0,93,100.00,38,
+JudgesDB,JudgeNameHE,W2,93,0,93,100.00,,
+JudgesDB,JudgeNameEN,W2,93,0,93,100.00,,
+show_winners,couples,W2,28,3,25,89.29,,,optional block
+show_winners,couples2,W2,28,4,24,85.71,,,optional block
+show_winners,couples3,W2,28,13,15,53.57,,,optional block
+show_winners,breeding_houses,W2,28,8,20,71.43,,,optional block
+show_winners,breeding_houses2,W2,28,11,17,60.71,,,optional block
+show_winners,breeding_houses3,W2,28,17,11,39.29,,,optional block
+show_winners,puppies,W2,28,19,9,32.14,,,optional block
+show_winners,puppies2,W2,28,23,5,17.86,,,optional block
+show_winners,puppies3,W2,28,25,3,10.71,,,optional block
+DogsDB,RaceID,ALL,259230,0,259230,100.00,?,match to BreedCode=259196

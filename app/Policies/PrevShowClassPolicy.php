@@ -15,7 +15,7 @@ class PrevShowClassPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_prev::show_class');
+        return $user->can('view_any_prev::show');
     }
 
     /**
@@ -23,7 +23,7 @@ class PrevShowClassPolicy
      */
     public function view(User $user, PrevShowClass $prevShowClass): bool
     {
-        return $user->can('view_prev::show_class');
+        return $user->can('view_prev::show');
     }
 
     /**
@@ -31,7 +31,7 @@ class PrevShowClassPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_prev::show_class');
+        return $user->can('create_prev::show');
     }
 
     /**
@@ -39,7 +39,7 @@ class PrevShowClassPolicy
      */
     public function update(User $user, PrevShowClass $prevShowClass): bool
     {
-        return $user->can('update_prev::show_class');
+        return $user->can('update_prev::show');
     }
 
     /**
@@ -47,7 +47,7 @@ class PrevShowClassPolicy
      */
     public function delete(User $user, PrevShowClass $prevShowClass): bool
     {
-        return $user->can('delete_prev::show_class');
+        return $user->can('delete_prev::show');
     }
 
     /**
@@ -55,7 +55,7 @@ class PrevShowClassPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_prev::show_class');
+        return $user->can('delete_any_prev::show');
     }
 
     /**
@@ -63,7 +63,7 @@ class PrevShowClassPolicy
      */
     public function restore(User $user, PrevShowClass $prevShowClass): bool
     {
-        return $user->can('restore_prev::show_class');
+        return $user->can('restore_prev::show');
     }
 
     /**
@@ -71,7 +71,7 @@ class PrevShowClassPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_prev::show_class');
+        return $user->can('restore_any_prev::show');
     }
 
     /**
@@ -79,7 +79,7 @@ class PrevShowClassPolicy
      */
     public function forceDelete(User $user, PrevShowClass $prevShowClass): bool
     {
-        return $user->can('force_delete_prev::show_class');
+        return $user->can('force_delete_prev::show');
     }
 
     /**
@@ -87,7 +87,7 @@ class PrevShowClassPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_prev::show_class');
+        return $user->can('force_delete_any_prev::show');
     }
 
     /**
@@ -95,7 +95,7 @@ class PrevShowClassPolicy
      */
     public function replicate(User $user, PrevShowClass $prevShowClass): bool
     {
-        return $user->can('replicate_prev::show_class');
+        return $user->can('replicate_prev::show');
     }
 
     /**
@@ -103,6 +103,6 @@ class PrevShowClassPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_prev::show_class');
+        return $user->can('reorder_prev::show');
     }
 }

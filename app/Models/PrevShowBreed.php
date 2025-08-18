@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PrevShowBreed extends Model
 {
@@ -19,7 +20,9 @@ class PrevShowBreed extends Model
     protected $table = 'Shows_Breeds';
 
     protected $primaryKey = 'DataID';
+
     public $incrementing = true;
+
     protected $keyType = 'int';
 
     protected $guarded = [];
@@ -46,7 +49,6 @@ class PrevShowBreed extends Model
         return $this->belongsTo(PrevShowArena::class, 'ArenaID', 'id');
     }
 
-
     public function breed(): BelongsTo
     {
         return $this->belongsTo(PrevBreed::class, 'RaceID', 'BreedCode');
@@ -57,9 +59,8 @@ class PrevShowBreed extends Model
         return $this->belongsTo(PrevJudge::class, 'JudgeID', 'DataID');
     }
 
-    // Legacy wrappers for backward compatibility
-    public function arenaID(): BelongsTo { return $this->arena(); }
-    public function showID(): BelongsTo { return $this->show(); }
-    public function raceID(): BelongsTo { return $this->breed(); }
-    public function judgeID(): BelongsTo { return $this->judge(); }
+    public function showDogs(): HasMany
+    {
+        return $this->hasMany(PrevShowDog::class, 'BreedID', 'DataID');
+    }
 }

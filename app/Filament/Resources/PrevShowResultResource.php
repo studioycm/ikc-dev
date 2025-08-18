@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\PrevDogResource as DogRes;
+use App\Filament\Resources\PrevShowArenaResource as ArenaRes;
+use App\Filament\Resources\PrevShowClassResource as ClassRes;
+use App\Filament\Resources\PrevShowResource as ShowRes;
 use App\Filament\Resources\PrevShowResultResource\Pages;
 use App\Models\PrevShowResult;
 use Filament\Forms\Components\DatePicker;
@@ -30,6 +34,28 @@ class PrevShowResultResource extends Resource
     protected static ?string $slug = 'prev-show-results';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?int $navigationSort = 60;
+
+    public static function getModelLabel(): string
+    {
+        return __('Show Result');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Show Results');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return __('Shows Management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Show Results');
+    }
 
     public static function form(Form $form): Form
     {
@@ -246,142 +272,45 @@ class PrevShowResultResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn(Builder $q) => $q->with(['dog', 'show', 'mainArena', 'subArena', 'class', 'breed']))
             ->columns([
-                TextColumn::make('DataID'),
-
-                TextColumn::make('ModificationDateTime')
-                    ->date(),
-
-                TextColumn::make('CreationDateTime')
-                    ->date(),
-
-                TextColumn::make('RegDogID'),
-
-                TextColumn::make('SagirID'),
-
-                TextColumn::make('JudgeName'),
-
-                TextColumn::make('ShowOrderID'),
-
-                TextColumn::make('MainArenaID'),
-
-                TextColumn::make('SubArenaID'),
-
-                TextColumn::make('ClassID'),
-
-                TextColumn::make('ShowID'),
-
-                TextColumn::make('JCAC'),
-
-                TextColumn::make('GCAC'),
-
-                TextColumn::make('REJCAC'),
-
-                TextColumn::make('REGCAC'),
-
-                TextColumn::make('CW'),
-
-                TextColumn::make('BJ'),
-
-                TextColumn::make('BV'),
-
-                TextColumn::make('CAC'),
-
-                TextColumn::make('RECACIB'),
-
-                TextColumn::make('RECAC'),
-
-                TextColumn::make('BP'),
-
-                TextColumn::make('BB'),
-
-                TextColumn::make('BOB'),
-
-                TextColumn::make('Excellent'),
-
-                TextColumn::make('Cannotbejudged'),
-
-                TextColumn::make('VeryGood'),
-
-                TextColumn::make('VeryPromising'),
-
-                TextColumn::make('Good'),
-
-                TextColumn::make('Promising'),
-
-                TextColumn::make('Sufficient'),
-
-                TextColumn::make('Satisfactory'),
-
-                TextColumn::make('Disqualified'),
-
-                TextColumn::make('Remarks'),
-
-                TextColumn::make('Rank'),
-
-                TextColumn::make('CACIB'),
-
-                TextColumn::make('BD'),
-
-                TextColumn::make('BOS'),
-
-                TextColumn::make('BPIS'),
-
-                TextColumn::make('BPIS2'),
-
-                TextColumn::make('BPIS3'),
-
-                TextColumn::make('BJIS'),
-
-                TextColumn::make('BJIS2'),
-
-                TextColumn::make('BJIS3'),
-
-                TextColumn::make('BVIS'),
-
-                TextColumn::make('BVIS2'),
-
-                TextColumn::make('BVIS3'),
-
-                TextColumn::make('BIG'),
-
-                TextColumn::make('BIG2'),
-
-                TextColumn::make('BIG3'),
-
-                TextColumn::make('BIS'),
-
-                TextColumn::make('BIS2'),
-
-                TextColumn::make('BIS3'),
-
-                TextColumn::make('BreedID'),
-
-                TextColumn::make('NotPresent'),
-
-                TextColumn::make('GenderID'),
-
-                TextColumn::make('NoTitle'),
-
-                TextColumn::make('VCAC'),
-
-                TextColumn::make('RVCAC'),
-
-                TextColumn::make('BBaby'),
-
-                TextColumn::make('BBIS'),
-
-                TextColumn::make('BBIS2'),
-
-                TextColumn::make('BBIS3'),
-
-                TextColumn::make('BBaby2'),
-
-                TextColumn::make('BBaby3'),
-
-                TextColumn::make('VCACIB'),
-
-                TextColumn::make('JCACIB'),
+                TextColumn::make('dog_summary')
+                    ->label(__('Dog name'))
+                    ->state(fn(\App\Models\PrevShowResult $r) => $r->dog?->full_name ?? '—')
+                    ->description(fn(\App\Models\PrevShowResult $r) => __('Sagir ID') . ': ' . ($r->SagirID ?? '—'))
+                    ->url(fn(\App\Models\PrevShowResult $r) => $r->dog ? DogRes::getUrl('view', ['record' => $r->dog->getKey()]) : null)
+                    ->openUrlInNewTab()
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('show_summary')
+                    ->label(__('Show title'))
+                    ->state(fn(\App\Models\PrevShowResult $r) => $r->show?->TitleName ?? '—')
+                    ->description(fn(\App\Models\PrevShowResult $r) => __('ID') . ': ' . ($r->ShowID ?? '—'))
+                    ->url(fn(\App\Models\PrevShowResult $r) => $r->ShowID ? ShowRes::getUrl('view', ['record' => $r->ShowID]) : null)
+                    ->openUrlInNewTab()
+                    ->toggleable(),
+
+                TextColumn::make('arena_summary')
+                    ->label(__('Arena name'))
+                    ->state(fn(\App\Models\PrevShowResult $r) => $r->mainArena?->GroupName ?? '—')
+                    ->description(fn(\App\Models\PrevShowResult $r) => __('ID') . ': ' . ($r->MainArenaID ?? '—'))
+                    ->url(fn(\App\Models\PrevShowResult $r) => $r->MainArenaID ? ArenaRes::getUrl('view', ['record' => $r->MainArenaID]) : null)
+                    ->openUrlInNewTab()
+                    ->toggleable(),
+
+                TextColumn::make('class_summary')
+                    ->label(__('Class type'))
+                    ->state(fn(\App\Models\PrevShowResult $r) => $r->class?->ClassName ?? '—')
+                    ->description(fn(\App\Models\PrevShowResult $r) => __('ID') . ': ' . ($r->ClassID ?? '—'))
+                    ->url(fn(\App\Models\PrevShowResult $r) => $r->ClassID ? ClassRes::getUrl('view', ['record' => $r->ClassID]) : null)
+                    ->openUrlInNewTab()
+                    ->toggleable(),
+
+                TextColumn::make('breed_summary')
+                    ->label(__('Breed'))
+                    ->state(fn(\App\Models\PrevShowResult $r) => $r->breed?->BreedNameEN ?: ($r->breed?->BreedName ?: '—'))
+                    ->description(fn(\App\Models\PrevShowResult $r) => __('Breed Code') . ': ' . ($r->breed?->BreedCode ?? '—')),
             ])
             ->filters([
                 TrashedFilter::make(),
@@ -416,10 +345,5 @@ class PrevShowResultResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
-    }
-
-    public static function getGloballySearchableAttributes(): array
-    {
-        return [];
     }
 }

@@ -3,11 +3,17 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PrevShowArenaResource\Pages;
+use App\Filament\Resources\PrevShowResource as ShowRes;
 use App\Models\PrevShowArena;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Grid as InfolistGrid;
+use Filament\Infolists\Components\Tabs;
+use Filament\Infolists\Components\Tabs\Tab;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -17,11 +23,11 @@ use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PrevShowArenaResource extends Resource
 {
@@ -35,22 +41,22 @@ class PrevShowArenaResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('Show Arena');
+        return 'Show Arena';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Show Arenas');
+        return 'Show Arenas';
     }
 
     public static function getNavigationGroup(): string
     {
-        return __('Shows Management');
+        return 'Shows Management';
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('Arenas');
+        return 'Arenas';
     }
 
     public static function form(Form $form): Form
@@ -87,14 +93,6 @@ class PrevShowArenaResource extends Resource
                 TextInput::make('JudgeID')
                     ->integer(),
 
-                DatePicker::make('arena_date'),
-
-                DatePicker::make('OrderTime'),
-
-                TextInput::make('ShowsDB_id')
-                    ->required()
-                    ->integer(),
-
                 Placeholder::make('created_at')
                     ->label('Created Date')
                     ->content(fn(?PrevShowArena $record): string => $record?->created_at?->diffForHumans() ?? '-'),
@@ -105,46 +103,59 @@ class PrevShowArenaResource extends Resource
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist->schema([
+            Tabs::make('ArenaTabs')->tabs([
+                Tab::make(__('Overview'))
+                    ->schema([
+                        InfolistGrid::make(3)->schema([
+                            TextEntry::make('DataID')->label('ID'),
+                            TextEntry::make('GroupName')->label(__('Name')),
+                            TextEntry::make('ArenaType')->label(__('Type')),
+                            TextEntry::make('ShowID')->label(__('Show ID')),
+                            TextEntry::make('JudgeID')->label(__('Judge ID')),
+                            TextEntry::make('OrderID')->label(__('Order')),
+                        ]),
+                    ]),
+                Tab::make(__('Timing'))
+                    ->schema([
+                        InfolistGrid::make(2)->schema([
+                            TextEntry::make('arena_date')->date()->label(__('Arena date')),
+                            TextEntry::make('OrderTime')->date()->label(__('Order time')),
+                            TextEntry::make('CreationDateTime')->since()->label(__('Created')),
+                            TextEntry::make('ModificationDateTime')->since()->label(__('Updated')),
+                        ]),
+                    ]),
+            ])->columnSpanFull(),
+        ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn(Builder $q) => $q->with(['show']))
             ->columns([
-                TextColumn::make('DataID'),
+                TextColumn::make('arena_summary')
+                    ->label(__('Arena name'))
+                    ->state(fn(PrevShowArena $r) => $r->GroupName ?: '—')
+                    ->description(fn(PrevShowArena $r) => __('ID') . ': ' . ($r->DataID ?? '—'))
+                    ->searchable()
+                    ->sortable(),
 
-                TextColumn::make('ModificationDateTime')
-                    ->date(),
-
-                TextColumn::make('CreationDateTime')
-                    ->date(),
-
-                TextColumn::make('ShowID'),
-
-                TextColumn::make('GroupName'),
-
-                TextColumn::make('GroupParentID'),
-
-                TextColumn::make('ClassID'),
-
-                TextColumn::make('OrderID'),
-
-                TextColumn::make('ArenaType'),
-
-                TextColumn::make('ManagerPass'),
-
-                TextColumn::make('JudgeID'),
-
-                TextColumn::make('arena_date')
-                    ->date(),
-
-                TextColumn::make('OrderTime')
-                    ->date(),
-
-                TextColumn::make('ShowsDB_id'),
+                TextColumn::make('show_summary')
+                    ->label(__('Show title'))
+                    ->state(fn(PrevShowArena $r) => $r->show?->TitleName ?? '—')
+                    ->description(fn(PrevShowArena $r) => ($r->ShowID ?? '—'))
+                    ->url(fn(PrevShowArena $r) => $r->ShowID ? ShowRes::getUrl('view', ['record' => $r->ShowID]) : null)
+                    ->openUrlInNewTab()
+                    ->toggleable(),
             ])
             ->filters([
                 TrashedFilter::make(),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
                 RestoreAction::make(),
@@ -164,16 +175,16 @@ class PrevShowArenaResource extends Resource
         return [
             'index' => Pages\ListPrevShowArenas::route('/'),
             'create' => Pages\CreatePrevShowArena::route('/create'),
+            'view' => Pages\ViewPrevShowArena::route('/{record}'),
             'edit' => Pages\EditPrevShowArena::route('/{record}/edit'),
         ];
     }
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
+        return parent::getEloquentQuery();
+        //            ->withoutGlobalScopes([
+        //                SoftDeletingScope::class,
+        //            ]);
     }
-
 }

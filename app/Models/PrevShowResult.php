@@ -20,10 +20,8 @@ class PrevShowResult extends Model
     protected $table = 'shows_results';
 
     protected $primaryKey = 'DataID';
-    public $incrementing = true;
-    protected $keyType = 'int';
 
-    protected $guarded = [];
+    public $incrementing = true;
 
     protected $casts = [
         'DataID' => 'integer',
@@ -34,12 +32,6 @@ class PrevShowResult extends Model
         'SubArenaID' => 'integer',
         'ClassID' => 'integer',
         'ShowID' => 'integer',
-        'JCAC' => 'integer',
-        'GCAC' => 'integer',
-        'REJCAC' => 'integer',
-        'REGCAC' => 'integer',
-        'CW' => 'integer',
-        'BJ' => 'integer',
         'ModificationDateTime' => 'datetime',
         'CreationDateTime' => 'datetime',
         'created_at' => 'datetime',
@@ -49,31 +41,31 @@ class PrevShowResult extends Model
 
     public function show(): BelongsTo
     {
-        return $this->belongsTo(PrevShow::class, 'ShowID');
+        return $this->belongsTo(PrevShow::class, 'ShowID', 'id');
     }
 
-    public function mainArena(): BelongsTo
+    public function arena(): BelongsTo
     {
-        return $this->belongsTo(PrevShowArena::class, 'MainArenaID');
-    }
-
-    public function subArena(): BelongsTo
-    {
-        return $this->belongsTo(PrevShowArena::class, 'SubArenaID');
+        return $this->belongsTo(PrevShowArena::class, 'MainArenaID', 'id');
     }
 
     public function class(): BelongsTo
     {
-        return $this->belongsTo(PrevShowClass::class, 'ClassID');
+        return $this->belongsTo(PrevShowClass::class, 'ClassID', 'id');
     }
 
     public function registration(): BelongsTo
     {
-        return $this->belongsTo(PrevShowRegistration::class, 'RegDogID');
+        return $this->belongsTo(PrevShowRegistration::class, 'RegDogID', 'DogId');
     }
 
     public function dog(): BelongsTo
     {
         return $this->belongsTo(PrevDog::class, 'SagirID');
+    }
+
+    public function breed(): BelongsTo
+    {
+        return $this->belongsTo(PrevBreed::class, 'BreedID', 'BreedCode');
     }
 }

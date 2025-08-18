@@ -20,6 +20,7 @@ class PrevShowArena extends Model
      */
     protected $table = 'Shows_Structure';
 
+    protected $primaryKey = 'id';
 
     protected $casts = [
         'DataID' => 'integer',
@@ -48,10 +49,9 @@ class PrevShowArena extends Model
         return $this->hasMany(PrevShowClass::class, 'ShowArenaID', 'id');
     }
 
-    public function breeds(): HasMany
+    public function showBreeds(): HasMany
     {
         return $this->hasMany(PrevShowBreed::class, 'ArenaID', 'id')
             ->with('breed');
     }
-
 }
