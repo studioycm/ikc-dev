@@ -17,18 +17,13 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PrevShowResultResource extends Resource
 {
+
     protected static ?string $model = PrevShowResult::class;
 
     protected static ?string $slug = 'prev-show-results';
@@ -272,7 +267,7 @@ class PrevShowResultResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn(Builder $q) => $q->with(['dog', 'show', 'mainArena', 'subArena', 'class', 'breed']))
+            ->modifyQueryUsing(fn(Builder $q) => $q->with(['dog', 'show', 'arena', 'class', 'breed']))
             ->columns([
                 TextColumn::make('dog_summary')
                     ->label(__('Dog name'))
@@ -313,19 +308,14 @@ class PrevShowResultResource extends Resource
                     ->description(fn(\App\Models\PrevShowResult $r) => __('Breed Code') . ': ' . ($r->breed?->BreedCode ?? '—')),
             ])
             ->filters([
-                TrashedFilter::make(),
             ])
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
-                RestoreAction::make(),
-                ForceDeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -341,9 +331,6 @@ class PrevShowResultResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
+        return parent::getEloquentQuery();
     }
 }

@@ -193,8 +193,6 @@ class PrevShowBreedResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        // Ensure Filament always has a proper Eloquent Builder with a model instance
-        // to avoid "Cannot use ::class on null" errors when resolving table records.
-        return static::$model::query();
+        return parent::getEloquentQuery();
     }
 }
