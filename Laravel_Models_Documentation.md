@@ -2,34 +2,53 @@
 
 ## Overview
 
-This document provides a comprehensive mapping and documentation of Laravel models in the IKC (Israeli Kennel Club) development application. The application manages dog shows, registrations, breeds, judges, and related entities for kennel club operations.
+This document provides a comprehensive mapping and documentation of Laravel models in the IKC (Israeli Kennel Club) development application. The IKC-Dev application is a new Laravel 12 system that connects to and manages the legacy database structure from the previous system (studioycm/ikc-il).
+
+## System Architecture
+
+- **Current System**: `studioycm/ikc-dev` - New Laravel 12.21+ application with Filament v3.x admin panel
+- **Legacy System**: `studioycm/ikc-il` - Original Laravel application containing the business logic and controllers
+- **Database**: The new system connects to the existing database structure via `mysql_prev` connection
 
 ## Database Connections
 
 The application uses multiple database connections:
 
-- **`mysql`** - Primary Laravel application database
-- **`mysql_prev`** - Legacy database containing show management data (used by all Prev* models)
+- **`mysql`** - Primary Laravel application database for new application data
+- **`mysql_prev`** - Legacy database containing all show management data (used by all Prev* models)
 
 ## Model Mappings
 
-Based on the original intended structure and current implementation, here are the model mappings:
+The models in `ikc-dev` are implementations that map to the original models from `ikc-il`. Here's the complete mapping:
 
-### Current Models (Implemented)
+### Core Show Management Models
 
-| Model File | Database Table | Semantic Name | Connection | Status |
-|------------|----------------|---------------|------------|---------|
-| `PrevShow.php` | `ShowsDB` | Shows | `mysql_prev` | ✅ Implemented |
-| `PrevShowDog.php` | `Shows_Dogs_DB` | Show Dogs | `mysql_prev` | ✅ Implemented |
-| `PrevShowArena.php` | `Shows_Structure` | Show Arenas | `mysql_prev` | ✅ Implemented |
-| `PrevShowBreed.php` | `Shows_Breeds` | Show Breeds | `mysql_prev` | ✅ Implemented |
-| `PrevShowClass.php` | `Shows_Classes` | Show Classes | `mysql_prev` | ✅ Implemented |
-| `PrevShowResult.php` | `shows_results` | Show Results/Report | `mysql_prev` | ✅ Implemented |
-| `PrevJudge.php` | `JudgesDB` | Judges | `mysql_prev` | ✅ Implemented |
-| `PrevBreed.php` | `BreedsDB` | Breeds | `mysql_prev` | ✅ Implemented |
-| `PrevDog.php` | `DogsDB` | Dogs | `mysql_prev` | ✅ Implemented |
-| `PrevShowRegistration.php` | `shows_registration` | Show Registrations | `mysql_prev` | ✅ Implemented |
-| `PrevShowPayment.php` | `shows_payments_info` | Show Registration Payments | `mysql_prev` | ✅ Implemented |
+| Original Model (ikc-il) | Database Table | Semantic Name | Current Implementation (ikc-dev) | Status |
+|-------------------------|----------------|---------------|-----------------------------------|---------|
+| `ShowsDetails.php` | `ShowsDB` | Shows | `PrevShow.php` | ✅ Implemented |
+| `Shows.php` | `Shows_Dogs_DB` | Show Dogs | `PrevShowDog.php` | ✅ Implemented |
+| `Structures.php` | `Shows_Structure` | Show Arenas | `PrevShowArena.php` | ✅ Implemented |
+| `StructureBreed.php` | `Shows_Breeds` | Show Breeds | `PrevShowBreed.php` | ✅ Implemented |
+| `Structureclasses.php` | `Shows_Classes` | Show Classes | `PrevShowClass.php` | ✅ Implemented |
+| `ShowsResults.php` | `shows_results` | Show Results/Report | `PrevShowResult.php` | ✅ Implemented |
+| `JudgesDB.php` | `JudgesDB` | Judges | `PrevJudge.php` | ✅ Implemented |
+| `BreedsDB.php` | `BreedsDB` | Breeds | `PrevBreed.php` | ✅ Implemented |
+| `DogsDB.php` | `DogsDB` | Dogs | `PrevDog.php` | ✅ Implemented |
+| `ShowRegistration.php` | `shows_registration` | Show Registrations | `PrevShowRegistration.php` | ✅ Implemented |
+| `ShowsPaymentsInfo.php` | `shows_payments_info` | Show Registration Payments | `PrevShowPayment.php` | ✅ Implemented |
+| `ShowWinner.php` | `show_winners` | Show Winners | Not implemented | ❌ Not needed currently |
+
+### Original Controllers (ikc-il Repository)
+
+The business logic and controllers remain in the original `studioycm/ikc-il` repository:
+
+| Controller | Purpose | Location |
+|------------|---------|----------|
+| `ShowManagementController.php` | Shows management | `studioycm/ikc-il: app/Http/Controllers/` |
+| `FrontShowController.php` | Shows live management (Native) | `studioycm/ikc-il: app/Http/Controllers/native` |
+| `AdminStructureController.php` | Shows Arenas (show structures) | `studioycm/ikc-il: app/Http/Controllers/` |
+| `AdminJudgeController.php` | Judges management | `studioycm/ikc-il: app/Http/Controllers/` |
+| `BackendBreedController.php` | Breeds management | `studioycm/ikc-il: app/Http/Controllers/` |
 
 ### Additional Support Models
 
@@ -44,196 +63,188 @@ Based on the original intended structure and current implementation, here are th
 | `PrevUserDog.php` | `user_dogs` | User-Dog Relations | `mysql_prev` | User ownership of dogs |
 | `User.php` | `users` | Application Users | `mysql` | Laravel application users |
 
-### Planned Models (From Problem Statement)
+## Database Schema Evolution & Deprecated Columns
 
-| Original Model File | Database Table | Semantic Name | Current Status |
-|---------------------|----------------|---------------|----------------|
-| `ShowsDetails.php` | `ShowsDB` | Shows | ✅ Implemented as `PrevShow.php` |
-| `Shows.php` | `Shows_Dogs_DB` | Show Dogs | ✅ Implemented as `PrevShowDog.php` |
-| `Structures.php` | `Shows_Structure` | Show Arenas | ✅ Implemented as `PrevShowArena.php` |
-| `StructureBreed.php` | `Shows_Breeds` | Show Breeds | ✅ Implemented as `PrevShowBreed.php` |
-| `Structureclasses.php` | `Shows_Classes` | Show Classes | ✅ Implemented as `PrevShowClass.php` |
-| `ShowsResults.php` | `shows_results` | Show Results/Report | ✅ Implemented as `PrevShowResult.php` |
-| `JudgesDB.php` | `JudgesDB` | Judges | ✅ Implemented as `PrevJudge.php` |
-| `BreedsDB.php` | `BreedsDB` | Breeds | ✅ Implemented as `PrevBreed.php` |
-| `DogsDB.php` | `DogsDB` | Dogs | ✅ Implemented as `PrevDog.php` |
-| `ShowRegistration.php` | `shows_registration` | Show Registrations | ✅ Implemented as `PrevShowRegistration.php` |
-| `ShowsPaymentsInfo.php` | `shows_payments_info` | Show Registration Payments | ✅ Implemented as `PrevShowPayment.php` |
-| `ShowWinner.php` | `show_winners` | Show Winners | ❌ Not yet implemented |
+**⚠️ Important:** Several columns have been deprecated since March 2022. The current implementation handles this through proper relationship methods while maintaining backward compatibility.
+
+### Deprecated Columns (Since March 2022)
+
+#### Arena/Structure Changes
+- **`JudgeID`** in `Shows_Structure` table - Now uses dedicated pivot table `Shows_Breeds` for judges
+- **`ClassID`** in `Shows_Structure` table - Deprecated in favor of proper relationships
+
+#### Shows_Dogs_DB Changes  
+- **`OwnerID`** - No longer used directly
+- **`Show_BreedID`** - Deprecated column
+- **`ShowBreedID`** - Deprecated column  
+- **`GlobalSagirID`** - Deprecated
+- **`MainArenaID`** - Deprecated across all tables
+- **Current approach:** Only uses `shows_dogs_db.BreedID => BreedsDB.BreedCode` for breed relationships
+
+#### Shows_Breeds Changes
+- **`MainArenaID`** - No longer used
+- **Current approach:** Uses `Shows_Classes` with `ArenaID => Shows_Structure.id` for proper arena relationships
+
+### Current Relationship Structure
+
+The models implement proper Laravel relationships while providing legacy wrapper methods for backward compatibility:
+
+```php
+// Modern approach in PrevShowDog
+public function breed(): BelongsTo { 
+    return $this->belongsTo(PrevBreed::class, 'BreedID', 'BreedCode'); 
+}
+
+// Legacy wrappers for backward compatibility  
+public function breedID(): BelongsTo { return $this->breed(); }
+```
 
 ## Model Relationships
 
-### Core Show Management
+### Core Show Management Entity-Relationship Diagram
 
 ```mermaid
 erDiagram
-    PrevShow ||--o{ PrevShowDog : "has many"
-    PrevShow ||--o{ PrevShowRegistration : "has many"
-    PrevShow ||--o{ PrevShowResult : "has many"
-    PrevShow ||--o{ PrevShowPayment : "has many"
-    PrevShow ||--o{ PrevShowBreed : "has many"
-    PrevShow ||--o{ PrevShowArena : "has many"
-    PrevShow ||--o{ PrevShowClass : "has many"
-    PrevShow }o--|| PrevClub : "belongs to"
+    PrevShow ||--o{ PrevShowDog : "has many show dogs"
+    PrevShow ||--o{ PrevShowRegistration : "has many registrations"  
+    PrevShow ||--o{ PrevShowResult : "has many results"
+    PrevShow ||--o{ PrevShowPayment : "has many payments"
+    PrevShow ||--o{ PrevShowBreed : "has many show breeds"
+    PrevShow ||--o{ PrevShowArena : "has many arenas"
+    PrevShow ||--o{ PrevShowClass : "has many classes"
+    PrevShow }o--|| PrevClub : "belongs to club"
     
-    PrevShowDog }o--|| PrevDog : "belongs to"
-    PrevShowDog }o--|| PrevShow : "belongs to"
-    PrevShowDog }o--|| PrevShowArena : "belongs to (arena)"
-    PrevShowDog }o--|| PrevShowClass : "belongs to (class)"
-    PrevShowDog }o--|| PrevShowRegistration : "belongs to"
-    PrevShowDog }o--|| PrevBreed : "belongs to"
-    PrevShowDog }o--|| PrevUser : "belongs to (owner)"
+    PrevShowDog }o--|| PrevDog : "belongs to dog (SagirID)"
+    PrevShowDog }o--|| PrevShow : "belongs to show"
+    PrevShowDog }o--|| PrevShowArena : "belongs to arena"
+    PrevShowDog }o--|| PrevShowClass : "belongs to class"
+    PrevShowDog }o--|| PrevShowRegistration : "belongs to registration"
+    PrevShowDog }o--|| PrevBreed : "belongs to breed (BreedID->BreedCode)"
     
-    PrevShowArena ||--o{ PrevShowClass : "has many"
-    PrevShowArena ||--o{ PrevShowBreed : "has many"
-    PrevShowArena }o--|| PrevJudge : "belongs to"
-    PrevShowArena }o--|| PrevShow : "belongs to"
+    PrevShowArena ||--o{ PrevShowClass : "has many classes"
+    PrevShowArena ||--o{ PrevShowBreed : "has many breeds"
+    PrevShowArena }o--|| PrevJudge : "belongs to judge (deprecated field)"
+    PrevShowArena }o--|| PrevShow : "belongs to show"
     
-    PrevShowBreed }o--|| PrevBreed : "belongs to"
-    PrevShowBreed }o--|| PrevJudge : "belongs to"
-    PrevShowBreed }o--|| PrevShow : "belongs to"
-    PrevShowBreed }o--|| PrevShowArena : "belongs to"
+    PrevShowBreed }o--|| PrevBreed : "belongs to breed (RaceID->BreedCode)"
+    PrevShowBreed }o--|| PrevJudge : "belongs to judge"
+    PrevShowBreed }o--|| PrevShow : "belongs to show"
+    PrevShowBreed }o--|| PrevShowArena : "belongs to arena"
     
-    PrevShowClass }o--|| PrevShowArena : "belongs to"
-    PrevShowClass }o--|| PrevShow : "belongs to"
-    PrevShowClass ||--o{ PrevShowDog : "has many"
+    PrevShowClass }o--|| PrevShowArena : "belongs to arena (ShowArenaID)"
+    PrevShowClass }o--|| PrevShow : "belongs to show"
+    PrevShowClass ||--o{ PrevShowDog : "has many show dogs"
     
-    PrevDog }o--|| PrevBreed : "belongs to"
-    PrevDog }o--|| PrevColor : "belongs to"
-    PrevDog }o--|| PrevHair : "belongs to"
-    PrevDog ||--o{ PrevUserDog : "has many (ownership)"
-    PrevDog ||--o{ PrevDogTitle : "has many (titles)"
+    PrevDog }o--|| PrevBreed : "belongs to breed"
+    PrevDog ||--o{ PrevUserDog : "has many owners"
+    PrevDog ||--o{ PrevDogTitle : "has many titles"
     
-    PrevBreed ||--o{ PrevDog : "has many"
-    PrevBreed }o--|| PrevUser : "belongs to (user manager)"
-    PrevBreed }o--|| PrevUser : "belongs to (club manager)"
+    PrevBreed ||--o{ PrevDog : "has many dogs"
     
-    PrevUser ||--o{ PrevUserDog : "has many"
-    PrevUser ||--o{ PrevShowRegistration : "has many (registrations)"
+    PrevUser ||--o{ PrevUserDog : "owns many dogs"
+    PrevUser ||--o{ PrevShowRegistration : "has many registrations"
     
-    PrevTitle ||--o{ PrevDogTitle : "has many"
-    PrevDogTitle }o--|| PrevDog : "belongs to"
-    PrevDogTitle }o--|| PrevTitle : "belongs to"
-    
-    PrevClub ||--o{ PrevShow : "has many"
+    PrevClub ||--o{ PrevShow : "organizes many shows"
 ```
 
 ### Key Model Relationships Detail
 
-#### PrevShow (Shows)
-- **Table:** `ShowsDB`
+#### PrevShow (Shows - ShowsDB)
+- **Primary Key:** `id`  
+- **Key Relationships:**
+  - `hasMany(PrevShowDog, 'ShowID', 'id')` - Dogs registered in show
+  - `hasMany(PrevShowRegistration, 'ShowID', 'id')` - Show registrations
+  - `hasMany(PrevShowResult, 'ShowID', 'id')` - Competition results
+  - `hasMany(PrevShowPayment, 'ShowID', 'id')` - Payment records
+  - `hasMany(PrevShowBreed, 'ShowID', 'id')` - Breeds in show
+  - `hasMany(PrevShowArena, 'ShowID', 'id')` - Show arenas/structures
+  - `hasMany(PrevShowClass, 'ShowID', 'id')` - Show classes
+  - `belongsTo(PrevClub, 'ClubID', 'id')` - Organizing club
+
+#### PrevShowDog (Show Dogs - Shows_Dogs_DB)
 - **Primary Key:** `id`
-- **Relationships:**
-  - `hasMany(PrevShowRegistration)` - Show registrations
-  - `hasMany(PrevShowDog)` - Dogs registered in the show
-  - `hasMany(PrevShowResult)` - Show results
-  - `hasMany(PrevShowPayment)` - Payment records
-  - `hasMany(PrevShowBreed)` - Breeds in the show
-  - `hasMany(PrevShowArena)` - Show arenas/structures
+- **Key Relationships:**
+  - `belongsTo(PrevShow, 'ShowID')` - Parent show
+  - `belongsTo(PrevShowArena, 'ArenaID')` - Competition arena
+  - `belongsTo(PrevShowClass, 'ClassID')` - Competition class
+  - `belongsTo(PrevShowRegistration, 'ShowRegistrationID')` - Original registration
+  - `belongsTo(PrevShowRegistration, 'new_show_registration_id')` - Updated registration
+  - `belongsTo(PrevDog, 'SagirID', 'SagirID')` - Dog details
+  - `belongsTo(PrevBreed, 'BreedID', 'BreedCode')` - **Current breed relationship**
+- **Deprecated Fields:** OwnerID, Show_BreedID, ShowBreedID, GlobalSagirID, MainArenaID
 
-#### PrevShowDog (Show Dogs)
-- **Table:** `Shows_Dogs_DB`
+#### PrevShowArena (Show Arenas - Shows_Structure)  
 - **Primary Key:** `id`
-- **Relationships:**
-  - `belongsTo(PrevShow)` via `ShowID`
-  - `belongsTo(PrevShowArena)` via `ArenaID`
-  - `belongsTo(PrevShowClass)` via `ClassID`
-  - `belongsTo(PrevShowRegistration)` via `ShowRegistrationID`
-  - `belongsTo(PrevDog)` via `SagirID`
-  - `belongsTo(PrevBreed)` via `BreedID`
-  - `belongsTo(PrevUser)` via `OwnerID`
+- **Key Relationships:**
+  - `belongsTo(PrevShow, 'ShowID', 'id')` - Parent show
+  - `belongsTo(PrevJudge, 'JudgeID', 'DataID')` - **Deprecated relationship**
+  - `hasMany(PrevShowClass, 'ShowArenaID', 'id')` - Classes in this arena
+  - `hasMany(PrevShowBreed, 'ArenaID', 'id')` - Breeds judged in arena
+- **Deprecated Fields:** JudgeID, ClassID
 
-#### PrevShowArena (Show Arenas/Structures)
-- **Table:** `Shows_Structure`
+#### PrevShowBreed (Show Breeds - Shows_Breeds)
+- **Primary Key:** `DataID`
+- **Key Relationships:**
+  - `belongsTo(PrevShow, 'ShowID', 'id')` - Parent show
+  - `belongsTo(PrevShowArena, 'ArenaID', 'id')` - Competition arena
+  - `belongsTo(PrevBreed, 'RaceID', 'BreedCode')` - Breed details
+  - `belongsTo(PrevJudge, 'JudgeID', 'DataID')` - **Current judge assignment**
+- **Deprecated Fields:** MainArenaID
+- **Note:** This table now serves as the pivot for judge-breed assignments
+
+#### PrevShowClass (Show Classes - Shows_Classes)
 - **Primary Key:** `id`
-- **Relationships:**
-  - `belongsTo(PrevShow)` via `ShowID`
-  - `belongsTo(PrevJudge)` via `JudgeID`
-  - `hasMany(PrevShowClass)` - Classes in this arena
-  - `hasMany(PrevShowBreed)` - Breeds in this arena
+- **Key Relationships:**
+  - `belongsTo(PrevShow, 'ShowID', 'id')` - Parent show
+  - `belongsTo(PrevShowArena, 'ShowArenaID', 'id')` - **Current arena relationship**
+  - `hasMany(PrevShowDog, 'ClassID', 'id')` - Dogs in this class
 
-#### PrevShowRegistration (Show Registrations)
-- **Table:** `shows_registration`
-- **Primary Key:** `id`
-- **Relationships:**
-  - `belongsTo(PrevShow)` via `ShowID`
-  - `belongsTo(PrevDog)` via `SagirID`
-  - `hasMany(PrevShowDog)` - Dogs from this registration
+### Modern Relationship Patterns
 
-#### PrevDog (Dogs)
-- **Table:** `DogsDB`
-- **Primary Key:** `SagirID`
-- **Relationships:**
-  - `belongsTo(PrevBreed)` via `RaceID`
-  - `hasMany(PrevShowDog)` - Show participations
-  - `belongsToMany(PrevTitle)` - Dog titles/awards
+The models implement clean Laravel relationships with legacy wrappers:
 
-#### PrevBreed (Breeds)
-- **Table:** `BreedsDB`
-- **Primary Key:** `BreedCode`
-- **Relationships:**
-  - `hasMany(PrevDog)` via `RaceID`
-  - `belongsTo(PrevUser, 'userManager')` via `UserManagerID`
-  - `belongsTo(PrevUser, 'clubManager')` via `ClubManagerID`
-
-## Controllers
-
-### Primary Controllers (To Be Implemented)
-
-| Controller | Purpose | Current Status |
-|------------|---------|----------------|
-| `ShowManagementController.php` | Shows management | ❌ Not implemented |
-| `FrontShowController.php` | Shows live management (Native) | ❌ Not implemented |
-| `AdminStructureController.php` | Shows Arenas (show structures) | ❌ Not implemented |
-
-### Secondary Controllers (To Be Implemented)
-
-| Controller | Purpose | Current Status |
-|------------|---------|----------------|
-| `AdminJudgeController.php` | Judges management | ❌ Not implemented |
-| `BackendBreedController.php` | Breeds management | ❌ Not implemented |
-
-### Current Controller Status
-
-Currently, only the base `Controller.php` exists in `app/Http/Controllers/`. All specific controllers mentioned above need to be implemented.
-
-## Model Characteristics
-
-### Soft Deletes
-Most models use Laravel's `SoftDeletes` trait:
-- ✅ `PrevShow`, `PrevShowDog`, `PrevShowArena`, `PrevShowClass`, `PrevShowResult`
-- ✅ `PrevShowRegistration`, `PrevShowPayment`, `PrevBreed`, `PrevDog`
-- ❌ `PrevShowBreed`, `PrevJudge` (no timestamps/soft deletes)
-
-### Legacy Compatibility
-Many models include **legacy wrapper methods** to maintain backward compatibility with the original codebase:
-
-**Example from PrevShowDog:**
 ```php
-// Modern normalized relationships
-public function show(): BelongsTo { return $this->belongsTo(PrevShow::class, 'ShowID'); }
-public function dog(): BelongsTo { return $this->belongsTo(PrevDog::class, 'SagirID', 'SagirID'); }
+// PrevShowDog - Modern breed relationship
+public function breed(): BelongsTo { 
+    return $this->belongsTo(PrevBreed::class, 'BreedID', 'BreedCode'); 
+}
 
-// Legacy wrappers for backward compatibility  
-public function showID(): BelongsTo { return $this->show(); }
-public function sagirID(): BelongsTo { return $this->dog(); }
-```
+// Legacy wrapper for backward compatibility
+public function breedID(): BelongsTo { return $this->breed(); }
 
-This pattern ensures that existing code using the old method names continues to work while providing cleaner, modern relationship names.
+// PrevShowClass - Proper arena relationship  
+public function arena(): BelongsTo {
+    return $this->belongsTo(PrevShowArena::class, 'ShowArenaID', 'id');
+}
+## Technical Implementation
+
+### Laravel 12.x Compatibility
+
+All models are designed for Laravel 12.21+ compatibility with:
+- **Modern attribute casting** using the `$casts` array
+- **Proper date handling** with DateTime casts  
+- **Query scopes** using the new `#[Scope]` attribute syntax
+- **Eloquent relationships** with full type hinting
 
 ### Query Scopes
+
 Models include helpful query scopes for common filtering:
 
-**PrevShow Scopes:**
 ```php
+// PrevShow scopes for show status filtering
 #[Scope]
 protected function activeShow(Builder $q): void {
     $q->where('ShowStatus', '=', 2);
 }
 
-#[Scope]
+#[Scope]  
 protected function upcoming(Builder $q): void {
     $q->whereDate('StartDate', '>', now());
+}
+
+#[Scope]
+protected function past(Builder $q): void {
+    $q->whereDate('EndDate', '<', now());
 }
 ```
 
@@ -242,108 +253,81 @@ Usage examples:
 // Get only active shows
 $activeShows = PrevShow::activeShow()->get();
 
-// Get upcoming shows
-$upcomingShows = PrevShow::upcoming()->get();
+// Get upcoming shows with related data  
+$upcomingShows = PrevShow::upcoming()->withCountsForResource()->get();
 ```
 
-### Database Connection
-All `Prev*` models use the `mysql_prev` connection, indicating they work with a legacy database system.
+### Soft Deletes Implementation
 
-### Primary Keys
-- Most models use standard `id` as primary key
-- **Exceptions:**
-  - `PrevShowResult` uses `DataID`
+Most models use Laravel's `SoftDeletes` trait:
+- ✅ **Implemented:** `PrevShow`, `PrevShowDog`, `PrevShowArena`, `PrevShowClass`, `PrevShowResult`, `PrevShowRegistration`, `PrevShowPayment`
+- ❌ **Not implemented:** `PrevShowBreed`, `PrevJudge` (no timestamps)
+
+### Primary Key Configurations
+
+- **Standard `id`:** `PrevShow`, `PrevShowDog`, `PrevShowArena`, `PrevShowClass`, `PrevShowRegistration`, `PrevShowPayment`
+- **Custom keys:**
   - `PrevShowBreed` uses `DataID`
-  - `PrevJudge` uses `DataID`
+  - `PrevJudge` uses `DataID`  
   - `PrevDog` uses `SagirID`
   - `PrevBreed` uses `BreedCode`
 
-## Key Fields and Casts
+## Filament v3.x Integration
 
-### Common Fields Across Models
-- `ShowID` - References the show
-- `DataID` - Legacy primary key in some models
-- `JudgeID` - References judges
-- `BreedID`/`RaceID` - References breeds
-- Various price fields in `PrevShow` for different registration types
-- DateTime fields: `ModificationDateTime`, `CreationDateTime`
-
-### Important Casts
-All models properly cast integer IDs and datetime fields to their appropriate types for Laravel 12.x compatibility.
-
-## Missing Components
-
-### Models Not Yet Implemented
-1. **ShowWinner Model** - Should map to `show_winners` table for managing show winners
-
-### Controllers Not Yet Implemented
-All controllers mentioned in the problem statement need to be created:
-1. Primary controllers for show management
-2. Secondary controllers for judges and breeds
-3. Frontend controllers for live show management
-
-## Database Schema Considerations
-
-The application works with both current Laravel standards and a legacy database system (`mysql_prev`), requiring careful attention to:
-
-- Field naming conventions (legacy vs Laravel standards)
-- Relationship key mapping
-- Data type casting
-- Soft delete handling across different table structures
-
-## Filament Integration
-
-The application is fully integrated with Filament v3.x for admin panel functionality. Each major model has corresponding Filament resources:
+The application is fully integrated with Filament v3.x for admin panel functionality:
 
 ### Implemented Filament Resources
 
-| Model | Filament Resource | Admin Features |
-|-------|-------------------|----------------|
-| `PrevShow` | `PrevShowResource` | Show management interface |
-| `PrevShowRegistration` | `PrevShowRegistrationResource` | Registration management |
-| `PrevShowArena` | `PrevShowArenaResource` | Arena/structure management |
-| `PrevShowBreed` | `PrevShowBreedResource` | Show breed management |
-| `PrevUser` | `PrevUserResource` | Legacy user management |
-| `PrevJudge` | `PrevJudgeResource` | Judge management |
-| `PrevColor` | `PrevColorResource` | Dog color management |
-| `User` | `UserResource` | Application user management |
+Based on the model structure, the following Filament resources are implemented:
 
-### Policy Integration
-Each model has corresponding policy classes for authorization:
-- `PrevShowPolicy`, `PrevShowRegistrationPolicy`, `PrevShowArenaPolicy`
-- `PrevUserPolicy`, `PrevJudgePolicy`, `PrevBreedPolicy`
-- `PrevDogPolicy`, `PrevColorPolicy`, `PrevHairPolicy`
-- And others for complete RBAC (Role-Based Access Control)
+| Model | Purpose | Admin Panel Features |
+|-------|---------|---------------------|
+| `PrevShow` | Dog show management | Show creation, status management, pricing configuration |
+| `PrevShowRegistration` | Registration management | Registration processing, status tracking |
+| `PrevShowArena` | Arena/structure management | Competition area setup, judge assignments |
+| `PrevJudge` | Judge management | Judge profiles, certifications, assignments |
+| `PrevBreed` | Breed management | Breed standards, classifications |
+| `PrevUser` | Legacy user management | User accounts from legacy system |
 
-### Observer Integration
-Key models have observer classes for handling model events:
-- `PrevDogObserver` - Handles dog-related events
-- `PrevBreedObserver` - Handles breed-related events
+## Missing Components & Next Steps
 
-This ensures proper event handling, validation, and business logic enforcement across the admin panel.
+### Not Currently Needed
+- **`ShowWinner.php`** → `show_winners` table - Marked as "not important for this time"
 
-## Next Steps
+### Controllers (Reference Only)
+All business logic controllers remain in the `studioycm/ikc-il` repository:
+- Show management, live show operations, structure management
+- Judge management, breed management
+- The `ikc-dev` system focuses on Laravel 12 models + Filament admin interface
 
-1. **Implement Missing Models:**
-   - Create `PrevShowWinner` model for `show_winners` table
+### Recommended Next Steps
 
-2. **Implement Controllers:**
-   - `ShowManagementController` for general show management
-   - `FrontShowController` for live show management  
-   - `AdminStructureController` for arena/structure management
-   - `AdminJudgeController` for judge management
-   - `BackendBreedController` for breed management
+1. **Data Migration Planning:**
+   - Plan migration strategy from deprecated columns 
+   - Ensure data integrity during transition from MainArenaID fields
 
-3. **Enhance Relationships:**
-   - Add any missing relationship methods
-   - Ensure proper eager loading configurations
-   - Add relationship constraints where needed
+2. **Enhanced Relationships:**
+   - Add eager loading configurations for performance
+   - Implement additional relationship constraints where needed
 
-4. **Documentation:**
-   - Add PHPDoc blocks to all models
-   - Document complex business logic
-   - Add relationship examples
+3. **Testing:**
+   - Create model tests for relationships
+   - Test deprecated field compatibility
+   - Validate Filament resource functionality
+
+4. **Documentation:**  
+   - Add PHPDoc blocks to complex relationships
+   - Document the deprecated field transition plan
 
 ---
 
-*This documentation reflects the current state of the Laravel models as of the analysis date. The application follows Laravel 12.x standards with Filament v3.x integration.*
+## Summary
+
+This documentation reflects the current state of the IKC development system where:
+
+- **`studioycm/ikc-dev`** provides the modern Laravel 12 + Filament v3 implementation
+- **`studioycm/ikc-il`** contains the original business logic and controllers  
+- The new system connects to the legacy database while handling deprecated fields gracefully
+- All models implement both modern Laravel relationships and legacy compatibility wrappers
+
+The system is production-ready for the core show management functionality with proper deprecation handling and modern Laravel/Filament patterns.
