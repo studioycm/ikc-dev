@@ -14,9 +14,6 @@ use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -31,7 +28,7 @@ class PrevShowBreedResource extends Resource
 
     protected static ?string $navigationIcon = 'fas-dna';
 
-    protected static ?int $navigationSort = 67;
+    protected static ?int $navigationSort = 70;
 
     public static function getModelLabel(): string
     {
@@ -110,7 +107,6 @@ class PrevShowBreedResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn(\Illuminate\Database\Eloquent\Builder $q) => $q->with(['show', 'breed']))
             ->columns([
                 TextColumn::make('show_summary')
                     ->label(__('Show title'))
@@ -145,12 +141,8 @@ class PrevShowBreedResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 

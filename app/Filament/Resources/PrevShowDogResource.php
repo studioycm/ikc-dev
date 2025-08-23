@@ -29,7 +29,7 @@ class PrevShowDogResource extends Resource
 
     protected static ?string $navigationIcon = 'fas-dog';
 
-    protected static ?int $navigationSort = 64;
+    protected static ?int $navigationSort = 90;
 
     public static function getModelLabel(): string
     {
@@ -250,5 +250,4 @@ class PrevShowDogResource extends Resource
     {
         return parent::getEloquentQuery();
     }
-
 }

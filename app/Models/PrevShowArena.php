@@ -4,13 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PrevShowArena extends Model
 {
-    use SoftDeletes;
-
     protected $connection = 'mysql_prev';
 
     /**
@@ -36,12 +34,8 @@ class PrevShowArena extends Model
 
     public function show(): BelongsTo
     {
-        return $this->belongsTo(PrevShow::class, 'ShowID', 'id');
-    }
-
-    public function judge(): BelongsTo
-    {
-        return $this->belongsTo(PrevJudge::class, 'JudgeID', 'DataID');
+        return $this->belongsTo(PrevShow::class, 'ShowID', 'id')
+            ->select('id', 'TitleName', 'StartDate', 'EndDate', 'location');
     }
 
     public function classes(): HasMany
@@ -49,9 +43,33 @@ class PrevShowArena extends Model
         return $this->hasMany(PrevShowClass::class, 'ShowArenaID', 'id');
     }
 
-    public function showBreeds(): HasMany
+    public function show_breeds(): HasMany
     {
         return $this->hasMany(PrevShowBreed::class, 'ArenaID', 'id')
-            ->with('breed');
+            ->orderBy('OrderID', 'desc')
+            ->with(['judge']);
+
+    }
+
+    /**
+     * Distinct judges that have Show_Breeds rows in this arena.
+     */
+    public function judges(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            PrevJudge::class,
+            'Shows_Breeds',
+            'ArenaID',   // FK on pivot referencing this model
+            'JudgeID',   // FK on pivot referencing related model
+            'id',        // local key
+            'DataID'     // related key
+        )->distinct();
+    }
+
+    public function show_dogs(): HasMany
+    {
+        return $this->hasMany(PrevShowDog::class, 'ArenaID', 'id')
+            ->orderBy('OrderID')
+            ->with(['dog']);
     }
 }

@@ -6,6 +6,7 @@ use App\Filament\Resources\PrevShowResource\Pages;
 use App\Filament\Resources\PrevShowResource\RelationManagers\PrevShowArenaRelationManager;
 use App\Filament\Resources\PrevShowResource\RelationManagers\PrevShowClassRelationManager;
 use App\Models\PrevShow;
+use App\Models\PrevShowArena;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -33,6 +34,7 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 
 class PrevShowResource extends Resource
@@ -43,7 +45,7 @@ class PrevShowResource extends Resource
 
     protected static ?string $navigationIcon = 'fas-trophy';
 
-    protected static ?int $navigationSort = 60;
+    protected static ?int $navigationSort = 20;
 
     public static function getModelLabel(): string
     {
@@ -188,7 +190,6 @@ class PrevShowResource extends Resource
                     ->required()
                     ->integer(),
 
-
             ]);
     }
 
@@ -196,7 +197,9 @@ class PrevShowResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function (Builder $query) {
-                return $query->with(['club', 'arenas', 'classes'])->withCount(['registrations', 'showDogs', 'results']);
+                return $query
+                    ->with(['arenas.judges', 'club']) // arenas and their judges for per-row descriptions if needed
+                    ->withCount(['registrations', 'showDogs', 'results', 'arenas', 'classes']);
             })
             ->columns([
                 TextColumn::make('id')
@@ -204,45 +207,48 @@ class PrevShowResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->searchable(),
-                TextColumn::make('TitleName')
-                    ->label(__('Title'))
-                    ->description(fn(PrevShow $record): HtmlString => new HtmlString('<p><span>' . $record->club->Name . '</span><br><span>' . $record->ShowType . '</span>, <span>' . $record->location . '</span></p>'))
+                TextColumn::make('show_title')
+                    ->label(__('Show'))
+                    ->formatStateUsing(fn(PrevShow $record): HtmlString => new HtmlString(
+                        '<p><span>' .
+                        $record->TitleName .
+                        '</span><br><span>' .
+                        $record->ShowType .
+                        '</span>, <span>' .
+                        $record->location .
+                        '</span><br><span>' .
+                        $record->club->Name .
+                        '</span></p>'
+                    ))
                     ->searchable()
-                    ->sortable(),
+                    ->sortable('ShowsDB.id'),
+
+                TextColumn::make('show_dates')
+                    ->label(__('Dates'))
+                    ->formatStateUsing(function (PrevShow $record): HtmlString {
+                        $dates = [];
+                        if ($record->StartDate) {
+                            $dates[] = __('Starting at') . $record->StartDate->format('d-m-Y');
+                        }
+                        if ($record->EndDate) {
+                            $dates[] = __('Ending at') . $record->EndDate->format('d-m-Y');
+                        }
+                        if ($record->EndRegistrationDate) {
+                            $dates[] = __('Registration Ending at') . $record->EndRegistrationDate->format('d-m-Y');
+                        }
+                        $dates_s = implode('<br>', $dates);
+
+                        return new HtmlString("<p> $dates_s </p>");
+                    })
+                    ->sortable(['StartDate', 'EndRegistrationDate'])
+                    ->toggleable(),
 
                 TextColumn::make('LongDesc')
                     ->label(__('Description'))
                     ->searchable()
                     ->sortable()
                     ->toggleable()
-                    ->html()
-                    ->wrap(),
-
-                TextColumn::make('StartDate')
-                    ->date()
-                    ->label(__('Starting at'))
-                    ->sortable()
-                    ->toggleable(),
-                TextColumn::make('EndDate')
-                    ->label(__('Ending at'))
-                    ->date()
-                    ->sortable()
-                    ->toggleable(),
-
-                TextColumn::make('EndRegistrationDate')
-                    ->date()
-                    ->label(__('Registration Ending at'))
-                    ->sortable()
-                    ->toggleable(),
-
-                //                TextColumn::make('FreeTextDesc')
-                //                    ->label(__('Additional Information')),
-
-                TextColumn::make('MaxRegisters')
-                    ->label(__('Max. Registrations'))
-                    ->numeric()
-                    ->sortable()
-                    ->toggleable(),
+                    ->html(),
 
                 IconColumn::make('ShowStatus')
                     ->label(__('Show Status'))
@@ -282,112 +288,23 @@ class PrevShowResource extends Resource
                     ->sortable()
                     ->toggleable(),
 
-                TextColumn::make('ShowPrice')
-                    ->money('ILS')
-                    ->sortable()
+                TextColumn::make('IsExtraTickets')
                     ->toggleable(),
 
-                TextColumn::make('Dog2Price1')
-                    ->money('ILS')
-                    ->sortable()
+                TextColumn::make('IsParking')
                     ->toggleable(),
 
-                TextColumn::make('Dog2Price2')
-                    ->money('ILS')
-                    ->sortable()
+                TextColumn::make('MoreTicketsSelect')
                     ->toggleable(),
 
-                TextColumn::make('Dog2Price3')
-                    ->money('ILS')
-                    ->sortable()
+                TextColumn::make('ParkingSelect')
                     ->toggleable(),
 
-                TextColumn::make('Dog2Price4')
-                    ->money('ILS')
-                    ->sortable()
+                TextColumn::make('start_from_index')
                     ->toggleable(),
 
-                TextColumn::make('Dog2Price5')
-                    ->money('ILS')
-                    ->sortable()
+                TextColumn::make('Check_all_members')
                     ->toggleable(),
-
-                TextColumn::make('Dog2Price6')
-                    ->money('ILS')
-                    ->sortable()
-                    ->toggleable(),
-
-                TextColumn::make('Dog2Price7')
-                    ->money('ILS')
-                    ->sortable()
-                    ->toggleable(),
-
-                TextColumn::make('Dog2Price8')
-                    ->money('ILS')
-                    ->sortable()
-                    ->toggleable(),
-
-                TextColumn::make('Dog2Price9')
-                    ->money('ILS')
-                    ->sortable()
-                    ->toggleable(),
-
-                TextColumn::make('Dog2Price10')
-                    ->money('ILS')
-                    ->sortable()
-                    ->toggleable(),
-
-                TextColumn::make('CouplesPrice')
-                    ->money('ILS')
-                    ->sortable()
-                    ->toggleable(),
-
-                TextColumn::make('BGidulPrice')
-                    ->money('ILS')
-                    ->sortable()
-                    ->toggleable(),
-
-                TextColumn::make('ZezaimPrice')
-                    ->money('ILS')
-                    ->sortable()
-                    ->toggleable(),
-
-                TextColumn::make('YoungPrice')
-                    ->money('ILS')
-                    ->sortable()
-                    ->toggleable(),
-
-                TextColumn::make('MoreDogsPrice')
-                    ->money('ILS')
-                    ->sortable()
-                    ->toggleable(),
-
-                TextColumn::make('MoreDogsPrice2')
-                    ->money('ILS')
-                    ->sortable()
-                    ->toggleable(),
-
-                TextColumn::make('PeototCost')
-                    ->money('ILS')
-                    ->sortable()
-                    ->toggleable(),
-
-                TextColumn::make('TicketCost')
-                    ->money('ILS')
-                    ->sortable()
-                    ->toggleable(),
-
-                TextColumn::make('IsExtraTickets'),
-
-                TextColumn::make('IsParking'),
-
-                TextColumn::make('MoreTicketsSelect'),
-
-                TextColumn::make('ParkingSelect'),
-
-                TextColumn::make('start_from_index'),
-
-                TextColumn::make('Check_all_members'),
 
                 TextColumn::make('DataID')
                     ->numeric()
@@ -407,7 +324,8 @@ class PrevShowResource extends Resource
                     ->sortable()
                     ->toggleable(),
 
-                ImageColumn::make('banner_image'),
+                ImageColumn::make('banner_image')
+                    ->toggleable(),
 
             ])
             ->filters([
@@ -429,8 +347,8 @@ class PrevShowResource extends Resource
             ])
             ->defaultSort(function (Builder $query): Builder {
                 return $query
-                    ->orderBy(\DB::raw('YEAR(StartDate)'), 'desc')
-                    ->orderBy(\DB::raw('MONTH(StartDate)'), 'desc')
+                    ->orderBy(DB::raw('YEAR(StartDate)'), 'desc')
+                    ->orderBy(DB::raw('MONTH(StartDate)'), 'desc')
                     ->orderBy('id', 'desc');
             });
     }
@@ -450,6 +368,22 @@ class PrevShowResource extends Resource
                                     TextEntry::make('location')->label(__('Location')),
                                     IconEntry::make('ShowStatus')->label(__('Active'))->boolean(),
                                 ]),
+                                InfolistSection::make(__('Arenas & Judges'))
+                                    ->schema([
+                                        TextEntry::make('arenas')
+                                            ->label(__('Arenas (Judges)'))
+                                            ->formatStateUsing(function (PrevShow $record): string {
+                                                $record->loadMissing('arenas.judges');
+
+                                                return $record->arenas
+                                                    ->sortBy('id')
+                                                    ->map(fn(PrevShowArena $a) => ($a->GroupName ?: "Arena #{$a->id}")
+                                                        . ' — '
+                                                        . $a->judges->pluck('JudgeNameHE')->unique()->sort()->join(', '))
+                                                    ->join(' | ');
+                                            })
+                                            ->columnSpanFull(),
+                                    ]),
                                 InfolistSection::make(__('Counts'))
                                     ->schema([
                                         TextEntry::make('arenas_count')->label(__('Arenas'))->state(fn(PrevShow $record) => $record->arenas()->count()),

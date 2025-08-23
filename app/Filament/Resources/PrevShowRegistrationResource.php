@@ -34,7 +34,7 @@ class PrevShowRegistrationResource extends Resource
 
     protected static ?string $navigationIcon = 'fas-clipboard-check';
 
-    protected static ?int $navigationSort = 63;
+    protected static ?int $navigationSort = 30;
 
     public static function getModelLabel(): string
     {
@@ -53,7 +53,7 @@ class PrevShowRegistrationResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Registrations');
+        return __('Show Registrations');
     }
 
     public static function form(Form $form): Form

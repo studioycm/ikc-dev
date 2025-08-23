@@ -5,12 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-//use Illuminate\Database\Eloquent\SoftDeletes;
-
 class PrevShowResult extends Model
 {
-//    use SoftDeletes;
-
     protected $connection = 'mysql_prev';
 
     /**
@@ -35,9 +31,6 @@ class PrevShowResult extends Model
         'ShowID' => 'integer',
         'ModificationDateTime' => 'datetime',
         'CreationDateTime' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
     ];
 
     public function show(): BelongsTo

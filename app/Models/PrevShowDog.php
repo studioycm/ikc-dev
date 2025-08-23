@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -30,6 +31,23 @@ class PrevShowDog extends Model
         'BreedID' => 'integer',
         'SagirID' => 'integer',
     ];
+
+    protected $appends = ['heb_dog_name', 'eng_dog_name'];
+
+    // related dog's hebrew name quick accessor with laravel new attribute style
+    protected function hebDogName(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $this->dog?->Heb_Name ?? '-',
+        );
+    }
+
+    protected function engDogName(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $this->dog?->Eng_Name ?? '-',
+        );
+    }
 
     // Normalized relation names
     public function show(): BelongsTo

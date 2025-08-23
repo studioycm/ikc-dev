@@ -177,11 +177,6 @@ class PrevClubResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
-                //              TextColumn::make('ClubCode')
-                //                    ->label(__('Club Code'))
-                //                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                //                    ->sortable()
-                //                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('managers.name')
                     ->label(__('Manager'))
                     ->listWithLineBreaks()
@@ -298,7 +293,7 @@ class PrevClubResource extends Resource
             ->record($record)
             ->schema([
                 Tabs::make('ClubTabs')->tabs([
-                    Tab::make(__('General'))->schema([
+                    Tab::make('General')->schema([
                         // Use a grid layout to organise the main/general and pricing sections as columns
                         InfolistGrid::make()
                             ->columns(5)
@@ -385,7 +380,7 @@ class PrevClubResource extends Resource
                     ]),
 
                     // Breeds tab unchanged (keeps Livewire entry)
-                    Tab::make(__('Breeds'))->schema([
+                    Tab::make('Breeds')->schema([
                         InfolistSection::make(__('Breeds in Club'))
                             ->schema([
                                 LivewireEntry::make(PrevClubBreedsTable::class)

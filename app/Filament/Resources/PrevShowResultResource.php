@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PrevDogResource as DogRes;
-use App\Filament\Resources\PrevShowArenaResource as ArenaRes;
-use App\Filament\Resources\PrevShowClassResource as ClassRes;
-use App\Filament\Resources\PrevShowResource as ShowRes;
+// use App\Filament\Resources\PrevDogResource as DogRes;
+// use App\Filament\Resources\PrevShowArenaResource as ArenaRes;
+// use App\Filament\Resources\PrevShowClassResource as ClassRes;
+// use App\Filament\Resources\PrevShowResource as ShowRes;
 use App\Filament\Resources\PrevShowResultResource\Pages;
 use App\Models\PrevShowResult;
 use Filament\Forms\Components\DatePicker;
@@ -13,9 +13,6 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -23,14 +20,13 @@ use Illuminate\Database\Eloquent\Builder;
 
 class PrevShowResultResource extends Resource
 {
-
     protected static ?string $model = PrevShowResult::class;
 
     protected static ?string $slug = 'prev-show-results';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?int $navigationSort = 60;
+    protected static ?int $navigationSort = 100;
 
     public static function getModelLabel(): string
     {
@@ -57,7 +53,8 @@ class PrevShowResultResource extends Resource
         return $form
             ->schema([
                 TextInput::make('DataID')
-                    ->required()
+                    ->disabled()
+                    ->unique()
                     ->integer(),
 
                 DatePicker::make('ModificationDateTime'),
@@ -267,56 +264,18 @@ class PrevShowResultResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn(Builder $q) => $q->with(['dog', 'show', 'arena', 'class', 'breed']))
             ->columns([
-                TextColumn::make('dog_summary')
-                    ->label(__('Dog name'))
-                    ->state(fn(\App\Models\PrevShowResult $r) => $r->dog?->full_name ?? '—')
-                    ->description(fn(\App\Models\PrevShowResult $r) => __('Sagir ID') . ': ' . ($r->SagirID ?? '—'))
-                    ->url(fn(\App\Models\PrevShowResult $r) => $r->dog ? DogRes::getUrl('view', ['record' => $r->dog->getKey()]) : null)
-                    ->openUrlInNewTab()
+                TextColumn::make('DataID')
+                    ->label(__('Data ID'))
                     ->searchable()
                     ->sortable(),
-
-                TextColumn::make('show_summary')
-                    ->label(__('Show title'))
-                    ->state(fn(\App\Models\PrevShowResult $r) => $r->show?->TitleName ?? '—')
-                    ->description(fn(\App\Models\PrevShowResult $r) => __('ID') . ': ' . ($r->ShowID ?? '—'))
-                    ->url(fn(\App\Models\PrevShowResult $r) => $r->ShowID ? ShowRes::getUrl('view', ['record' => $r->ShowID]) : null)
-                    ->openUrlInNewTab()
-                    ->toggleable(),
-
-                TextColumn::make('arena_summary')
-                    ->label(__('Arena name'))
-                    ->state(fn(\App\Models\PrevShowResult $r) => $r->mainArena?->GroupName ?? '—')
-                    ->description(fn(\App\Models\PrevShowResult $r) => __('ID') . ': ' . ($r->MainArenaID ?? '—'))
-                    ->url(fn(\App\Models\PrevShowResult $r) => $r->MainArenaID ? ArenaRes::getUrl('view', ['record' => $r->MainArenaID]) : null)
-                    ->openUrlInNewTab()
-                    ->toggleable(),
-
-                TextColumn::make('class_summary')
-                    ->label(__('Class type'))
-                    ->state(fn(\App\Models\PrevShowResult $r) => $r->class?->ClassName ?? '—')
-                    ->description(fn(\App\Models\PrevShowResult $r) => __('ID') . ': ' . ($r->ClassID ?? '—'))
-                    ->url(fn(\App\Models\PrevShowResult $r) => $r->ClassID ? ClassRes::getUrl('view', ['record' => $r->ClassID]) : null)
-                    ->openUrlInNewTab()
-                    ->toggleable(),
-
-                TextColumn::make('breed_summary')
-                    ->label(__('Breed'))
-                    ->state(fn(\App\Models\PrevShowResult $r) => $r->breed?->BreedNameEN ?: ($r->breed?->BreedName ?: '—'))
-                    ->description(fn(\App\Models\PrevShowResult $r) => __('Breed Code') . ': ' . ($r->breed?->BreedCode ?? '—')),
             ])
             ->filters([
             ])
             ->actions([
                 EditAction::make(),
-                DeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 

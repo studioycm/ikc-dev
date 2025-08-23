@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -37,6 +38,39 @@ class PrevShowBreed extends Model
         'OrderID' => 'integer',
         'count' => 'integer',
     ];
+
+    // append the breed name to the model
+    protected $appends = ['judge_he_name', 'breed_he_name'];
+
+    // new format laravel attributes for judgeHeName, judgeEnName, breedHeName, breedEnName
+    protected function judgeHeName(): Attribute
+    {
+        // efficient way to get the name of the judge name only
+        return Attribute::make(
+            get: fn($value) => $this->judge?->JudgeNameHE ?? '-',
+        );
+    }
+
+    protected function judgeEnName(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $this->judge?->JudgeNameEN ?? '-',
+        );
+    }
+
+    protected function breedHeName(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $this->breed?->BreedName ?? '-',
+        );
+    }
+
+    protected function breedEnName(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $this->breed?->BreedNameEN ?? '-',
+        );
+    }
 
     // Normalized relation names
     public function show(): BelongsTo

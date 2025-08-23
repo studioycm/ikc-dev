@@ -46,10 +46,13 @@ Filter: COALESCE(created_at, CreationDateTime)
 
 SQL used (example):
 
-```sql
-SELECT 'ShowsDB < 2022-03-01' AS window, COUNT(*) total,
-  SUM(CASE WHEN `DataID` IS NOT NULL AND `DataID` <> '' THEN 1 ELSE 0 END) AS DataID_non_empty,
-  ROUND(100*SUM(CASE WHEN `DataID` IS NOT NULL AND `DataID` <> '' THEN 1 ELSE 0 END)/NULLIF(COUNT(*),0),2) AS DataID_non_empty_pct
+```mysql
+SELECT `ShowsDB`.`created_at` < '2022-03-01'                                            AS `window`,
+       COUNT(*)                                                                            total,
+       SUM(CASE WHEN ShowsDB.`DataID` IS NOT NULL AND `DataID` <> '' THEN 1 ELSE 0 END) AS DataID_non_empty,
+       ROUND(
+           100 * SUM(CASE WHEN ShowsDB.`DataID` IS NOT NULL AND `DataID` <> '' THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0),
+           2)                                                                           AS DataID_non_empty_pct
 FROM `ShowsDB`
 WHERE COALESCE(`created_at`,`CreationDateTime`) < '2022-03-01';
 ```
@@ -144,8 +147,8 @@ Filter: COALESCE(created_at, CreationDateTime)
 
 Generic SQL template used for per-column usage:
 
-```sql
-SELECT 'TABLE window' AS window,
+```mysql
+SELECT CAST('TABLE window' AS CHAR) AS `window`,
   COUNT(*) AS total,
   SUM(CASE WHEN `Col` IS NULL OR `Col` = '' THEN 1 ELSE 0 END) AS Col_empty,
   (COUNT(*) - SUM(CASE WHEN `Col` IS NULL OR `Col` = '' THEN 1 ELSE 0 END)) AS Col_non_empty,
@@ -399,3 +402,13 @@ PrevShowDog::on('mysql_prev')->whereNotNull('BreedID')->with('breed')->limit(10)
 
 Prepared by: IKC Dev — Legacy Data Profiling
 Generated on: {{ date('Y-m-d') }}
+
+## Clarifications (Aug 2025)
+
+- shows_results uses MainArenaID for the arena reference. Do not rely on ArenaID in shows_results; link to arenas via
+  shows_results.MainArenaID -> Shows_Structure.id.
+- Per-judge breed counts must be evaluated per (ShowID + ArenaID + JudgeID) in Shows_Breeds, and should include only
+  breeds that had at least one show-dog in the same arena of the same show. Practically, filter with EXISTS on
+  Shows_Dogs_DB matching ShowID, ArenaID, and BreedID, excluding soft-deleted dogs.
+- Mapping note: shows_results.RegDogID and shows_registrations.DogID refer to the dog record in DogsDB (legacy naming).
+  Modernized usage primarily joins via SagirID, but the legacy fields conceptually point to the same dog identity.
