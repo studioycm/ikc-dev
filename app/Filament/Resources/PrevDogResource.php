@@ -2,26 +2,36 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\PrevDogResource\Pages;
+use App\Models\PrevBreed;
+use App\Models\PrevColor;
 use App\Models\PrevDog;
 use App\Models\PrevHair;
 use App\Models\PrevUser;
-use App\Models\PrevBreed;
-use App\Models\PrevColor;
-use App\Models\PrevTitle;
-use App\Models\PrevUserDog;
-use App\Models\PrevDogTitle;
-use Filament\Resources\Resource;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Split;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Form;
+use Filament\Infolists\Components\Grid as InfolistGrid;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\Section as InfolistSection;
+use Filament\Infolists\Components\Tabs;
+use Filament\Infolists\Components\Tabs\Tab;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
-
-use Filament\Tables\Table;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\HtmlString;
+
 //use Filament\Tables\Filters\QueryBuilder;
 //use Filament\Tables\Filters\SelectFilter;
 //use Filament\Tables\Filters\QueryBuilder\Constraints\DateConstraint;
@@ -30,28 +40,10 @@ use Filament\Tables\Filters\Filter;
 //use Filament\Tables\Filters\QueryBuilder\Constraints\BooleanConstraint;
 //use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint;
 //use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint\Operators\IsRelatedToOperator;
-use Filament\Support\Colors\Color;
 //use Filament\Support\Facades\FilamentColor;
-use Filament\Support\Enums\FontWeight;
-use Illuminate\Support\HtmlString;
-use Filament\Tables\Enums\FiltersLayout;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PrevDogResource\Pages;
 // use App\Filament\Resources\PrevDogResource\RelationManagers;
 // infolist class
-use Filament\Infolists\Infolist;
-use Filament\Infolists\Components\Tabs;
-use Filament\Infolists\Components\Tabs\Tab;
-use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\ImageEntry;
 // use Filament\Infolists\Components\KeyValueEntry;
-use Filament\Infolists\Components\RepeatableEntry;
-use Filament\Infolists\Components\Grid as InfolistGrid;
-use Filament\Infolists\Components\Section as InfolistSection;
-use Filament\Infolists\Components\Split as InfolistSplit;
 
 // use App\Filament\Exports\DogExporter;
 // use App\Filament\Imports\DogImporter;
@@ -244,8 +236,7 @@ class PrevDogResource extends Resource
                         // format the related duplicates so each of the duplicates array items will be a link to the route of PrevDogResource view page using the id as the parameter
                         $duplicatesLinks = $record->duplicates?->pluck('id')
                             ->filter(fn ($id) => $id != $record->id)
-                            ->map(fn ($id) =>
-                            '<a href="' . route('filament.admin.resources.prev-dogs.view', ['record' => $id]) . '" target="_blank">' . $id . '</a>'
+                            ->map(fn ($id) => '<a href="' . route('filament.admin.resources.prev-dog.view', ['record' => $id]) . '" target="_blank">' . $id . '</a>'
                         )->implode(', ');
                         return new HtmlString($duplicatesLinks);
                     })
