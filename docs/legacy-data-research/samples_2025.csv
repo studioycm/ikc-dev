@@ -1,0 +1,6 @@
+show_id,arena_id,start_date,dogs,arena_judges,breeds_with_dogs,results,notes
+1526,2512,2025-02-14,204,1,9,109,Top 2025 show by dogs/payments; top arena by dogs
+1560,2598,2025-04-26,121,1,3,94,High dogs/payments; top arena by dogs
+1512,2469,2025-01-11,28,1,10,74,Smaller show; arena with strongest metrics
+1546,2580,2025-03-21,45,1,5,100,Show has >=2 judges overall; this arena top by results
+1578,2636,2025-05-24,24,3,7,24,Show has 3 judges overall; single strong arena

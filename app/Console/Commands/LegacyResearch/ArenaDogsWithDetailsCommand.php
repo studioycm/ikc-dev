@@ -34,8 +34,7 @@ class ArenaDogsWithDetailsCommand extends BaseLegacyResearchCommand
 
         $this->info('Building arena dogs with details for show ID ' . $showId . '...');
 
-        $query = PrevShowDog::query()
-            ->on('mysql_prev')
+        $query = PrevShowDog::on('mysql_prev')
             ->where('ShowID', $showId)
             ->with(['dog', 'breed', 'showClass'])
             ->orderBy('ArenaID')

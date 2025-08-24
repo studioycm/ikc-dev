@@ -31,8 +31,7 @@ class ArenaBreedsCommand extends BaseLegacyResearchCommand
 
         $this->info('Building breeds-per-arena report for show ID ' . $showId . '...');
 
-        $records = PrevShowBreed::query()
-            ->on('mysql_prev')
+        $records = PrevShowBreed::on('mysql_prev')
             ->where('ShowID', $showId)
             ->with(['breed', 'judge'])
             ->orderBy('ArenaID')

@@ -32,8 +32,7 @@ class ShowArenaJudgesCommand extends BaseLegacyResearchCommand
 
         $this->info('Building judges-per-arena report for show ID ' . $showId . '...');
 
-        $records = PrevShowBreed::query()
-            ->on('mysql_prev')
+        $records = PrevShowBreed::on('mysql_prev')
             ->where('ShowID', $showId)
             // Only count breeds that actually had at least one show dog in the same arena of the same show
             ->whereExists(function ($q) {
@@ -50,7 +49,7 @@ class ShowArenaJudgesCommand extends BaseLegacyResearchCommand
                 'JudgeID',
                 DB::raw('COUNT(DISTINCT RaceID) as breeds_count'),
             ])
-            ->groupBy('ShowID', 'ArenaID', 'JudgeID')
+            ->groupBy(['ShowID', 'ArenaID', 'JudgeID'])
             ->orderBy('ArenaID')
             ->orderBy('JudgeID')
             ->with('judge')
