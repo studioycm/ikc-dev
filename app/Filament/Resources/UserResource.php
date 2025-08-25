@@ -4,20 +4,18 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Auth\VerifyEmail;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification as LaraNotification;
 use Illuminate\Support\Str;
-use Filament\Facades\Filament;
-use Filament\Notifications\Notification;
-use Filament\Notifications\Actions\Action;
-use Filament\Notifications\Auth\VerifyEmail;
-use Filament\Pages\Auth\EmailVerification\EmailVerificationPrompt;
 
 class UserResource extends Resource
 {
@@ -159,6 +157,35 @@ class UserResource extends Resource
                         // $user->email_verified_at = now();
                         // $user->save();
                     }),
+                Tables\Actions\Action::make('send_test_email')
+                    ->label('Send test email')
+                    ->icon('heroicon-o-paper-airplane')
+                    ->color('primary')
+                    ->requiresConfirmation()
+                    ->action(function (User $record): void {
+                        $record->notify(new class extends LaraNotification {
+                            public function via($notifiable): array
+                            {
+                                return ['mail'];
+                            }
+
+                            public function toMail($notifiable): MailMessage
+                            {
+                                return (new MailMessage)
+                                    ->subject('Test email from ' . config('app.name'))
+                                    ->greeting('Hello ' . ($notifiable->name ?? ''))
+                                    ->line('This is a quick test email to confirm delivery.')
+                                    ->salutation('Regards, ' . config('app.name'));
+                            }
+                        });
+
+                        Notification::make()
+                            ->title('Email dispatched')
+                            ->body('A test email was dispatched to ' . $record->email)
+                            ->success()
+                            ->send();
+                    }),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
