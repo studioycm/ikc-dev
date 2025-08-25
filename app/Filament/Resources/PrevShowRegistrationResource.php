@@ -23,7 +23,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PrevShowRegistrationResource extends Resource
@@ -420,24 +419,4 @@ class PrevShowRegistrationResource extends Resource
             ]);
     }
 
-    public static function getGlobalSearchEloquentQuery(): Builder
-    {
-        return parent::getGlobalSearchEloquentQuery()->with(['registeredBy']);
-    }
-
-    public static function getGloballySearchableAttributes(): array
-    {
-        return ['registeredBy.name'];
-    }
-
-    public static function getGlobalSearchResultDetails(Model $record): array
-    {
-        $details = [];
-
-        if ($record->registeredBy) {
-            $details['RegisteredBy'] = $record->registeredBy->name;
-        }
-
-        return $details;
-    }
 }
