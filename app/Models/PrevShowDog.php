@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PrevShowDog extends Model
@@ -19,6 +20,9 @@ class PrevShowDog extends Model
      * @var string
      */
     protected $table = 'Shows_Dogs_DB';
+
+    // disable fillable attributes
+    protected $guarded = [];
 
     protected $casts = [
         'DataID' => 'integer',
@@ -86,9 +90,9 @@ class PrevShowDog extends Model
     }
 
     // revers relation with PrevShowResult
-    public function result(): BelongsTo
+    public function result(): HasOne
     {
-        return $this->belongsTo(PrevShowResult::class, 'SagirID', 'SagirID')
+        return $this->hasOne(PrevShowResult::class, 'SagirID', 'SagirID')
             ->where('ShowID', $this->ShowID)
             ->where('MainArenaID', $this->ArenaID)
             ->where('ClassID', $this->ClassID);

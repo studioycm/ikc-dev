@@ -2,15 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use App\Models\PrevTitle;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PrevDogTitle extends Pivot
 {
@@ -22,6 +17,7 @@ class PrevDogTitle extends Pivot
      * @var string
      */
     protected $connection = 'mysql_prev';
+
     /**
      * The table associated with the model.
      *
@@ -29,14 +25,8 @@ class PrevDogTitle extends Pivot
      */
     protected $table = 'Dogs_ScoresDB';
 
-    protected $fillable = [
-        'SagirID',
-        'AwardID',
-        'ShowID',
-        'created_at',
-        'updated_at',
-        'deleted_at'
-    ];
+    // Disable Fillable Attributes
+    protected $guarded = [];
 
     // append the title name to the model
     protected $appends = ['name'];
@@ -58,9 +48,7 @@ class PrevDogTitle extends Pivot
     public function name(): Attribute
     {
         return Attribute::make(
-            get: fn ($value, $attributes) => PrevTitle::find($attributes['AwardID'])->name,
+            get: fn($value, $attributes) => PrevTitle::query()->where('TitleCode', $attributes['AwardID'])->first()?->name,
         );
     }
-
-    
 }

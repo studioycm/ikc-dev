@@ -1,0 +1,62 @@
+column,data_type,human_name,semantic,purpose,non_null_w1,total_w1,pct_w1,non_null_w2,total_w2,pct_w2,non_null_total,total_all,pct_all,samples,relation_map,enum_map,related_table,related_column,date_split_column
+Heb_Name,varchar(200),"Hebrew Name","record name; varchar; e.g.","record name",0,0,,14204,29361,48.38,241462,259549,93.03," | N/O | Debora Venturesime | OLIM-MIK BEAU MONDE | GOROD GREM",,,,,created_at
+Eng_Name,varchar(200),"English Name","record name; varchar; e.g. Uspeh Kapitolina IZ Kitaiskogo Kvartala","record name",0,0,,15509,29361,52.82,245197,259549,94.47,"Uspeh Kapitolina IZ Kitaiskogo Kvartala | Amalia | Kuuhaukun King-Ping | Rocky Of Newbiggin | Vanderful John",,,,,created_at
+BeitGidulID,"decimal(28,8)","Breeding House","identifier; decimal; e.g. 0.00000000",identifier,0,0,,7029,29361,23.94,106837,259549,41.16,"0.00000000 | 7028.00000000 | 7208.00000000 | 7067.00000000 | 6311.00000000",breedinghouses.GidulCode,,breedinghouses,GidulCode,created_at
+RegDate,datetime(6),"Registration Date","date - registration; datetime; e.g. 2009-12-24 00:00:00.000000","date - registration",0,0,,29335,29361,99.91,259522,259549,99.99,"2009-12-24 00:00:00.000000 | 2009-12-14 00:00:00.000000 | 2009-11-17 00:00:00.000000 | 2009-11-12 00:00:00.000000 | 2009-10-14 00:00:00.000000",,,,,created_at
+BirthDate,datetime(6),"Birth Date","date - birth; datetime; e.g. 1900-01-01 00:00:00.000000","date - birth",0,0,,16630,29361,56.64,246776,259549,95.08,"1900-01-01 00:00:00.000000 | 2009-01-05 00:00:00.000000 | 2008-09-30 00:00:00.000000 | 2005-06-05 00:00:00.000000 | 2000-07-22 00:00:00.000000",,,,,created_at
+RaceID,"decimal(28,8)","Breed Code","relation; decimal; e.g. 195.00000000",relation,0,0,,29361,29361,100,259549,259549,100,"195.00000000 | 200.00000000 | 205.00000000 | 203.00000000 | 998.00000000",BreedsDB.BreedCode,,BreedsDB,BreedCode,created_at
+ColorID,"decimal(28,8)","Color Code","relation; decimal; e.g. 8.00000000",relation,0,0,,29356,29361,99.98,259542,259549,100,"8.00000000 | 9000.00000000 | 74.00000000 | 1.00000000 | 9.00000000",ColorsDB.OldCode,,ColorsDB,OldCode,created_at
+HairID,"decimal(28,8)","Hair Code","relation; decimal; e.g. 4.00000000",relation,0,0,,29297,29361,99.78,259485,259549,99.98,"4.00000000 | 3.00000000 | 2.00000000 | 1.00000000 | 30.00000000",HairsDB.OldCode,,HairsDB,OldCode,created_at
+SupplementarySign,"decimal(28,8)","Supplementary Sign","data; decimal; e.g. 0.00000000",data,0,0,,0,29361,0,139912,259549,53.91,"0.00000000 | 1.00000000 | 12.00000000 | 6.00000000 | 24.00000000",,,,,created_at
+GrowerId,"decimal(28,8)","Breeder (User)","relation; decimal; e.g. 0.00000000",relation,0,0,,0,29361,0,225189,259549,86.76,"0.00000000 | 6238.00000000 | 357.00000000 | 5320.00000000 | 3915.00000000",users.id,,users,id,created_at
+CurrentOwnerId,"decimal(28,8)","Current Owner (legacy code)","relation; decimal; e.g. 0.00000000",relation,0,0,,0,29361,0,225188,259549,86.76,"0.00000000 | 61868.00000000 | 198.00000000 | 74440.00000000 | 36784.00000000",users.owner_code,,users,owner_code,created_at
+OwnershipDate,datetime(6),"Ownership Date","date; datetime; e.g. 2009-12-24 00:00:00.000000",date,0,0,,25,29361,0.09,230211,259549,88.7,"2009-12-24 00:00:00.000000 | 2009-12-14 00:00:00.000000 | 2009-11-17 00:00:00.000000 | 2009-11-12 00:00:00.000000 | 2009-10-14 00:00:00.000000",,,,,created_at
+FatherSAGIR,"decimal(28,8)","Father SAGIR ID","relation; decimal; e.g. 917203.00000000",relation,0,0,,22374,29361,76.2,252558,259549,97.31,"917203.00000000 | 0.00000000 | 917205.00000000 | 917199.00000000 | 917193.00000000",DogsDB.SagirID,,DogsDB,SagirID,created_at
+MotherSAGIR,"decimal(28,8)","Mother SAGIR ID","relation; decimal; e.g. 917203.00000000",relation,0,0,,22358,29361,76.15,252539,259549,97.3,"917203.00000000 | 0.00000000 | 917206.00000000 | 917200.00000000 | 917194.00000000",DogsDB.SagirID,,DogsDB,SagirID,created_at
+Pelvis,varchar(200),Pelvis,"data; varchar; e.g.",data,0,0,,823,29361,2.8,205206,259549,79.06," | C | B | A | TC",,,,,created_at
+Notes,longtext,Notes,"notes; longtext; e.g.",notes,0,0,,14319,29361,48.77,240981,259549,92.85,"  | MOL,BIR-CH MOL,BIR-CH | 200702104 200702104 | 200702103 200702103 | ????? ???? ????? ????",,,,,created_at
+ImportNumber,varchar(200),"Import Number","data; varchar; e.g. RKFR1782111",data,0,0,,14872,29361,50.65,242080,259549,93.27,"RKFR1782111 | RKFR1396083 | ER2485901RKFR1710876 | RKF2347840 | RKF1232010",,,,,created_at
+SCH,"decimal(28,8)",SCH,"data; decimal; e.g. 0.00000000",data,0,0,,0,29361,0,216269,259549,83.32,"0.00000000 | 1.00000000 | 3.00000000 | 2.00000000",,,,,created_at
+RemarkCode,"decimal(28,8)","Remark Code","data; decimal; e.g. 0.00000000",data,0,0,,0,29361,0,188591,259549,72.66,"0.00000000 | 16.00000000 | 12.00000000 | 1.00000000 | 20.00000000",,,,,created_at
+GenderID,"decimal(28,8)",Gender,"identifier; decimal; e.g. 2.00000000",identifier,0,0,,29361,29361,100,259548,259549,100,"2.00000000 | 1.00000000 | 0.00000000",,,,,created_at
+SizeID,"decimal(28,8)",Size,"identifier; decimal; e.g. 0.00000000",identifier,0,0,,23,29361,0.08,92799,259549,35.75,"0.00000000 | 2.00000000 | 1.00000000 | 3.00000000 | 4.00000000",,,,,created_at
+ProfileImage,varchar(300),"Profile Image","media; varchar; e.g. 202230;504346.jpg",media,0,0,,0,29361,0,3893,259549,1.5,"202230;504346.jpg | 202230;misoko_pdg.jpg | 202002;13825__LV23508_10.jpg | 202230;bobtail.jpg | 202002;pedigree_gloris_marvel.jpeg",,,,,created_at
+GroupID,"decimal(28,8)",Group,"identifier; decimal; e.g. 7.00000000",identifier,0,0,,1,29361,0,230187,259549,88.69,"7.00000000 | 5.00000000 | 4.00000000 | 1.00000000 | 3.00000000",,,,,created_at
+IsMagPass,"decimal(28,8)","MAG Pass","flag; decimal; e.g. 0.00000000",flag,0,0,,39,29361,0.13,62233,259549,23.98,"0.00000000 | 1.00000000 | 2.00000000",,,,,created_at
+MagDate,datetime(6),"MAG Date","date; datetime; e.g. 2016-01-09 00:00:00.000000",date,0,0,,0,29361,0,649,259549,0.25,"2016-01-09 00:00:00.000000 | 2018-09-07 00:00:00.000000 | 2012-02-06 00:00:00.000000 | 2015-01-24 00:00:00.000000 | 2010-12-26 00:00:00.000000",,,,,created_at
+MagJudge,varchar(200),"MAG Judge","data; varchar; e.g.",data,0,0,,42,29361,0.14,224761,259549,86.6," ",,,,,created_at
+MagPlace,varchar(200),"MAG Place","data; varchar; e.g.",data,0,0,,42,29361,0.14,224761,259549,86.6,"  | מומלץ-בתוקף 24 חודש ?????-????? 24 ???? | כפר הנוער מנוף ??? ????? ???? | עבר-בתוקף 24 חודש ???-????? 24 ???? | כפר אחים ??? ????",,,,,created_at
+DnaID,varchar(200),"DNA ID","identifier; varchar; e.g.",identifier,0,0,,13112,29361,44.66,74456,259549,28.69," | 19OREU09619  | #V297961 | V516432 | V408990",,,,,created_at
+Chip,varchar(200),Microchip,"identifier; varchar; e.g.",identifier,0,0,,29295,29361,99.78,131362,259549,50.61," | 643098100087586 | 804098100013855 | 0 | 985121014908164",,,,,created_at
+GidulShowType,varchar(200),"Gidul Show Type","identifier; varchar; e.g. after",identifier,0,0,,5025,29361,17.11,104877,259549,40.41,"after |  | before | none",,,,,created_at
+pedigree_color,varchar(30),"Pedigree Color","data; varchar; e.g. Blue",data,0,0,,41,29361,0.14,41,259549,0.02,"Blue | Red",,,,,created_at
+PedigreeNotes,varchar(4000),"Pedigree Notes","notes; varchar; e.g.",notes,0,0,,14550,29361,49.56,241914,259549,93.21,"  | RUS,GRAND,BLR,UKR-CH RUS,GRAND,BLR,UKR-CH | MOL-J-CH MOL-CH MOL-J-CH MOL-CH | 19OREU09619  19OREU09619  | CH-SH  CH-SH ",,,,,created_at
+HealthNotes,varchar(4000),"Health Notes","notes; varchar; e.g.",notes,0,0,,0,29361,0,56322,259549,21.7," | EDO | ED1
+ | ED-0 | PRA-Normal 4/9/2003",,,,,created_at
+Status,varchar(200),Status,"data; varchar; e.g.",data,0,0,,339,29361,1.15,25881,259549,9.97," | notapproved | onhold | notrecomm | waiting",,,,,created_at
+Image2,varchar(300),"Image #2","media; varchar; e.g. 202230;misoku_ch.jpg",media,0,0,,0,29361,0,171,259549,0.07,"202230;misoku_ch.jpg | 202230;bobtail_ch.jpg | 202230;ixavquantosdanskchampion.pdf | 202230;Hun_ch_18877.jpg | ",,,,,created_at
+TitleName,varchar(300),"Titles (pre‑2010)","record name; varchar; e.g. GCH RUS, CH RUS, KAZ, KGZ, UZB, JCH RUS, CH RKF, CH CLUB RUS","record name",0,0,,42,29361,0.14,42,259549,0.02,"GCH RUS, CH RUS, KAZ, KGZ, UZB, JCH RUS, CH RKF, CH CLUB RUS | null | DK S CH | SA CH | Int.Ch, DKCh",,,,,created_at
+Breeder_Name,varchar(300),"Breeder Name (Text)","record name; varchar; e.g. Meital Bar-Sela","record name",0,0,,13109,29361,44.65,13144,259549,5.06,"Meital Bar-Sela | ישראל ישראלי | Mrs. Irina Ischenko, Ukraine. | Yu.A. Tarkhanova, Russia | Henric Fryckstrand, Sweden",,,,,created_at
+BreedID,"decimal(28,8)","Breed ID (alt)","identifier; decimal; e.g. 81.00000000",identifier,0,0,,3,29361,0.01,3,259549,0,81.00000000,BreedsDB.BreedCode,,BreedsDB,BreedCode,created_at
+sheger_id,bigint(20),"Sheger ID","identifier; bigint; e.g. 144",identifier,0,0,,14474,29361,49.3,14474,259549,5.58,"144 | 151 | 153 | 157 | 158",,,,,created_at
+sagir_prefix,varchar(20),"SAGIR Prefix","enum; varchar; e.g. 4",enum,0,0,,29355,29361,99.98,259531,259549,99.99,"4 | 5 | 3 | 1 | 2",,"{""1"":""ISR"",""2"":""IMP"",""3"":""APX"",""4"":""EXT"",""5"":""NUL""}",,,created_at
+is_correct,varchar(255),"Is Correct","flag; varchar; e.g. 1",flag,0,0,,371,29361,1.26,10923,259549,4.21,"1 | 0",,,,,created_at
+message,text,Message,"data; text; e.g. חברת כבוד בהתאחדות - החברות הינה לצמיתות, עודכנה לה חברות עד 01.01.2040
+25.05.25 לבקשת יוסי חדד הוגדרה חברות כבוד בחוג הישראלי לכלבי שפיץ עבור מירנה",data,0,0,,475,29361,1.62,4731,259549,1.82,"חברת כבוד בהתאחדות - החברות הינה לצמיתות, עודכנה לה חברות עד 01.01.2040
+25.05.25 לבקשת יוסי חדד הוגדרה חברות כבוד בחוג הישראלי לכלבי שפיץ עבור מירנה | . | חסר זכר סאלוקי מספר סגיר -14622
+Caranat Al Naqawa 
+desertsalukis@gmail.com | גזע כללי?? | מס 32 זהה למס 2 
+מס 16 לא זכור לי
+חסרה בוסטון טרייר נקבה סגיר 136336",,,,,created_at
+message_test,varchar(255),"Message (Test)","data; varchar; e.g. ?????? ???? ??? ?? ?????",data,0,0,,0,29361,0,1,259549,0,"?????? ???? ??? ?? ?????",,,,,created_at
+not_relevant,tinyint(1),"Not Relevant","flag; tinyint; e.g. 1",flag,0,0,,166,29361,0.57,2675,259549,1.03,"1 | 0",,,,,created_at
+IsMagPass_2,"decimal(28,8)","MAG 2nd Pass","flag; decimal; e.g. 0.00000000",flag,0,0,,205,29361,0.7,64931,259549,25.02,"0.00000000 | 1.00000000 | 2.00000000",,,,,created_at
+MagDate_2,datetime(6),"MAG 2nd Date","date; datetime; e.g.",date,0,0,,0,29361,0,0,259549,0,,,,,,created_at
+MagJudge_2,varchar(255),"MAG 2nd Judge","data; varchar; e.g.",data,0,0,,29361,29361,100,259548,259549,100,,,,,,created_at
+MagPlace_2,varchar(255),"MAG 2nd Place","data; varchar; e.g.",data,0,0,,29361,29361,100,95254,259549,36.7," | ?????-????? 24 ???? | ??? ????? ???? | ???-????? 24 ???? | ??? ????",,,,,created_at
+PedigreeNotes_2,varchar(1000),"Pedigree Notes (2)","notes; varchar; e.g.",notes,0,0,,29361,29361,100,119458,259549,46.03," | RUS,GRAND,BLR,UKR-CH | MOL-J-CH MOL-CH | 19OREU09619  | CH-SH ",,,,,created_at
+Notes_2,varchar(1000),"Notes (2)","notes; varchar; e.g.",notes,0,0,,29361,29361,100,259549,259549,100," | MOL,BIR-CH | 200702104 | 200702103 | ????? ????",,,,,created_at
+red_pedigree,tinyint(1),"Red Pedigree","flag; tinyint; e.g. 0",flag,0,0,,23685,29361,80.67,249228,259549,96.02,"0 | 1",,,,,created_at
+Chip_2,varchar(255),"Microchip (2)","identifier; varchar; e.g. 0",identifier,0,0,,41,29361,0.14,68,259549,0.03,"0 | 953010001278665 | 953010001969520 | 985111000923997 | 990000002718043",,,,,created_at
+Foreign_Breeder_name,varchar(255),"Foreign Breeder Name","record name; varchar; e.g. Zubenko Olena","record name",0,0,,2,29361,0.01,2,259549,0,"Zubenko Olena | Sinchenko Zh.N, Russia",,,,,created_at
+Breeding_ManagerID,bigint(20),"Breeding Manager (User)","identifier; bigint; e.g. 249369",identifier,0,0,,409,29361,1.39,409,259549,0.16,"249369 | 249571 | 231298 | 227921 | 228508",users.id,,users,id,created_at

@@ -6,10 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PrevColor extends Model
-
 {
     use SoftDeletes;
-
 
     /**
      * The connection name for the model.
@@ -25,17 +23,8 @@ class PrevColor extends Model
      */
     protected $table = 'ColorsDB';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-    protected $fillable = [
-        'ColorNameHE',
-        'ColorNameEN',
-        'OldCode',
-        'Remark',
-    ];
+    // Disable Fillable Attributes
+    protected $guarded = [];
 
     protected $casts = [
         'OldCode' => 'integer',

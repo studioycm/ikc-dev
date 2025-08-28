@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources\PrevDogResource\RelationManagers;
 
+use App\Filament\Resources\PrevUserResource;
 use App\Models\PrevUser;
 use Filament\Forms;
+use Filament\Infolists\Components\Grid as InfolistGrid;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 class OwnersRelationManager extends RelationManager
 {
@@ -19,16 +21,28 @@ class OwnersRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('name')
+            ->defaultSort('dogs2users.created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Owner'))
+                    ->description(fn($record) => $record->id)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('mobile_phone')
                     ->label(__('Phone'))
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->copyable()
+                    ->copyMessage(fn($state) => __('Phone number') . " $state " . __('copied to clipboard'))
+                    ->copyMessageDuration(1000)
+                    ->icon('heroicon-o-phone')
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('email')
                     ->label(__('Email'))
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->copyable()
+                    ->copyMessage(fn($state) => __('Email') . " $state " . __('copied to clipboard'))
+                    ->copyMessageDuration(1000)
+                    ->icon('heroicon-o-envelope')
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('ownership.status')
                     ->label(__('Status'))
                     ->badge(),
@@ -39,22 +53,7 @@ class OwnersRelationManager extends RelationManager
                     ->dateTime()
                     ->label(__('Updated At')),
             ])
-            ->filters([
-                // Optionally filter by status
-                Tables\Filters\SelectFilter::make('status')
-                    ->label(__('Status'))
-                    ->options([
-                        'current' => __('Current'),
-                        'historic' => __('Historic'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        if (!filled($data['value'] ?? null)) {
-                            return $query;
-                        }
-
-                        return $query->wherePivot('status', $data['value']);
-                    }),
-            ])
+            ->filters([])
             ->headerActions([
                 Tables\Actions\AttachAction::make()
                     ->label(__('Attach Owner'))
@@ -69,22 +68,47 @@ class OwnersRelationManager extends RelationManager
                         Forms\Components\Select::make('status')
                             ->label(__('Status'))
                             ->options([
-                                'current' => __('Current'),
-                                'historic' => __('Historic'),
+                                'current' => 'Current',
+                                'old' => 'Old',
+                                null => 'Unknown',
                             ])
                             ->default('current')
                             ->required(),
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->label(__('Edit Pivot'))
+                Tables\Actions\ViewAction::make()
+                    ->label(__('View Owner'))
+                    // Show a simple modal instead of navigating to a non-existent View page
+                    ->infolist([
+                        InfolistGrid::make(3)->schema([
+                            TextEntry::make('id')->label('ID'),
+                            TextEntry::make('name')->label(__('Name')),
+                            TextEntry::make('mobile_phone')->label(__('Phone')),
+                            TextEntry::make('email')->label(__('Email')),
+                            TextEntry::make('address_city')->label(__('City')),
+                            TextEntry::make('address_street')->label(__('Street')),
+                        ]),
+                    ])
+                    ->modalHeading(fn(PrevUser $record) => $record->name)
+                    ->modalSubmitAction(false)
+                    ->extraModalFooterActions([
+                        Tables\Actions\Action::make('editOwner')
+                            ->label(__('Edit Owner'))
+                            ->icon('heroicon-o-pencil-square')
+                            ->url(fn(PrevUser $record) => PrevUserResource::getUrl('edit', ['record' => $record]))
+                            ->openUrlInNewTab(),
+                    ]),
+
+                Tables\Actions\EditAction::make('edit-ownership')
+                    ->label(__('Edit Ownership'))
                     ->form([
                         Forms\Components\Select::make('status')
                             ->label(__('Status'))
                             ->options([
-                                'current' => __('Current'),
-                                'historic' => __('Historic'),
+                                'current' => 'Current',
+                                'old' => 'Old',
+                                null => 'Unknown',
                             ])
                             ->required(),
                     ]),

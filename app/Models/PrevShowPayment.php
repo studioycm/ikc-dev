@@ -19,6 +19,9 @@ class PrevShowPayment extends Model
      */
     protected $table = 'shows_payments_info';
 
+    // disable fillable attributes
+    protected $guarded = [];
+
     protected $primaryKey = 'DataID';
 
     public $incrementing = true;

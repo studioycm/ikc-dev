@@ -8,12 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-
 class PrevTitle extends Model
 {
-    protected $primaryKey = 'TitleCode';
-    public $incrementing = false;
-    protected $keyType = 'int';
     use SoftDeletes;
 
     /**
@@ -25,13 +21,8 @@ class PrevTitle extends Model
 
     protected $table = 'dogs_titles_db';
 
-    protected $fillable = [
-        'TitleCode',
-        'TitleName',
-        'created_at',
-        'updated_at',
-        'deleted_at'
-    ];
+    // disable fillable attributes
+    protected $guarded = [];
 
     // append the title name to the model
     protected $appends = ['name'];
@@ -60,7 +51,6 @@ class PrevTitle extends Model
 
     // count the number of dogs with this title
 
-
     // get name using TitleName attribute
     public function name(): Attribute
     {
@@ -68,6 +58,4 @@ class PrevTitle extends Model
             get: fn ($value, $attributes) => $this->TitleName,
         );
     }
-
-
 }

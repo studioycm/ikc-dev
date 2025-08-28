@@ -16,6 +16,9 @@ class PrevShowResult extends Model
      */
     protected $table = 'shows_results';
 
+    // disable fillable attributes
+    protected $guarded = [];
+
     protected $primaryKey = 'DataID';
 
     public $incrementing = true;
@@ -55,7 +58,10 @@ class PrevShowResult extends Model
 
     public function dog(): BelongsTo
     {
-        return $this->belongsTo(PrevDog::class, 'SagirID');
+        return $this->belongsTo(PrevShowDog::class, 'SagirID', 'SagirID')
+            ->where('ShowID', $this->ShowID)
+            ->where('MainArenaID', $this->ArenaID)
+            ->where('ClassID', $this->ClassID);
     }
 
     public function breed(): BelongsTo

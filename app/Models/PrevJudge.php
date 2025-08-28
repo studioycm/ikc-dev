@@ -17,6 +17,9 @@ class PrevJudge extends Model
 
     protected $table = 'JudgesDB';
 
+    // Disable Fillable Attributes
+    protected $guarded = [];
+
     protected $primaryKey = 'DataID';
 
     public $incrementing = true;

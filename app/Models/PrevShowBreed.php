@@ -20,13 +20,14 @@ class PrevShowBreed extends Model
      */
     protected $table = 'Shows_Breeds';
 
+    // Disable Fillable Attributes
+    protected $guarded = [];
+
     protected $primaryKey = 'DataID';
 
     public $incrementing = true;
 
     protected $keyType = 'int';
-
-    protected $guarded = [];
 
     protected $casts = [
         'DataID' => 'integer',
