@@ -28,6 +28,9 @@ class PrevUser extends Model implements HasName
      */
     protected $table = 'users';
 
+    // disable fillable attributes
+    protected $guarded = [];
+
     protected $primaryKey = 'id';
 
     protected $appends = ['full_name', 'full_name_heb', 'full_name_eng', 'name', 'normalised_phone'];

@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PrevShowDogResource\Pages;
 use App\Models\PrevShowDog;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -74,10 +73,6 @@ class PrevShowDogResource extends Resource
                 TextInput::make('OrderID')
                     ->integer(),
 
-                Select::make('OwnerID')
-                    ->relationship('ownerID', 'name')
-                    ->searchable(),
-
                 DatePicker::make('BirthDate'),
 
                 TextInput::make('BreedID')
@@ -124,39 +119,6 @@ class PrevShowDogResource extends Resource
                     ->integer(),
 
                 DatePicker::make('present'),
-
-                TextInput::make('SagirID')
-                    ->required()
-                    ->integer(),
-
-                TextInput::make('ShowID')
-                    ->required()
-                    ->integer(),
-
-                TextInput::make('ArenaID')
-                    ->required()
-                    ->integer(),
-
-                TextInput::make('ShowRegistrationID')
-                    ->required()
-                    ->integer(),
-
-                TextInput::make('ClassID')
-                    ->required()
-                    ->integer(),
-
-                Select::make('OwnerID')
-                    ->relationship('ownerID', 'name')
-                    ->searchable()
-                    ->required(),
-
-                TextInput::make('new_show_registration_id')
-                    ->required()
-                    ->integer(),
-
-                TextInput::make('BreedID')
-                    ->required()
-                    ->integer(),
 
             ]);
     }
@@ -212,9 +174,9 @@ class PrevShowDogResource extends Resource
 
                 TextColumn::make('result.DataID')
                     ->label(__('Result'))
-                    ->url(function ($state) {
-                        return $state ? PrevShowResultResource::getUrl('edit', ['record' => $state]) : null;
-                    })
+//                    ->url(function ($state) {
+//                        return $state ? PrevShowResultResource::getUrl('edit', ['record' => $state]) : null;
+//                    })
                     ->searchable(isGlobal: false, isIndividual: true)
                     ->toggleable(),
 

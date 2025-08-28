@@ -178,7 +178,15 @@ class DogsDbColumnsResearch extends BaseLegacyResearchCommand
 
             $rel = $this->relationKeys[$col] ?? '';
             [$relTable, $relColumn] = $rel ? explode('.', $rel) + [null, null] : [null, null];
-            $enumMap = $col === 'sagir_prefix' ? json_encode(\App\Models\PrevDog::SAGIR_PREFIX_MAP, JSON_UNESCAPED_UNICODE) : '';
+
+            $enumMap = '';
+            if ($col === 'sagir_prefix') {
+                $map = [];
+                foreach (\App\Enums\Legacy\LegacySagirPrefix::cases() as $case) {
+                    $map[$case->value] = $case->code();
+                }
+                $enumMap = json_encode($map, JSON_UNESCAPED_UNICODE);
+            }
 
             $rows[] = [
                 $col,

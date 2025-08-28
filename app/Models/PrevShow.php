@@ -23,6 +23,8 @@ class PrevShow extends Model
      */
     protected $table = 'ShowsDB';
 
+    // Disable Fillable Attributes
+    protected $guarded = [];
 
     protected $casts = [
         'DataID' => 'integer',
@@ -81,9 +83,6 @@ class PrevShow extends Model
         );
     }
 
-
-
-
     // Relations
     public function club(): BelongsTo
     {
@@ -127,7 +126,8 @@ class PrevShow extends Model
 
     // Scopes
     #[Scope]
-    protected function activeShow (Builder $q): void {
+    protected function activeShow(Builder $q): void
+    {
 
         $q->where('ShowStatus', '=', 2);
     }
@@ -143,7 +143,6 @@ class PrevShow extends Model
     {
         $q->whereDate('EndDate', '<', now());
     }
-
 
     public function scopeWithCountsForResource(Builder $q): Builder
     {

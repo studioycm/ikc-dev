@@ -250,5 +250,20 @@
     "Name on Card": "שם על הכרטיס",
     "Buyer IP": "כתובת IP של הרוכש",
     "Payment Subject": "נושא התשלום",
-    "Cart Key": "מפתח עגלה"
+    "Cart Key": "מפתח עגלה",
+    "IL": "IL",
+    "ISR": "ISR",
+    "IMP": "IMP",
+    "APX": "APX",
+    "EXT": "EXT",
+    "NUL": "NUL",
+    "Not Approved": "פסול לגידול",
+    "Not Recommended": "לא מומלץ לגידול",
+    "On Hold": "מוקפא",
+    "Waiting": "בבירור",
+    "Petite": "זעיר",
+    "Small": "ננסי",
+    "Medium": "בינוני",
+    "Large": "ענק",
+    "w/o": "ללא"
 }

@@ -17,6 +17,9 @@ class PrevShowClass extends Model
      */
     protected $table = 'Shows_Classes';
 
+    // Disable Fillable Attributes
+    protected $guarded = [];
+
     protected $primaryKey = 'id';
 
     protected $casts = [

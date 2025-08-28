@@ -23,18 +23,8 @@ class PrevHair extends Model
      */
     protected $table = 'HairsDB';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-    protected $fillable = [
-        'DataID',
-        'HairNameHE',
-        'HairNameEN',
-        'OldCode',
-        'Remark',
-    ];
+    // Disable Fillable Attributes
+    protected $guarded = [];
 
     protected $casts = [
         'OldCode' => 'integer',

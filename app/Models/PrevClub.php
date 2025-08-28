@@ -2,24 +2,32 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class PrevClub extends Model
 {
     use SoftDeletes;
 
     protected $connection = 'mysql_prev';
+
     protected $table = 'clubs';
+
+    // disable fillable attributes
+    protected $guarded = [];
+
     protected $primaryKey = 'id';
+
     public $incrementing = true;
+
     protected $keyType = 'int';
+
     public $timestamps = true;
 
     protected $casts = [
@@ -36,7 +44,7 @@ class PrevClub extends Model
         'status' => 'integer',
     ];
 
-//    protected $appends = ['full_address'];
+    //    protected $appends = ['full_address'];
 
     // Pivot: clubs ↔ breeds
     public function breeds(): BelongsToMany
@@ -49,8 +57,6 @@ class PrevClub extends Model
     {
         return $this->breeds()->withCount('dogs')->get();
     }
-
-
 
     public function managers(): BelongsToMany
     {
@@ -66,13 +72,11 @@ class PrevClub extends Model
                     $this->attributes['Street'] ?? null,
                     $this->attributes['Number'] ?? null,
                 ]);
+
                 return $parts ? implode(', ', $parts) : '';
             }
         );
     }
-
-
-
 
     /**
      * Scope to add breeds_count (via withCount) and dogs_count (via selectSub).
@@ -97,7 +101,7 @@ class PrevClub extends Model
             ->whereNull('d.deleted_at');
 
         $q->selectRaw('clubs.*')
-          ->selectSub($dogsCountSub, 'dogs_count');
+            ->selectSub($dogsCountSub, 'dogs_count');
 
         return $q;
     }

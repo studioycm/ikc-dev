@@ -18,6 +18,9 @@ class PrevShowArena extends Model
      */
     protected $table = 'Shows_Structure';
 
+    // Disable Fillable Attributes
+    protected $guarded = [];
+
     protected $primaryKey = 'id';
 
     protected $casts = [

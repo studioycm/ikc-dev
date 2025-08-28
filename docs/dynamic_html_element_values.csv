@@ -1,0 +1,32 @@
+﻿Options List,Models,Enum Name pre-formatting,Create Enum Instructions,Value,Label Hebrew,Label English
+3 > Dog Status,PrevDog,dog status,create,1,מאושר,Approved
+3 > Dog Status,PrevDog,dog status,create,2,לא מאושר,Not approved
+3 > Dog Status,PrevDog,dog status,create,3,בתהליך,In process
+3 > Dog Status,PrevDog,dog status,create,4,פסול,Canceled
+5 > Pedigree color,PrevDog,pedigree certificate color,create,Blue,כחול,Blue
+5 > Pedigree color,PrevDog,pedigree certificate color,create,Red,אדום,Red
+6 > Task Status,PrevTask,task status,"create, add model",Competed,המשימה הסתיימה,Competed
+6 > Task Status,PrevTask,task status,create,In process,בתהליך,In process
+6 > Task Status,PrevTask,task status,create,New,חדש,New
+6 > Task Status,PrevTask,task status,create,On Hold,בהשהייה,On Hold
+7 > Activity Type,PrevActivity,activity type,skip,Activity1,activity1,Activity1
+7 > Activity Type,PrevActivity,activity type,skip,Activity2,Activity2,Activity2
+8 > Template Type,PrevTextTemplate,text template type,skip,dynamic_text,Dynamic Text,Dynamic Text
+8 > Template Type,PrevTextTemplate,text template type,skip,message,Message,Message
+9 > Certificate Type,PrevUserRequest,certificate type,create as simple enum on model,champion_of_israel,אלוף על ישראל,Israeli Grand Champion
+9 > Certificate Type,PrevUserRequest,certificate type,create as simple enum on model,elderly_israeli_champion,אלוף קשיש ישראל,Israeli Veteran Champion
+9 > Certificate Type,PrevUserRequest,certificate type,create as simple enum on model,israeli_champion,אלוף ישראל,Israeli Champion
+9 > Certificate Type,PrevUserRequest,certificate type,create as simple enum on model,young_israeli_champion,אלוף ישראל צעיר,Israeli Junior Champion
+10 > Shipping,PrevUserRequest,shipping type,create as simple enum on model,1,התעודה תשלח ללא תוספת תשלום בדואר רשום לכתובת הבעלים המופיעה מעלה,The certificate will be sent without additional payment by registered mail to the owner's address listed above
+10 > Shipping,PrevUserRequest,shipping type,create as simple enum on model,2,אגיע למשרדי ההתאחדות לאסוף את התעודה,I will come to the association offices to collect the certificate
+11 > Class,PrevShowClass,show class,create,beginners_class,כיתת מתחילים,Beginners class
+11 > Class,PrevShowClass,show class,create,over_13,בוגרים מעל גיל 13,Adults over the age of 13
+11 > Class,PrevShowClass,show class,create,under_13,צעירים מתחת לגיל 13,Young people under the age of 13
+12 > Sagirs Prefix,PrevDog,sagir prefix,create,1,גורים,ISR
+12 > Sagirs Prefix,PrevDog,sagir prefix,create,2,יבוא,IMP
+12 > Sagirs Prefix,PrevDog,sagir prefix,create,3,נלווה,APX
+12 > Sagirs Prefix,PrevDog,sagir prefix,create,4,חיצוני,EXT
+12 > Sagirs Prefix,PrevDog,sagir prefix,create,5,פיקטיבי,NUL
+13 > beauty champion interested in status,PrevDog,international championship class,create as simple enum on model,International champion,אלוף בינלאומי,International champion
+13 > beauty champion interested in status,PrevDog,international championship class,create as simple enum on model,Senior international champion,אלוף בינלאומי קשיש,Senior international champion
+13 > beauty champion interested in status,PrevDog,international championship class,create as simple enum on model,Young international champion,אלוף בינלאומי צעיר,Young international champion

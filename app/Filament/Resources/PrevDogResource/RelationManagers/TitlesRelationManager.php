@@ -18,6 +18,7 @@ class TitlesRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('TitleName')
+            ->defaultSort('Dogs_ScoresDB.EventDate', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('TitleName')
                     ->label(__('Title'))

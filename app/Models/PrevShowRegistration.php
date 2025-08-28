@@ -20,6 +20,9 @@ class PrevShowRegistration extends Model
      */
     protected $table = 'shows_registration';
 
+    // disable fillable attributes
+    protected $guarded = [];
+
     protected $casts = [
         'id' => 'integer',
         'DataID' => 'integer',

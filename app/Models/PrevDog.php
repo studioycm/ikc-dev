@@ -2,18 +2,22 @@
 
 namespace App\Models;
 
+use App\Casts\Legacy\LegacyDogGenderCast;
+use App\Casts\Legacy\LegacyDogSizeCast;
+use App\Enums\Legacy\LegacyDogStatus;
+use App\Enums\Legacy\LegacyPedigreeColor;
+use App\Enums\Legacy\LegacySagirPrefix;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PrevDog extends Model
-
 {
     use SoftDeletes;
+
     /**
      * The connection name for the model.
      *
@@ -28,7 +32,8 @@ class PrevDog extends Model
      */
     protected $table = 'DogsDB';
 
-
+    // Disable Fillable Attributes
+    protected $guarded = [];
     // casting the attributes to the correct types
     protected $casts = [
         'SagirID' => 'integer',
@@ -36,55 +41,64 @@ class PrevDog extends Model
         'MotherSAGIR' => 'integer',
         'Heb_Name' => 'string',
         'Eng_Name' => 'string',
-        'GenderID' => 'integer',
         'ColorID' => 'integer',
         'HairID' => 'integer',
         'RaceID' => 'integer',
+        'GenderID' => LegacyDogGenderCast::class,
+        'SizeID' => LegacyDogSizeCast::class,
+        'Status' => LegacyDogStatus::class,
+        'pedigree_color' => LegacyPedigreeColor::class,
+        'sagir_prefix' => LegacySagirPrefix::class,
     ];
 
-    // create maping for sagir_prefix (1"ISR", 2"IMP", 3"APX", 4"EXT", 5"NUL")
-    const SAGIR_PREFIX_MAP = [
-        1 => 'ISR',
-        2 => 'IMP',
-        3 => 'APX',
-        4 => 'EXT',
-        5 => 'NUL',
-    ];
-
-    // create maping for GenderID and Sex fields: 1="M", 2="F","ז"="M","נ"="F",null or any other = "n/a"
-    const GenderMap = [
+    // create mapping for GenderID and Sex fields: 1="M", 2="F","ז"="M","נ"="F",null or any other = "n/a"
+    const array GenderMap = [
         1 => 'M',
         2 => 'F',
         'ז' => 'm',
         'נ' => 'f',
     ];
 
-
-
     // eloquent relationships with PrevBreed and PrevColor
-    public function breed(): HasOne
+    public function breed(): BelongsTo
     {
-        return $this->hasOne(PrevBreed::class, 'BreedCode', 'RaceID');
-    }
-    public function color(): HasOne
-    {
-        return $this->hasOne(PrevColor::class, 'OldCode', 'ColorID');
+        // Dog belongs to a breed: RaceID (dogs) -> BreedCode (breeds)
+        return $this->belongsTo(PrevBreed::class, 'RaceID', 'BreedCode');
     }
 
-    public function hair(): HasOne
+    public function color(): BelongsTo
     {
-        return $this->hasOne(PrevHair::class, 'OldCode', 'HairID');
+        // Dog belongs to a color: ColorID (dogs) -> OldCode (colors)
+        return $this->belongsTo(PrevColor::class, 'ColorID', 'OldCode');
+    }
+
+    public function hair(): BelongsTo
+    {
+        // Dog belongs to a hair type: HairID (dogs) -> OldCode (hairs)
+        return $this->belongsTo(PrevHair::class, 'HairID', 'OldCode');
     }
     // eloquent relationships with self PrevDog model as a father and mother
 
-    public function father(): HasOne
+    public function father(): BelongsTo
     {
-        return $this->hasOne(self::class, 'SagirID', 'FatherSAGIR');
+        return $this->belongsTo(self::class, 'FatherSAGIR', 'SagirID');
     }
 
-    public function mother(): HasOne
+    public function mother(): BelongsTo
     {
-        return $this->hasOne(self::class, 'SagirID', 'MotherSAGIR');
+        return $this->belongsTo(self::class, 'MotherSAGIR', 'SagirID');
+    }
+
+    public function childrenAsFather(): HasMany
+    {
+        // All pups that list this dog as FatherSAGIR
+        return $this->hasMany(self::class, 'FatherSAGIR', 'SagirID');
+    }
+
+    public function childrenAsMother(): HasMany
+    {
+        // All pups that list this dog as MotherSAGIR
+        return $this->hasMany(self::class, 'MotherSAGIR', 'SagirID');
     }
 
     // users that are dog owners using dogs2users table or PrevUserDog model
@@ -117,6 +131,7 @@ class PrevDog extends Model
     {
         return $this->belongsTo(PrevUser::class, 'BreedingManagerID', 'id');
     }
+
     // current_owner using "DogsOwners" table from connection "mysql_prev" without a dedicated model
     public function currentOwner(): BelongsTo
     {
@@ -132,7 +147,8 @@ class PrevDog extends Model
         return $relation;
     }
 
-    protected $appends = ['full_name', 'sagir_prefix', 'prefixed_sagir', 'gender'];
+    // appends full_name and prefixed_sagir, removed the "sagir_prefix" and "gender" attributes
+    protected $appends = ['full_name'];
 
     public function fullName(): Attribute
     {
@@ -150,37 +166,24 @@ class PrevDog extends Model
                 if ($eng) {
                     return $eng;
                 }
+
                 return '<< Name Not Found >>';
             }
         );
     }
 
-    // create an accessor for the sagir_prefix attribute using Laravel 12 syntax
-    public function sagirPrefix(): Attribute
+    // simple accessor to get a human-friendly label anywhere.
+    public function genderLabel(): Attribute
     {
         return Attribute::make(
-            get: fn($value) =>
-                self::SAGIR_PREFIX_MAP[$value] ?? 'NUL'
+            get: fn(): string => $this->GenderID->getLabel()
         );
     }
 
-    // create an attribute that concatnating the SagirID (an integer) with the "sagir_prefix" and "-" in between
-    public function prefixedSagir(): Attribute
+    public function sizeLabel(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $this->sagir_prefix . '-' . (string)$this->SagirID
+            get: fn(): string => $this->SizeID->getLabel()
         );
     }
-
-    // create an accessor for the Gender attribute using Laravel 12 syntax
-    public function gender(): Attribute
-    {
-        return Attribute::make(
-            get: fn() => isset($this->attributes['GenderID']) && array_key_exists((int)$this->attributes['GenderID'], self::GenderMap)
-                        ? self::GenderMap[(int)$this->attributes['GenderID']]
-                        : 'n/a'
-        );
-    }
-
-
 }
