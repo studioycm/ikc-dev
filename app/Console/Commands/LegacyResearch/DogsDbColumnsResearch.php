@@ -178,6 +178,7 @@ class DogsDbColumnsResearch extends BaseLegacyResearchCommand
 
             $rel = $this->relationKeys[$col] ?? '';
             [$relTable, $relColumn] = $rel ? explode('.', $rel) + [null, null] : [null, null];
+
             $enumMap = '';
             if ($col === 'sagir_prefix') {
                 $map = [];

@@ -34,7 +34,6 @@ class PrevDog extends Model
 
     // Disable Fillable Attributes
     protected $guarded = [];
-
     // casting the attributes to the correct types
     protected $casts = [
         'SagirID' => 'integer',

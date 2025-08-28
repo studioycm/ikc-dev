@@ -92,6 +92,7 @@ class PrevDogResource extends Resource
     {
         return $form
             ->schema([
+
                 FormTabs::make('prevDogFormTabs')
                     ->tabs([
                         FormTab::make('general')

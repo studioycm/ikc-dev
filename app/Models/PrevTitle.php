@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PrevTitle extends Model
 {
+    protected $primaryKey = 'TitleCode';
+    public $incrementing = false;
+    protected $keyType = 'int';
     use SoftDeletes;
 
     /**
