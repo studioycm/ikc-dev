@@ -12,6 +12,9 @@ enum LegacyDogStatus: string implements HasColor, HasIcon, HasLabel
     case NotRecommended = 'notrecomm';
     case OnHold = 'onhold';
     case Waiting = 'waiting';
+    // handle empty/null/none of the above values the right way
+    case Unknown = 'unknown';
+
 
     public function getLabel(): string
     {
@@ -20,6 +23,7 @@ enum LegacyDogStatus: string implements HasColor, HasIcon, HasLabel
             self::NotRecommended => __('Not Recommended'),
             self::OnHold => __('On Hold'),
             self::Waiting => __('Waiting'),
+            self::Unknown => "---",
         };
     }
 
@@ -28,8 +32,9 @@ enum LegacyDogStatus: string implements HasColor, HasIcon, HasLabel
         return match ($this) {
             self::NotApproved => 'danger',
             self::NotRecommended => 'warning',
-            self::OnHold => 'gray',
+            self::OnHold => 'white',
             self::Waiting => 'info',
+            self::Unknown => 'grey',
         };
     }
 
@@ -40,6 +45,7 @@ enum LegacyDogStatus: string implements HasColor, HasIcon, HasLabel
             self::NotRecommended => 'fas-thumbs-down',
             self::OnHold => 'fas-pause-circle',
             self::Waiting => 'fas-hourglass-half',
+            self::Unknown => 'fas-question',
         };
     }
 }

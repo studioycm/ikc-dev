@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Casts\Legacy\LegacyDogGenderCast;
 use App\Casts\Legacy\LegacyDogSizeCast;
-use App\Enums\Legacy\LegacyDogStatus;
+use App\Casts\Legacy\LegacyDogStatusCast;
 use App\Enums\Legacy\LegacyPedigreeColor;
 use App\Enums\Legacy\LegacySagirPrefix;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -46,7 +46,7 @@ class PrevDog extends Model
         'RaceID' => 'integer',
         'GenderID' => LegacyDogGenderCast::class,
         'SizeID' => LegacyDogSizeCast::class,
-        'Status' => LegacyDogStatus::class,
+        'Status' => LegacyDogStatusCast::class,
         'pedigree_color' => LegacyPedigreeColor::class,
         'sagir_prefix' => LegacySagirPrefix::class,
     ];
