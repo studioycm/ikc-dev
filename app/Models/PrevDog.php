@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\Legacy\LegacyDogGenderCast;
 use App\Casts\Legacy\LegacyDogSizeCast;
+
 use App\Casts\Legacy\LegacyDogStatusCast;
 use App\Enums\Legacy\LegacyPedigreeColor;
 use App\Enums\Legacy\LegacySagirPrefix;
