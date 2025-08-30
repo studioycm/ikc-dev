@@ -432,8 +432,7 @@ class PrevDogResource extends Resource
                     ->with('owners')
                     ->with('titles')
                     ->with('duplicates');
-                //                ->with('currentOwner')
-                //                ->withCount('duplicates')
+                //                ->with('currentOwner');
             })
             ->columns([
                 Tables\Columns\TextColumn::make('id')
@@ -635,7 +634,7 @@ class PrevDogResource extends Resource
                 Tables\Columns\TextColumn::make('Status')
                     ->label(__('Status'))
                     ->badge()
-                    ->icon(fn(PrevDog $record): string => $record->Status?->getIcon() ?? 'fas-question')
+                    ->icon(fn(PrevDog $record): string => $record->Status?->getIcon() ?? 'fas-minus-circle')
                     ->color(fn(PrevDog $record): string => $record->Status?->getColor() ?? 'gray')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -1132,7 +1131,7 @@ class PrevDogResource extends Resource
                             TextEntry::make('Status')
                                 ->label(__('Status'))
                                 ->badge()
-                                ->icon(fn(PrevDog $record): string => $record->Status?->getIcon() ?? 'fas-question')
+                                ->icon(fn(PrevDog $record): string => $record->Status?->getIcon() ?? 'fas-minus-circle')
                                 ->color(fn(PrevDog $record): string => $record->Status?->getColor() ?? 'gray'),
                         ]),
                     ])

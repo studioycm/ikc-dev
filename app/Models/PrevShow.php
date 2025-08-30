@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use App\Casts\Legacy\LegacyShowTypeCast;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
+// use Illuminate\Database\Eloquent\Casts\Attribute;
+
 
 class PrevShow extends Model
 {
@@ -30,7 +34,7 @@ class PrevShow extends Model
         'DataID' => 'integer',
         'ShowID' => 'integer',
         'MaxRegisters' => 'integer',
-        'ShowType' => 'integer',
+        'ShowType' => LegacyShowTypeCast::class,
         'ClubID' => 'integer',
         'ShowStatus' => 'integer',
         'Check_all_members' => 'integer',
@@ -66,23 +70,6 @@ class PrevShow extends Model
         'deleted_at' => 'datetime',
     ];
 
-    protected function ShowType(): Attribute
-    {
-        return Attribute::make(
-            get: function ($value): ?string {
-                $code = (int) ($value ?? 0);
-
-                return match ($code) {
-                    1 => __('International Show'),
-                    2 => __('Clubs Show'),
-                    3 => __('National Show'),
-                    4 => __('Breeding Qualification Test'),
-                    default => __('Not set'),
-                };
-            }
-        );
-    }
-
     // Relations
     public function club(): BelongsTo
     {
@@ -97,6 +84,18 @@ class PrevShow extends Model
     public function arenas(): HasMany
     {
         return $this->hasMany(PrevShowArena::class, 'ShowID', 'id');
+    }
+
+    public function judges(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            PrevJudge::class,
+            'Shows_Breeds',
+            'ShowID',   // FK on pivot referencing this model
+            'JudgeID',   // FK on pivot referencing related model
+            'id',        // local key
+            'DataID',     // related key
+        )->distinct();
     }
 
     public function registrations(): HasMany

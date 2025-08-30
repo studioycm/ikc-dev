@@ -2,13 +2,14 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\Legacy\LegacyShowTypeEnum;
 use App\Filament\Resources\PrevShowResource\Pages;
 use App\Filament\Resources\PrevShowResource\RelationManagers\PrevShowArenaRelationManager;
 use App\Filament\Resources\PrevShowResource\RelationManagers\PrevShowClassRelationManager;
 use App\Models\PrevShow;
-use App\Models\PrevShowArena;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid as InfolistGrid;
 use Filament\Infolists\Components\IconEntry;
@@ -35,7 +36,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\HtmlString;
 
 class PrevShowResource extends Resource
 {
@@ -92,8 +92,12 @@ class PrevShowResource extends Resource
                 TextInput::make('MaxRegisters')
                     ->numeric(),
 
-                TextInput::make('ShowType')
-                    ->numeric(),
+                ToggleButtons::make('ShowType')
+                    ->label(__('Show Type'))
+                    ->options(LegacyShowTypeEnum::class)
+                    ->grouped()
+                    ->nullable(),
+
 
                 TextInput::make('ClubID')
                     ->numeric(),
@@ -198,8 +202,7 @@ class PrevShowResource extends Resource
         return $table
             ->modifyQueryUsing(function (Builder $query) {
                 return $query
-                    ->with(['arenas.judges', 'club']) // arenas and their judges for per-row descriptions if needed
-                    ->withCount(['registrations', 'showDogs', 'results', 'arenas', 'classes']);
+                    ->with(['judges', 'club']);
             })
             ->columns([
                 TextColumn::make('id')
@@ -207,48 +210,46 @@ class PrevShowResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->searchable(),
-                TextColumn::make('show_title')
-                    ->label(__('Show'))
-                    ->formatStateUsing(fn(PrevShow $record): HtmlString => new HtmlString(
-                        '<p><span>' .
-                        $record->TitleName .
-                        '</span><br><span>' .
-                        $record->ShowType .
-                        '</span>, <span>' .
-                        $record->location .
-                        '</span><br><span>' .
-                        $record->club->Name .
-                        '</span></p>'
-                    ))
-                    ->searchable()
-                    ->sortable('ShowsDB.id'),
-
-                TextColumn::make('show_dates')
-                    ->label(__('Dates'))
-                    ->formatStateUsing(function (PrevShow $record): HtmlString {
-                        $dates = [];
-                        if ($record->StartDate) {
-                            $dates[] = __('Starting at') . $record->StartDate->format('d-m-Y');
-                        }
-                        if ($record->EndDate) {
-                            $dates[] = __('Ending at') . $record->EndDate->format('d-m-Y');
-                        }
-                        if ($record->EndRegistrationDate) {
-                            $dates[] = __('Registration Ending at') . $record->EndRegistrationDate->format('d-m-Y');
-                        }
-                        $dates_s = implode('<br>', $dates);
-
-                        return new HtmlString("<p> $dates_s </p>");
-                    })
-                    ->sortable(['StartDate', 'EndRegistrationDate'])
-                    ->toggleable(),
-
+                TextColumn::make('club.Name')
+                    ->label(__('Club'))
+                    ->searchable(['clubs.Name'], isIndividual: true, isGlobal: false)
+                    ->sortable('clubs.Name'),
+                TextColumn::make('TitleName')
+                    ->label(__('Show Title')),
+                TextColumn::make('ShowType')
+                    ->label(__('Show Type'))
+                    ->badge()
+                    ->icon(fn(PrevShow $r): ?string => $r->ShowType?->getIcon())
+                    ->color(fn(PrevShow $r): ?string => $r->ShowType?->getColor())
+                    ->searchable(['ShowsDB.ShowType'], isIndividual: true, isGlobal: false)
+                    ->sortable('ShowsDB.ShowType'),
+                TextColumn::make('location')
+                    ->label(__('Location'))
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->sortable(),
                 TextColumn::make('LongDesc')
                     ->label(__('Description'))
                     ->searchable()
                     ->sortable()
                     ->toggleable()
-                    ->html(),
+                    ->html()
+                    ->limit(400)
+                    ->wrap(),
+                TextColumn::make('StartDate')
+                    ->label(__('Starts'))
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('EndDate')
+                    ->label(__('Ends'))
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('EndRegistrationDate')
+                    ->label(__('Registration Ends'))
+                    ->date()
+                    ->sortable()
+                    ->toggleable(),
 
                 IconColumn::make('ShowStatus')
                     ->label(__('Show Status'))
@@ -301,9 +302,14 @@ class PrevShowResource extends Resource
                     ->toggleable(),
 
                 TextColumn::make('start_from_index')
+                    ->label(__('Index Start'))
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->toggleable(),
 
-                TextColumn::make('Check_all_members')
+                IconColumn::make('Check_all_members')
+                    ->label(__('All Members'))
+                    ->boolean(fn($state): bool => $state === 1)
+                    ->color(fn($state): string => $state === 1 ? 'success' : 'danger')
                     ->toggleable(),
 
                 TextColumn::make('DataID')
@@ -362,28 +368,31 @@ class PrevShowResource extends Resource
                         Tab::make(__('Overview'))
                             ->schema([
                                 InfolistGrid::make(3)->schema([
-                                    TextEntry::make('TitleName')->label(__('Title'))->columnSpan(2),
+                                    TextEntry::make('TitleName')->label(__('Show title'))->columnSpan(2),
                                     TextEntry::make('club.Name')->label(__('Club')),
-                                    TextEntry::make('ShowType')->label(__('Type')),
-                                    TextEntry::make('location')->label(__('Location')),
-                                    IconEntry::make('ShowStatus')->label(__('Active'))->boolean(),
-                                ]),
-                                InfolistSection::make(__('Arenas & Judges'))
-                                    ->schema([
-                                        TextEntry::make('arenas')
-                                            ->label(__('Arenas (Judges)'))
-                                            ->formatStateUsing(function (PrevShow $record): string {
-                                                $record->loadMissing('arenas.judges');
+                                    TextEntry::make('ShowType')
+                                        ->label(__('Show type'))
+                                        ->badge()
+                                        ->icon(fn(PrevShow $r): ?string => $r->ShowType?->getIcon())
+                                        ->color(fn(PrevShow $r): ?string => $r->ShowType?->getColor()),
 
-                                                return $record->arenas
-                                                    ->sortBy('id')
-                                                    ->map(fn(PrevShowArena $a) => ($a->GroupName ?: "Arena #{$a->id}")
-                                                        . ' — '
-                                                        . $a->judges->pluck('JudgeNameHE')->unique()->sort()->join(', '))
-                                                    ->join(' | ');
-                                            })
-                                            ->columnSpanFull(),
-                                    ]),
+                                    TextEntry::make('location')->label(__('Location')),
+                                    IconEntry::make('ShowStatus')->label(__('Show Status'))->boolean(),
+                                ]),
+                                InfolistGrid::make(2)->schema([
+                                    InfolistSection::make(__('Show Description'))
+                                        ->schema([
+                                            TextEntry::make('LongDesc')
+                                                ->label(false)
+                                                ->html(),
+                                        ])->columnSpan(1),
+                                    InfolistSection::make(__('Judges'))
+                                        ->schema([
+                                            TextEntry::make('judges.JudgeNameHE')
+                                                ->label(false)
+                                                ->separator('; '),
+                                        ])->columnSpan(1),
+                                ]),
                                 InfolistSection::make(__('Counts'))
                                     ->schema([
                                         TextEntry::make('arenas_count')->label(__('Arenas'))->state(fn(PrevShow $record) => $record->arenas()->count()),
@@ -396,8 +405,8 @@ class PrevShowResource extends Resource
                         Tab::make(__('Dates'))
                             ->schema([
                                 InfolistGrid::make(2)->schema([
-                                    TextEntry::make('StartDate')->date()->label(__('Starting at')),
-                                    TextEntry::make('EndDate')->date()->label(__('Ending at')),
+                                    TextEntry::make('StartDate')->dateTime()->label(__('Starting at')),
+                                    TextEntry::make('EndDate')->dateTime()->label(__('Ending at')),
                                     TextEntry::make('EndRegistrationDate')->date()->label(__('Registration ends')),
                                     TextEntry::make('CreationDateTime')->since()->label(__('Created')),
                                     TextEntry::make('ModificationDateTime')->since()->label(__('Updated')),
