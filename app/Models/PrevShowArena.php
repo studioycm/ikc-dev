@@ -49,7 +49,7 @@ class PrevShowArena extends Model
     public function show_breeds(): HasMany
     {
         return $this->hasMany(PrevShowBreed::class, 'ArenaID', 'id')
-            ->orderBy('OrderID', 'desc')
+            ->orderBy('OrderID')
             ->with(['judge']);
 
     }

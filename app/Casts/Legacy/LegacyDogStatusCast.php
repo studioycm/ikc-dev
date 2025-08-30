@@ -13,7 +13,7 @@ class LegacyDogStatusCast implements CastsAttributes
         // Treat null / empty / invalid as Unknown
         $raw = is_string($value) ? trim($value) : null;
         if ($raw === null || $raw === '') {
-            return LegacyDogStatus::Unknown;
+            return LegacyDogStatus::Off;
         }
 
         $normalized = strtolower($raw);
@@ -24,8 +24,7 @@ class LegacyDogStatusCast implements CastsAttributes
             'notrecomm', 'not recommended' => LegacyDogStatus::NotRecommended,
             'onhold', 'on hold' => LegacyDogStatus::OnHold,
             'waiting' => LegacyDogStatus::Waiting,
-            'unknown' => LegacyDogStatus::Unknown,
-            default => LegacyDogStatus::Unknown,
+            default => LegacyDogStatus::Off,
         };
     }
 
@@ -44,9 +43,7 @@ class LegacyDogStatusCast implements CastsAttributes
                 'notrecomm', 'not recommended' => LegacyDogStatus::NotRecommended->value,
                 'onhold', 'on hold' => LegacyDogStatus::OnHold->value,
                 'waiting' => LegacyDogStatus::Waiting->value,
-                'unknown' => LegacyDogStatus::Unknown->value,
-                // Empty strings become null to avoid bad data
-                '' => null,
+                'Off' => LegacyDogStatus::Off->value,
                 default => null,
             };
         }

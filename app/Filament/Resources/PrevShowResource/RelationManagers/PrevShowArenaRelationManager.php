@@ -26,10 +26,6 @@ class PrevShowArenaRelationManager extends RelationManager
                     ->required()
                     ->maxLength(255)
                     ->label('Name'),
-                Forms\Components\Select::make('JudgeID')
-                    ->relationship('judge', 'JudgeNameEN')
-                    ->required()
-                    ->label('Judge'),
                 Forms\Components\TextInput::make('OrderID')
                     ->required()
                     ->numeric()
@@ -40,10 +36,17 @@ class PrevShowArenaRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function ($query) {
+                return $query
+                    ->with(['judges']);
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('id')->label('ID')->toggleable(),
                 Tables\Columns\TextColumn::make('GroupName')->label('Name')->toggleable(),
-                Tables\Columns\TextColumn::make('judge.JudgeNameEN')->label('Judge')->toggleable(),
+                Tables\Columns\TextColumn::make('judges.JudgeNameHE')
+                    ->label('Judges')
+                    ->separator('; ')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('OrderID')->label('Order')->numeric()->toggleable(),
             ])
             ->headerActions([])
