@@ -15,6 +15,7 @@ use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification as LaravelNotification;
 use Illuminate\Support\Str;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Throwable;
@@ -167,7 +168,7 @@ class UserResource extends Resource
                         $config = self::getMailDiagnosticInfo();
 
                         try {
-                            $record->notify(new TestMailNotification($record));
+                            LaravelNotification::sendNow($record, new TestMailNotification($record));
 
                             Notification::make()
                                 ->title('Email dispatched')
@@ -243,6 +244,11 @@ class UserResource extends Resource
         $fromAddress = (string)(config('mail.from.address') ?? '');
         $fromName = (string)(config('mail.from.name') ?? '');
 
+        // Queue diagnostics
+        $queueDefault = (string)(config('queue.default') ?? 'sync');
+        $queueDriver = (string)(config("queue.connections.$queueDefault.driver") ?? '');
+        $queueName = (string)(config("queue.connections.$queueDefault.queue") ?? (string)(config('queue.queue', 'default')));
+
         return [
             'default' => $default,
             'transport' => $transport,
@@ -252,6 +258,9 @@ class UserResource extends Resource
             'username' => $username,
             'from_address' => $fromAddress,
             'from_name' => $fromName,
+            'queue_default' => $queueDefault,
+            'queue_driver' => $queueDriver,
+            'queue_name' => $queueName,
         ];
     }
 
@@ -269,6 +278,9 @@ class UserResource extends Resource
             'encryption=' . (string)($config['encryption'] ?? ''),
             'username=' . (string)($config['username'] ?? ''),
             'from=' . $fromDisplay,
+            'queue.default=' . (string)($config['queue_default'] ?? ''),
+            'queue.driver=' . (string)($config['queue_driver'] ?? ''),
+            'queue.name=' . (string)($config['queue_name'] ?? ''),
         ];
 
         return implode(' | ', $parts);
