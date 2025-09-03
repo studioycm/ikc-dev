@@ -8,7 +8,12 @@ return [
 
     'columns' => [
         'text' => [
-            'more_list_items' => 'ו-:count פריטים נוספים',
+            'actions' => [
+                'collapse_list' => 'הצג :count פחות',
+                'expand_list' => 'הצג :count יותר',
+            ],
+
+            'more_list_items' => 'ו- :count נוספים',
         ],
     ],
 
