@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
+use App\Notifications\TestMailNotification;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -13,9 +14,10 @@ use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification as LaraNotification;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Throwable;
 
 class UserResource extends Resource
 {
@@ -41,15 +43,14 @@ class UserResource extends Resource
         return __('System Users');
     }
 
-
     protected static ?int $navigationSort = 98;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-//    public static function getNavigationBadge(): ?string
-//    {
-//        return static::getModel()::count();
-//    }
+    //    public static function getNavigationBadge(): ?string
+    //    {
+    //        return static::getModel()::count();
+    //    }
 
     public static function form(Form $form): Form
     {
@@ -102,9 +103,9 @@ class UserResource extends Resource
                     ->badge()
                     ->formatStateUsing(fn ($state): string => Str::headline($state))
                     ->color(fn (string $state): string => match ($state) {
-                            'super_admin' => 'success',
-                            'panel_user' => 'warning',
-                        })
+                        'super_admin' => 'success',
+                        'panel_user' => 'warning',
+                    })
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -139,7 +140,7 @@ class UserResource extends Resource
                         Notification::make()
                             ->title('Email verification link sent')
                             ->body('Email verification link sent to ' . $user->email .
-                            '<br>' . $notification->url)
+                                '<br>' . $notification->url)
                             ->success()
                             ->icon('heroicon-o-shield-check')
                             ->iconColor('primery')
@@ -163,27 +164,46 @@ class UserResource extends Resource
                     ->color('primary')
                     ->requiresConfirmation()
                     ->action(function (User $record): void {
-                        $record->notify(new class extends LaraNotification {
-                            public function via($notifiable): array
-                            {
-                                return ['mail'];
-                            }
+                        $config = self::getMailDiagnosticInfo();
 
-                            public function toMail($notifiable): MailMessage
-                            {
-                                return (new MailMessage)
-                                    ->subject('Test email from ' . config('app.name'))
-                                    ->greeting('Hello ' . ($notifiable->name ?? ''))
-                                    ->line('This is a quick test email to confirm delivery.')
-                                    ->salutation('Regards, ' . config('app.name'));
-                            }
-                        });
+                        try {
+                            $record->notify(new TestMailNotification($record));
 
-                        Notification::make()
-                            ->title('Email dispatched')
-                            ->body('A test email was dispatched to ' . $record->email)
-                            ->success()
-                            ->send();
+                            Notification::make()
+                                ->title('Email dispatched')
+                                ->body('A test email was dispatched to ' . $record->email
+                                    . '<br>' . self::formatMailDiagnosticInfo($config))
+                                ->success()
+                                ->send();
+                        } catch (TransportExceptionInterface $e) {
+                            Log::error('SMTP transport error during test mail.', [
+                                'exception' => $e,
+                                'mail' => $config,
+                                'user_id' => $record->id,
+                            ]);
+
+                            Notification::make()
+                                ->title('Mail connection failed')
+                                ->body('Could not connect to the SMTP server. Please verify your SendGrid SMTP settings.'
+                                    . '<br>' . self::formatMailDiagnosticInfo($config))
+                                ->danger()
+                                ->persistent()
+                                ->send();
+                        } catch (Throwable $e) {
+                            Log::error('Unexpected error during test mail.', [
+                                'exception' => $e,
+                                'mail' => $config,
+                                'user_id' => $record->id,
+                            ]);
+
+                            Notification::make()
+                                ->title('Mail error')
+                                ->body('An unexpected error occurred while sending the test email.'
+                                    . '<br>' . self::formatMailDiagnosticInfo($config))
+                                ->danger()
+                                ->persistent()
+                                ->send();
+                        }
                     }),
 
             ])
@@ -208,5 +228,49 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    protected static function getMailDiagnosticInfo(): array
+    {
+        $default = (string)(config('mail.default') ?? 'smtp');
+        $mailerKey = $default !== '' ? $default : 'smtp';
+
+        $transport = (string)(config("mail.mailers.$mailerKey.transport") ?? '');
+        $host = (string)(config("mail.mailers.$mailerKey.host") ?? config('mail.mailers.smtp.host'));
+        $port = (int)(config("mail.mailers.$mailerKey.port") ?? (int)(config('mail.mailers.smtp.port') ?? 0));
+        $encryption = (string)(config("mail.mailers.$mailerKey.encryption") ?? config('mail.mailers.smtp.encryption'));
+        $username = (string)(config("mail.mailers.$mailerKey.username") ?? config('mail.mailers.smtp.username'));
+        $fromAddress = (string)(config('mail.from.address') ?? '');
+        $fromName = (string)(config('mail.from.name') ?? '');
+
+        return [
+            'default' => $default,
+            'transport' => $transport,
+            'host' => $host,
+            'port' => $port,
+            'encryption' => $encryption,
+            'username' => $username,
+            'from_address' => $fromAddress,
+            'from_name' => $fromName,
+        ];
+    }
+
+    protected static function formatMailDiagnosticInfo(array $config): string
+    {
+        $from = trim((string)($config['from_address'] ?? ''));
+        $fromName = trim((string)($config['from_name'] ?? ''));
+        $fromDisplay = $fromName !== '' ? $from . ' (' . $fromName . ')' : $from;
+
+        $parts = [
+            'default=' . (string)($config['default'] ?? ''),
+            'transport=' . (string)($config['transport'] ?? ''),
+            'host=' . (string)($config['host'] ?? ''),
+            'port=' . (string)($config['port'] ?? ''),
+            'encryption=' . (string)($config['encryption'] ?? ''),
+            'username=' . (string)($config['username'] ?? ''),
+            'from=' . $fromDisplay,
+        ];
+
+        return implode(' | ', $parts);
     }
 }
