@@ -4,14 +4,13 @@ namespace App\Notifications;
 
 use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /**
  * A simple test mail notification used to verify mail transport configuration.
  */
-class TestMailNotification extends Notification implements ShouldQueue
+class TestMailNotification extends Notification
 {
     use Queueable;
 
@@ -36,7 +35,7 @@ class TestMailNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $appName = (string)config('app.name');
-        $name = $this->user?->name ?? (property_exists($notifiable, 'name') ? (string)$notifiable->name : $this->user?->name);
+        $name = $this->user?->name ?? (property_exists($notifiable, 'name') ? (string)$notifiable->name : '');
 
         return (new MailMessage)
             ->subject('Test email from ' . $appName)
