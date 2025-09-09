@@ -18,3 +18,44 @@
 .fi-ta-row.fi-ta-row-deleted {
     @apply bg-red-100 dark:bg-red-900;
 }
+
+.fi-tabs {
+    @apply ms-0 me-auto;
+
+}
+
+.fi-form-sagir,
+.fi-form-sagir input.fi-input:disabled {
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+.fi-form-sagir-blue {
+    background-color: #007bff !important;
+}
+
+.fi-form-sagir-red {
+    background-color: #dc3545 !important;
+}
+
+.fi-form-sagir-green {
+    background-color: #28a745 !important;
+}
+
+.fi-form-sagir-yellow {
+    background-color: #ffc107 !important;
+}
+
+.fi-form-sagir-orange {
+    background-color: #fd7e14 !important;
+}
+
+.fi-form-sagir-purple {
+    background-color: #6f42c1 !important;
+}
+
+.fi-form-sagir-gray {
+    background-color: #6c757d !important;
+}

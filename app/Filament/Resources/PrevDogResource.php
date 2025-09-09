@@ -63,6 +63,8 @@ class PrevDogResource extends Resource
 
     protected static ?string $navigationIcon = 'fas-paw';
 
+//    protected static ?string $recordRouteKeyName = 'SagirID';
+
     //    public static function getNavigationBadge(): ?string
     //    {
     //        return (string) static::$model::count();
@@ -103,11 +105,13 @@ class PrevDogResource extends Resource
                                         Forms\Components\TextInput::make('SagirID')
                                             ->label(__('Sagir'))
                                             ->numeric()
-                                            ->prefix(fn(Model $record): string => $record->sagir_prefix?->code() ?? '---')
+                                            ->extraAttributes(fn(Model $record): array => ['class' => 'dark:disabled:text-white fi-form-sagir fi-form-sagir-' . $record->sagir_prefix?->getColor()])
+                                            ->prefix(fn(Model $record): HtmlString => $record->sagir_prefix?->code() ? new HtmlString('<span class="fi-form-sagir">' . $record->sagir_prefix?->code() . '</span>') : new HtmlString('<span>---</span>'))
                                             ->suffixAction(
                                                 Action::make('setPrefix')
                                                     ->label(__('Prefix'))
                                                     ->icon('fas-chevron-circle-down')
+                                                    ->color(fn(Model $record): string => 'white')
                                                     ->modalHeading(__('Select SAGIR Prefix'))
                                                     ->form([
                                                         Forms\Components\Select::make('prefix')
@@ -131,9 +135,23 @@ class PrevDogResource extends Resource
                                             ->grouped()
                                             ->options(LegacyDogGender::class),
                                         Forms\Components\DatePicker::make('BirthDate')
-                                            ->label(__('Birth Date')),
+                                            ->label(__('Birth Date'))
+                                            ->timezone('Asia/Jerusalem')
+                                            ->native(false)
+                                            ->locale('he')
+                                            ->format('yyyy-mm-dd')
+                                            ->displayFormat('d-m-Y')
+                                            ->weekStartsOnSunday()
+                                            ->closeOnDateSelection(),
                                         Forms\Components\DatePicker::make('RegDate')
-                                            ->label(__('Registration Date')),
+                                            ->label(__('Registration Date'))
+                                            ->timezone('Asia/Jerusalem')
+                                            ->native(false)
+                                            ->locale('he')
+                                            ->format('yyyy-mm-dd')
+                                            ->displayFormat('d-m-Y')
+                                            ->weekStartsOnSunday()
+                                            ->closeOnDateSelection(),
                                         Forms\Components\TextInput::make('Chip')
                                             ->label(__('Chip'))
                                             ->maxLength(200),
@@ -144,7 +162,7 @@ class PrevDogResource extends Resource
                                             ->label(__('Import Number'))
                                             ->maxLength(200),
                                         Forms\Components\TextInput::make('Chip_2')
-                                            ->label(__('Chip (2)'))
+                                            ->label(__('Chip 2'))
                                             ->maxLength(255),
                                         Forms\Components\ToggleButtons::make('Status')
                                             ->label(__('Status'))
@@ -153,7 +171,7 @@ class PrevDogResource extends Resource
                                             ->nullable()
                                             ->columnSpan(2),
                                     ])
-                                    ->label(__('Identity'))
+                                    ->heading(__('Identity'))
                                     ->columns(4),
                                 Section::make('breed_appearance')
                                     ->schema([
@@ -173,17 +191,62 @@ class PrevDogResource extends Resource
                                             ->label(__('Size'))
                                             ->options(LegacyDogSize::class)
                                             ->grouped(),
+                                        Forms\Components\Select::make('GroupID')
+                                            ->label(__('Group ID'))
+                                            ->options(array_combine(range(0, 7), range(0, 7)))
+                                            ->searchable(),
                                     ])
-                                    ->label(__('Breed & Appearance'))
+                                    ->heading(__('Breed & Appearance'))
                                     ->columns(4),
-                            ]),
+                                Section::make('misc_system')
+                                    ->schema([
+                                        Forms\Components\DateTimePicker::make('ModificationDateTime')
+                                            ->label(__('Modified On'))
+                                            ->format('Y-m-d H:i:s')
+                                            ->timezone('Asia/Jerusalem')
+                                            ->native(false)
+                                            ->locale('he')
+                                            ->displayFormat('d-m-Y H:i:s')
+                                            ->weekStartsOnSunday()
+                                            ->closeOnDateSelection()
+                                            ->default(now()),
+                                        Forms\Components\Toggle::make('encoding')
+                                            ->label(__('Encoding Issue'))
+                                            ->inline(false),
+                                        Forms\Components\Toggle::make('is_correct')
+                                            ->label(__('Is Correct'))
+                                            ->inline(false),
+                                        Forms\Components\Toggle::make('not_relevant')
+                                            ->label(__('Not Relevant'))
+                                            ->inline(false),
+                                        Forms\Components\Select::make('RemarkCode')
+                                            ->label(__('Remark Code'))
+                                            ->options(fn() => array_combine(range(0, 36), range(0, 36)))
+                                            ->searchable(),
+                                        Forms\Components\Textarea::make('Notes')
+                                            ->label(__('Notes'))
+                                            ->maxLength(1000),
+                                        Forms\Components\Textarea::make('Notes_2')
+                                            ->label(__('Notes (2)'))
+                                            ->maxLength(1000),
+                                        Forms\Components\Textarea::make('message')
+                                            ->label(__('Message'))
+                                            ->maxLength(255),
+                                        Forms\Components\Textarea::make('message_test')
+                                            ->label(__('Message Test'))
+                                            ->maxLength(255),
+                                    ])
+                                    ->heading(__('Misc. System'))
+                                    ->columns(4),
+                            ])
+                            ->label(__('General')),
 
                         FormTab::make('owners')
                             ->schema([
                                 Section::make('ownership')
                                     ->schema([
                                         Select::make('CurrentOwnerId')
-                                            ->label(__('Current Owner'))
+                                            ->label(__('Owner Pre 2022'))
                                             ->searchable()
                                             ->getSearchResultsUsing(function (string $search) {
                                                 return PrevUser::query()
@@ -201,7 +264,14 @@ class PrevDogResource extends Resource
                                             })
                                             ->getOptionLabelUsing(fn($value): ?string => PrevUser::query()->where('owner_code', $value)->first()?->name),
                                         Forms\Components\DatePicker::make('OwnershipDate')
-                                            ->label(__('Ownership Date')),
+                                            ->label(__('Ownership Date'))
+                                            ->timezone('Asia/Jerusalem')
+                                            ->native(false)
+                                            ->locale('he')
+                                            ->format('yyyy-mm-dd')
+                                            ->displayFormat('d-m-Y')
+                                            ->weekStartsOnSunday()
+                                            ->closeOnDateSelection(),
                                         Forms\Components\TextInput::make('BeitGidulID')
                                             ->label(__('Beit Gidul ID'))
                                             ->numeric(),
@@ -224,16 +294,18 @@ class PrevDogResource extends Resource
                                             ->label(__('Breeding Manager ID'))
                                             ->numeric(),
                                     ])
-                                    ->label(__('Ownership'))
+                                    ->heading(__('Pre 2022 Ownership'))
                                     ->columns(4),
-                            ]),
+                            ])
+                            ->label(__('Owners Pre 2022')),
 
                         FormTab::make('pedigree_ancestry')
                             ->schema([
                                 Section::make('pedigree')
                                     ->schema([
                                         Select::make('FatherSAGIR')
-                                            ->label(__('Father SAGIR'))
+                                            ->label(__('Father'))
+                                            ->columnSpan(2)
                                             ->searchable()
                                             ->getSearchResultsUsing(function (string $search) {
                                                 return PrevDog::query()
@@ -253,7 +325,8 @@ class PrevDogResource extends Resource
                                                 return $d ? ($d->SagirID . ' - ' . $d->full_name) : null;
                                             }),
                                         Select::make('MotherSAGIR')
-                                            ->label(__('Mother SAGIR'))
+                                            ->label(__('Mother'))
+                                            ->columnSpan(2)
                                             ->searchable()
                                             ->getSearchResultsUsing(function (string $search) {
                                                 return PrevDog::query()
@@ -272,54 +345,57 @@ class PrevDogResource extends Resource
 
                                                 return $d ? ($d->SagirID . ' - ' . $d->full_name) : null;
                                             }),
-                                        Forms\Components\Toggle::make('red_pedigree')
-                                            ->label(__('Red Pedigree')),
-                                        Forms\Components\ToggleButtons::make('pedigree_color')
-                                            ->label(__('Pedigree Color'))
-                                            ->options(LegacyPedigreeColor::class)
-                                            ->grouped()
-                                            ->colors([
-                                                'Blue' => 'info',
-                                                'Red' => 'danger',
-                                            ])
-                                            ->icons([
-                                                'Blue' => 'fas-certificate',
-                                                'Red' => 'fas-certificate',
-                                            ]),
                                         Forms\Components\TextInput::make('sheger_id')
                                             ->label(__('Sheger ID'))
                                             ->numeric(),
+                                        Forms\Components\Toggle::make('red_pedigree')
+                                            ->label(__('Red Pedigree'))
+                                            ->inline(false)
+                                            ->onColor('danger')
+                                            ->offColor('gray'),
+                                        Forms\Components\ToggleButtons::make('pedigree_color')
+                                            ->label(__('Pedigree Color'))
+                                            ->options(LegacyPedigreeColor::class)
+                                            ->grouped(),
                                         Forms\Components\Textarea::make('PedigreeNotes')
                                             ->label(__('Pedigree Notes'))
                                             ->maxLength(4000)
-                                            ->columnSpanFull(),
+                                            ->columnSpan(2),
                                         Forms\Components\Textarea::make('PedigreeNotes_2')
                                             ->label(__('Pedigree Notes (2)'))
                                             ->maxLength(1000)
-                                            ->columnSpanFull(),
+                                            ->columnSpan(2),
                                     ])
-                                    ->label(__('Pedigree'))
+                                    ->heading(__('Pedigree'))
                                     ->columns(4),
                                 Section::make('ancestry')
                                     ->schema([
                                         Forms\Components\Placeholder::make('pedigree_placeholder')
                                             ->content(new HtmlString(__('A 3-generation pedigree view will appear here soon.'))),
                                     ])
-                                    ->label(__('Ancestry (coming soon)')),
+                                    ->heading(__('Ancestry (coming soon)')),
                             ])
-                            ->label(__('Pedigree & Ancestry')),
+                            ->label(__('Pedigree')),
 
                         FormTab::make('Shows')
                             ->schema([
+                                Forms\Components\TextInput::make('ShowsCount')
+                                    ->label(__('Shows Count'))
+                                    ->numeric()
+                                    ->disabled(),
                                 Forms\Components\Placeholder::make('shows_hint')
-                                    ->content(new HtmlString(__('Shows list will be available via a relation manager.'))),
-                            ]),
+                                    ->content(new HtmlString(__('Shows list will be available via a relation manager.')))
+                                    ->columnSpanFull(),
+                            ])
+                            ->label(__('Shows'))
+                            ->columns(4),
 
                         FormTab::make('Documents')
                             ->schema([
                                 Forms\Components\Placeholder::make('documents_hint')
-                                    ->content(new HtmlString(__('Documents management is coming soon.'))),
-                                Section::make(__('Media'))
+                                    ->content(new HtmlString(__('Documents management is coming soon.')))
+                                    ->columnSpanFull(),
+                                Section::make('media')
                                     ->schema([
                                         Forms\Components\TextInput::make('ProfileImage')
                                             ->label(__('Profile Image'))
@@ -328,8 +404,10 @@ class PrevDogResource extends Resource
                                             ->label(__('Image 2'))
                                             ->maxLength(300),
                                     ])
+                                    ->heading(__('Media'))
                                     ->columns(2),
-                            ]),
+                            ])
+                            ->label(__('Documents')),
 
                         FormTab::make('health')
                             ->schema([
@@ -344,20 +422,24 @@ class PrevDogResource extends Resource
                                         Forms\Components\Textarea::make('HealthNotes')
                                             ->label(__('Health Notes'))
                                             ->maxLength(4000)
-                                            ->columnSpanFull(),
+                                            ->columnSpan(2),
                                     ])
-                                    ->label(__('Health & Identification'))
+                                    ->heading(__('Health & Identification'))
                                     ->columns(4),
-                                Section::make('shows_mag')
+                                Section::make('mag')
                                     ->schema([
-                                        Forms\Components\TextInput::make('ShowsCount')
-                                            ->label(__('Shows Count'))
-                                            ->numeric(),
                                         Forms\Components\TextInput::make('IsMagPass')
                                             ->label(__('MAG Pass'))
                                             ->numeric(),
                                         Forms\Components\DatePicker::make('MagDate')
-                                            ->label(__('MAG Date')),
+                                            ->label(__('MAG Date'))
+                                            ->timezone('Asia/Jerusalem')
+                                            ->native(false)
+                                            ->locale('he')
+                                            ->format('yyyy-mm-dd')
+                                            ->displayFormat('d-m-Y')
+                                            ->weekStartsOnSunday()
+                                            ->closeOnDateSelection(),
                                         Forms\Components\TextInput::make('MagJudge')
                                             ->label(__('MAG Judge'))
                                             ->maxLength(200),
@@ -368,7 +450,14 @@ class PrevDogResource extends Resource
                                             ->label(__('MAG 2nd Pass'))
                                             ->numeric(),
                                         Forms\Components\DatePicker::make('MagDate_2')
-                                            ->label(__('MAG 2nd Date')),
+                                            ->label(__('MAG 2nd Date'))
+                                            ->timezone('Asia/Jerusalem')
+                                            ->native(false)
+                                            ->locale('he')
+                                            ->format('yyyy-mm-dd')
+                                            ->displayFormat('d-m-Y')
+                                            ->weekStartsOnSunday()
+                                            ->closeOnDateSelection(),
                                         Forms\Components\TextInput::make('MagJudge_2')
                                             ->label(__('MAG 2nd Judge'))
                                             ->maxLength(255),
@@ -376,43 +465,10 @@ class PrevDogResource extends Resource
                                             ->label(__('MAG 2nd Place'))
                                             ->maxLength(255),
                                     ])
-                                    ->label(__('Shows & MAG'))
+                                    ->heading(__('MAG'))
                                     ->columns(4),
-                                Section::make('misc_system')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('RemarkCode')
-                                            ->label(__('Remark Code'))
-                                            ->numeric(),
-                                        Forms\Components\TextInput::make('GroupID')
-                                            ->label(__('Group ID'))
-                                            ->numeric(),
-                                        Forms\Components\Toggle::make('encoding')
-                                            ->label(__('Encoding Issue')),
-                                        Forms\Components\TextInput::make('is_correct')
-                                            ->label(__('Is Correct'))
-                                            ->maxLength(255),
-                                        Forms\Components\Toggle::make('not_relevant')
-                                            ->label(__('Not Relevant')),
-                                        Forms\Components\Textarea::make('Notes')
-                                            ->label(__('Notes'))
-                                            ->columnSpanFull(),
-                                        Forms\Components\TextInput::make('Notes_2')
-                                            ->label(__('Notes (2)'))
-                                            ->maxLength(1000),
-                                        Forms\Components\Textarea::make('message')
-                                            ->label(__('Message'))
-                                            ->columnSpanFull(),
-                                        Forms\Components\TextInput::make('message_test')
-                                            ->label(__('Message Test'))
-                                            ->maxLength(255),
-                                        Forms\Components\DateTimePicker::make('ModificationDateTime')
-                                            ->label(__('Modified On'))
-                                            ->format('Y-m-d H:i:s')
-                                            ->default(now()),
-                                    ])
-                                    ->label(__('Misc. System'))
-                                    ->columns(4),
-                            ]),
+                            ])
+                            ->label(__('Health')),
                     ])
                     ->persistTabInQueryString()
                     ->columnSpanFull(),
@@ -1028,7 +1084,14 @@ class PrevDogResource extends Resource
                 Filter::make('RegDate')
                     ->form([
                         DatePicker::make('RegDate')
-                            ->label(__('Registration Date')),
+                            ->label(__('Registration Date'))
+                            ->timezone('Asia/Jerusalem')
+                            ->native(false)
+                            ->locale('he')
+                            ->format('yyyy-mm-dd')
+                            ->displayFormat('d-m-Y')
+                            ->weekStartsOnSunday()
+                            ->closeOnDateSelection(),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
@@ -1039,7 +1102,14 @@ class PrevDogResource extends Resource
                 Filter::make('BirthDate')
                     ->form([
                         DatePicker::make('BirthDate')
-                            ->label(__('Birth Date')),
+                            ->label(__('Birth Date'))
+                            ->timezone('Asia/Jerusalem')
+                            ->native(false)
+                            ->locale('he')
+                            ->format('yyyy-mm-dd')
+                            ->displayFormat('d-m-Y')
+                            ->weekStartsOnSunday()
+                            ->closeOnDateSelection(),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
@@ -1050,7 +1120,14 @@ class PrevDogResource extends Resource
                 Filter::make('OwnershipDate')
                     ->form([
                         DatePicker::make('OwnershipDate')
-                            ->label(__('Ownership Date')),
+                            ->label(__('Ownership Date'))
+                            ->timezone('Asia/Jerusalem')
+                            ->native(false)
+                            ->locale('he')
+                            ->format('yyyy-mm-dd')
+                            ->displayFormat('d-m-Y')
+                            ->weekStartsOnSunday()
+                            ->closeOnDateSelection(),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
@@ -1097,44 +1174,45 @@ class PrevDogResource extends Resource
             ->schema([
                 Tabs::make('Dog Record')->tabs([
                     /***** 1. Overview *****/
-                    Tab::make('General')->schema([
-                        InfolistGrid::make(4)->schema([
-                            //                            TextEntry::make('sagir_prefix')
-                            //                                ->badge()
-                            //                                ->color(fn (PrevDog $record): string => $record->sagir_prefix->getColor())
-                            //                                ->icon(fn (PrevDog $record): string => $record->sagir_prefix->getIcon()),
-                            TextEntry::make('SagirID')
-                                ->label(__('Sagir'))
-                                ->prefix(fn(PrevDog $record): string => $record->sagir_prefix->code())
-                                ->numeric(decimalPlaces: 0, thousandsSeparator: ''),
-                            TextEntry::make('full_name')
-                                ->label(__('Full Name')),
-                            TextEntry::make('RegDate')
-                                ->label(__('Registration Date'))
-                                ->date(),
-                            TextEntry::make('BirthDate')
-                                ->label(__('Birth Date'))
-                                ->date(),
-                        ]),
-                        InfolistGrid::make(4)->schema([
-                            TextEntry::make('GenderID')
-                                ->label(__('Gender'))
-                                ->state(fn(PrevDog $record): string => ($record->GenderID?->getLabel() ?? 'n/a')
-                                    . (!empty($record->Sex) ? " ({$record->Sex})" : '')
-                                )
-                                ->color(fn(PrevDog $record) => $record->GenderID?->getColor())
-                                ->icon(fn(PrevDog $record) => $record->GenderID?->getIcon())
-                                ->iconColor(fn(PrevDog $record) => $record->GenderID?->getColor()),
-                            TextEntry::make('breed.BreedName')->label(__('Breed')),
-                            TextEntry::make('color.ColorNameHE')->label(__('Color')),
-                            TextEntry::make('hair.HairNameHE')->label(__('Hair')),
-                            TextEntry::make('Status')
-                                ->label(__('Status'))
-                                ->badge()
-                                ->icon(fn(PrevDog $record): string => $record->Status?->getIcon() ?? 'fas-minus-circle')
-                                ->color(fn(PrevDog $record): string => $record->Status?->getColor() ?? 'gray'),
-                        ]),
-                    ])
+                    Tab::make('General')
+                        ->schema([
+                            InfolistGrid::make(4)->schema([
+                                //                            TextEntry::make('sagir_prefix')
+                                //                                ->badge()
+                                //                                ->color(fn (PrevDog $record): string => $record->sagir_prefix->getColor())
+                                //                                ->icon(fn (PrevDog $record): string => $record->sagir_prefix->getIcon()),
+                                TextEntry::make('SagirID')
+                                    ->label(__('Sagir'))
+                                    ->prefix(fn(PrevDog $record): string => $record->sagir_prefix->code())
+                                    ->numeric(decimalPlaces: 0, thousandsSeparator: ''),
+                                TextEntry::make('full_name')
+                                    ->label(__('Full Name')),
+                                TextEntry::make('RegDate')
+                                    ->label(__('Registration Date'))
+                                    ->date(),
+                                TextEntry::make('BirthDate')
+                                    ->label(__('Birth Date'))
+                                    ->date(),
+                            ]),
+                            InfolistGrid::make(4)->schema([
+                                TextEntry::make('GenderID')
+                                    ->label(__('Gender'))
+                                    ->state(fn(PrevDog $record): string => ($record->GenderID?->getLabel() ?? 'n/a')
+                                        . (!empty($record->Sex) ? " ({$record->Sex})" : '')
+                                    )
+                                    ->color(fn(PrevDog $record) => $record->GenderID?->getColor())
+                                    ->icon(fn(PrevDog $record) => $record->GenderID?->getIcon())
+                                    ->iconColor(fn(PrevDog $record) => $record->GenderID?->getColor()),
+                                TextEntry::make('breed.BreedName')->label(__('Breed')),
+                                TextEntry::make('color.ColorNameHE')->label(__('Color')),
+                                TextEntry::make('hair.HairNameHE')->label(__('Hair')),
+                                TextEntry::make('Status')
+                                    ->label(__('Status'))
+                                    ->badge()
+                                    ->icon(fn(PrevDog $record): string => $record->Status?->getIcon() ?? 'fas-minus-circle')
+                                    ->color(fn(PrevDog $record): string => $record->Status?->getColor() ?? 'gray'),
+                            ]),
+                        ])
                         ->label(__('General')),
 
                     /***** 2. Ownership & Breeding *****/

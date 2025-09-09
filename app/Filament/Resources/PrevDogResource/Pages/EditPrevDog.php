@@ -24,6 +24,6 @@ class EditPrevDog extends EditRecord
 
     public function getContentTabLabel(): ?string
     {
-        return __('General');
+        return __('Dog');
     }
 }

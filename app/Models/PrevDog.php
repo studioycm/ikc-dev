@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Casts\Legacy\LegacyDogGenderCast;
 use App\Casts\Legacy\LegacyDogSizeCast;
-
 use App\Casts\Legacy\LegacyDogStatusCast;
 use App\Enums\Legacy\LegacyPedigreeColor;
 use App\Enums\Legacy\LegacySagirPrefix;
@@ -51,6 +50,16 @@ class PrevDog extends Model
         'pedigree_color' => LegacyPedigreeColor::class,
         'sagir_prefix' => LegacySagirPrefix::class,
     ];
+
+    /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+//    public function getRouteKeyName(): string
+//    {
+//        return 'SagirID';
+//    }
 
     // create mapping for GenderID and Sex fields: 1="M", 2="F","ז"="M","נ"="F",null or any other = "n/a"
     const array GenderMap = [
