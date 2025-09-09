@@ -10,12 +10,18 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class OwnersRelationManager extends RelationManager
 {
     protected static string $relationship = 'owners';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('Owners');
+    }
 
     public function table(Table $table): Table
     {

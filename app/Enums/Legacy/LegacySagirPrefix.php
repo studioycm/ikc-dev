@@ -31,7 +31,7 @@ enum LegacySagirPrefix: int
         return match ($this) {
             self::ISR => 'blue',
             self::IMP => 'purple',
-            self::APX => 'orange',
+            self::APX => 'yellow',
             self::EXT => 'green',
             self::NUL => 'red',
         };

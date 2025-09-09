@@ -24,6 +24,6 @@ class ViewPrevDog extends ViewRecord
 
     public function getContentTabLabel(): ?string
     {
-        return __('General');
+        return __('Dog');
     }
 }

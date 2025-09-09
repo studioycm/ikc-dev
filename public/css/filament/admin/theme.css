@@ -4813,6 +4813,11 @@ select {
     color: rgba(var(--gray-400), var(--tw-text-opacity, 1))
 }
 
+.dark\:disabled\:text-white:disabled:is(.dark *) {
+    --tw-text-opacity: 1;
+    color: rgb(255 255 255/var(--tw-text-opacity, 1))
+}
+
 .dark\:disabled\:ring-white\/10:disabled:is(.dark *) {
     --tw-ring-color: hsla(0, 0%, 100%, .1)
 }
@@ -5817,4 +5822,44 @@ input:focus-visible + .dark\:\[input\:focus-visible\+\&\]\:ring-white\/20:is(.da
 .fi-ta-row.fi-ta-row-deleted:is(.dark *) {
     --tw-bg-opacity: 1;
     background-color: rgb(127 29 29/var(--tw-bg-opacity, 1))
+}
+
+.fi-tabs {
+    margin-inline-start: 0;
+    margin-inline-end: auto
+}
+
+.fi-form-sagir, .fi-form-sagir input.fi-input:disabled {
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important
+}
+
+.fi-form-sagir-blue {
+    background-color: #007bff !important
+}
+
+.fi-form-sagir-red {
+    background-color: #dc3545 !important
+}
+
+.fi-form-sagir-green {
+    background-color: #28a745 !important
+}
+
+.fi-form-sagir-yellow {
+    background-color: #ffc107 !important
+}
+
+.fi-form-sagir-orange {
+    background-color: #fd7e14 !important
+}
+
+.fi-form-sagir-purple {
+    background-color: #6f42c1 !important
+}
+
+.fi-form-sagir-gray {
+    background-color: #6c757d !important
 }
