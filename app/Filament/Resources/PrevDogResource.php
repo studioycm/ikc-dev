@@ -877,7 +877,7 @@ class PrevDogResource extends Resource
                 //                    ->sortable(['CurrentOwnerId'])
                 //                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('Breeder_Name')
-                    ->label(__('Breeder Name - depracted'))
+                    ->label(__('Breeder Name'))
                     ->wrapHeader()
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false)
@@ -1368,7 +1368,6 @@ class PrevDogResource extends Resource
             ->searchOnBlur()
             ->striped()
             ->deferLoading()
-//          ->recordUrl(false)
             ->recordUrl(fn(PrevDog $record): string => PrevDogResource::getUrl('edit', ['record' => $record]))
             ->recordClasses(fn (Model $record) => $record->trashed() ? 'fi-ta-row-deleted' : null);
     }
