@@ -299,182 +299,286 @@ class PrevDogResource extends Resource
                             ])
                             ->label(__('Owners Pre 2022')),
 
-                        FormTab::make('pedigree_ancestry')
+                        FormTab::make('pedigree_and_parents')
                             ->schema([
                                 Section::make('pedigree')
                                     ->schema([
-                                        Select::make('FatherSAGIR')
-                                            ->label(__('Father'))
-                                            ->columnSpan(2)
-                                            ->searchable()
-                                            ->getSearchResultsUsing(function (string $search) {
-                                                return PrevDog::query()
-                                                    ->where('SagirID', 'like', "%{$search}%")
-                                                    ->orWhere('Heb_Name', 'like', "%{$search}%")
-                                                    ->orWhere('Eng_Name', 'like', "%{$search}%")
-                                                    ->orWhere('Chip', 'like', "%{$search}%")
-                                                    ->orWhere('ImportNumber', 'like', "%{$search}%")
-                                                    ->limit(50)
-                                                    ->get()
-                                                    ->mapWithKeys(fn($d) => [$d->SagirID => $d->SagirID . ' - ' . $d->full_name])
-                                                    ->all();
-                                            })
-                                            ->getOptionLabelUsing(function ($value) {
-                                                $d = PrevDog::query()->where('SagirID', $value)->first();
+                                        Forms\Components\Group::make([
+                                            Select::make('FatherSAGIR')
+                                                ->label(__('Father'))
+                                                ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
+                                                ->relationship('father', 'SagirID', modifyQueryUsing: fn(Builder $query) => $query->where('GenderID', '=', LegacyDogGender::Male->value), ignoreRecord: true)
+                                                ->optionsLimit(20)
+                                                ->searchDebounce(1500)
+                                                ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}")
+                                                ->createOptionForm([
+                                                    Forms\Components\Grid::make(3)
+                                                        ->schema([
+                                                            Forms\Components\TextInput::make('ImportNumber')
+                                                                ->label(__('Import Number'))
+                                                                ->maxLength(200),
+                                                            Forms\Components\TextInput::make('Eng_Name')
+                                                                ->label(__('English Name'))
+                                                                ->maxLength(200),
+                                                            Forms\Components\TextInput::make('Heb_Name')
+                                                                ->label(__('Hebrew Name'))
+                                                                ->maxLength(200),
+                                                            Forms\Components\Group::make([
+                                                                Forms\Components\DatePicker::make('BirthDate')
+                                                                    ->label(__('Birth Date'))
+                                                                    ->timezone('Asia/Jerusalem')
+                                                                    ->native(false)
+                                                                    ->locale('he')
+                                                                    ->format('yyyy-mm-dd')
+                                                                    ->displayFormat('d-m-Y')
+                                                                    ->weekStartsOnSunday()
+                                                                    ->closeOnDateSelection(),
+                                                                Forms\Components\DatePicker::make('RegDate')
+                                                                    ->label(__('Registration Date'))
+                                                                    ->timezone('Asia/Jerusalem')
+                                                                    ->native(false)
+                                                                    ->locale('he')
+                                                                    ->format('yyyy-mm-dd')
+                                                                    ->displayFormat('d-m-Y')
+                                                                    ->weekStartsOnSunday()
+                                                                    ->closeOnDateSelection()
+                                                                    ->default(now()),
+                                                            ])
+                                                                ->columns(3)
+                                                                ->columnSpan(3),
+                                                            Select::make('RaceID')
+                                                                ->label(__('Breed'))
+                                                                ->relationship('breed', 'BreedName')
+                                                                ->searchable()
+                                                                ->preload()
+                                                                ->default(fn(Pages\EditPrevDog $livewire) => $livewire->getRecord()->RaceID),
+                                                            Select::make('ColorID')
+                                                                ->label(__('Color'))
+                                                                ->relationship('color', 'ColorNameHE')
+                                                                ->searchable()
+                                                                ->preload()
+                                                                ->default(9000),
+                                                            Select::make('HairID')
+                                                                ->label(__('Hair'))
+                                                                ->relationship('hair', 'HairNameHE')
+                                                                ->searchable()
+                                                                ->preload()
+                                                                ->default(4),
+                                                            Forms\Components\TextInput::make('Chip')
+                                                                ->label(__('Chip'))
+                                                                ->unique()
+                                                                ->maxLength(200),
+                                                            Forms\Components\TextInput::make('DnaID')
+                                                                ->label(__('DNA ID'))
+                                                                ->maxLength(200),
+                                                            Forms\Components\TextInput::make('Breeder_Name')
+                                                                ->label(__('Breeder Name'))
+                                                                ->maxLength(300),
+                                                            Forms\Components\Textarea::make('HealthNotes')
+                                                                ->label(__('Health Notes'))
+                                                                ->maxLength(4000),
+                                                            Forms\Components\Textarea::make('Notes')
+                                                                ->label(__('Notes'))
+                                                                ->maxLength(1000),
+                                                            Forms\Components\TextInput::make('PedigreeNotes')
+                                                                ->label(__('Titles (Pedigree Notes)'))
+                                                                ->helperText('Comma separated'),
+                                                            Forms\Components\ToggleButtons::make('GenderID')
+                                                                ->label(__('Gender'))
+                                                                ->grouped()
+                                                                ->options(LegacyDogGender::class)
+                                                                ->default(fn(Forms\Get $get) => LegacyDogGender::Male->value),
+                                                            Forms\Components\Select::make('sagir_prefix')
+                                                                ->label(__('Sagir Prefix'))
+                                                                ->options(LegacySagirPrefix::class)
+                                                                ->default(LegacySagirPrefix::NUL->value),
+                                                            Forms\Components\Hidden::make('SagirID'),
+                                                            Forms\Components\Hidden::make('DataID'),
+                                                        ])
+                                                ])
+                                                ->createOptionUsing(function (array $data, Forms\Get $get): int|string {
+                                                    // Auto gender: father
+                                                    $data['GenderID'] = LegacyDogGender::Male->value;
 
-                                                return $d ? ($d->SagirID . ' - ' . $d->full_name) : null;
-                                            })
-                                            ->createOptionForm([
-                                                Forms\Components\TextInput::make('Eng_Name')
-                                                    ->label(__('English Name'))
-                                                    ->maxLength(200),
-                                                Forms\Components\TextInput::make('Heb_Name')
-                                                    ->label(__('Hebrew Name'))
-                                                    ->maxLength(200),
-                                                Forms\Components\TextInput::make('ImportNumber')
-                                                    ->label(__('Import Number'))
-                                                    ->maxLength(200),
-                                                Forms\Components\DatePicker::make('BirthDate')
-                                                    ->label(__('Birth Date'))
-                                                    ->timezone('Asia/Jerusalem')
-                                                    ->native(false)
-                                                    ->locale('he')
-                                                    ->format('yyyy-mm-dd')
-                                                    ->displayFormat('d-m-Y')
-                                                    ->weekStartsOnSunday()
-                                                    ->closeOnDateSelection(),
-                                                Select::make('RaceID')
-                                                    ->label(__('Breed'))
-                                                    ->relationship('breed', 'BreedName')
-                                                    ->searchable(),
-                                                Select::make('HairID')
-                                                    ->label(__('Hair'))
-                                                    ->relationship('hair', 'HairNameHE')
-                                                    ->searchable(),
-                                                Select::make('ColorID')
-                                                    ->label(__('Color'))
-                                                    ->relationship('color', 'ColorNameHE')
-                                                    ->searchable(),
-                                                Forms\Components\ToggleButtons::make('GenderID')
-                                                    ->label(__('Gender'))
-                                                    ->grouped()
-                                                    ->options(LegacyDogGender::class)
-                                                    ->default(fn(Forms\Get $get) => LegacyDogGender::Male->value),
-                                                Forms\Components\Select::make('sagir_prefix')
-                                                    ->label(__('Sagir Prefix'))
-                                                    ->options(\App\Enums\Legacy\LegacySagirPrefix::class)
-                                                    ->default(\App\Enums\Legacy\LegacySagirPrefix::NUL->value),
-                                                Forms\Components\TextInput::make('Chip')
-                                                    ->label(__('Chip'))
-                                                    ->maxLength(200),
-                                                Forms\Components\TextInput::make('DnaID')
-                                                    ->label(__('DNA ID'))
-                                                    ->maxLength(200),
-                                                Forms\Components\TextInput::make('breeder_name')
-                                                    ->label(__('Breeder Name'))
-                                                    ->maxLength(300),
-                                                Forms\Components\Textarea::make('HealthNotes')
-                                                    ->label(__('Health Notes'))
-                                                    ->maxLength(4000),
-                                                Forms\Components\TextInput::make('PedigreeNotes')
-                                                    ->label(__('Titles'))
-                                                    ->helperText('Comma separated'),
-                                                Forms\Components\Textarea::make('Notes')
-                                                    ->label(__('Notes'))
-                                                    ->maxLength(1000),
-                                                Forms\Components\TextInput::make('SagirID')
-                                                    ->label(__('Sagir'))
-                                                    ->numeric()
-                                                    ->helperText(__('Temporary value will be auto-set')),
-                                                Forms\Components\TextInput::make('DataID')
-                                                    ->label(__('Data ID'))
-                                                    ->numeric()
-                                                    ->helperText(__('Temporary value will be auto-set')),
-                                            ])
-                                            ->createOptionUsing(function (array $data, Forms\Get $get): int|string {
-                                                // Auto gender: father
-                                                $data['GenderID'] = \App\Enums\Legacy\LegacyDogGender::Male->value;
+                                                    // Default sagir_prefix to NUL if empty
+                                                    $data['sagir_prefix'] = $data['sagir_prefix'] ?? LegacySagirPrefix::NUL->value;
 
-                                                // Default sagir_prefix to NUL if empty
-                                                $data['sagir_prefix'] = $data['sagir_prefix'] ?? \App\Enums\Legacy\LegacySagirPrefix::NUL->value;
+                                                    // Temporary SagirID and DataID = max+1
+                                                    $maxSagir = PrevDog::query()->max('SagirID');
+                                                    $maxData = PrevDog::query()->max('DataID');
+                                                    $data['SagirID'] = (int)($maxSagir) + 1;
+                                                    $data['DataID'] = (int)($maxData) + 1;
 
-                                                // Auto-select breed from current "son" record RaceID if not chosen
-                                                /** @var PrevDog|null $current */
-                                                $current = request()->route('record') ? PrevDog::find(request()->route('record')) : null;
-                                                if (!($data['RaceID'] ?? null) && $current) {
-                                                    $data['RaceID'] = $current->RaceID;
-                                                }
+                                                    // Create the father dog record
+                                                    $father = PrevDog::create($data);
 
-                                                // Temporary SagirID and DataID = max+1
-                                                $maxSagir = PrevDog::query()->max('SagirID') ?? 0;
-                                                $maxData = PrevDog::query()->max('DataID') ?? 0;
-                                                $data['SagirID'] = (int)($maxSagir) + 1;
-                                                $data['DataID'] = (int)($maxData) + 1;
+                                                    return $father->id; // Return the PK used in the select
+                                                })
+                                                ->createOptionAction(fn(Action $action) => $action
+                                                    ->modalHeading(__('Create Father'))
+                                                    ->modalWidth('6xl')
+                                                    ->label(__('Create new dog as Father'))
+                                                    ->color('warning')
+                                                    ->icon('fas-circle-plus')
+                                                ),
 
-                                                // Map optional alias fields from form to model
-                                                if (isset($data['breeder_name'])) {
-                                                    $data['Breeder_Name'] = $data['breeder_name'];
-                                                }
+                                            Select::make('MotherSAGIR')
+                                                ->label(__('Mother'))
+                                                ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
+                                                ->relationship('mother', 'SagirID', modifyQueryUsing: fn(Builder $query) => $query->where('GenderID', '=', LegacyDogGender::Female->value), ignoreRecord: true)
+                                                ->optionsLimit(20)
+                                                ->searchDebounce(1500)
+                                                ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}")
+                                                ->createOptionForm([
+                                                    Forms\Components\Grid::make(3)
+                                                        ->schema([
+                                                            Forms\Components\TextInput::make('ImportNumber')
+                                                                ->label(__('Import Number'))
+                                                                ->maxLength(200),
+                                                            Forms\Components\TextInput::make('Eng_Name')
+                                                                ->label(__('English Name'))
+                                                                ->maxLength(200),
+                                                            Forms\Components\TextInput::make('Heb_Name')
+                                                                ->label(__('Hebrew Name'))
+                                                                ->maxLength(200),
+                                                            Forms\Components\Group::make([
+                                                                Forms\Components\DatePicker::make('BirthDate')
+                                                                    ->label(__('Birth Date'))
+                                                                    ->timezone('Asia/Jerusalem')
+                                                                    ->native(false)
+                                                                    ->locale('he')
+                                                                    ->format('yyyy-mm-dd')
+                                                                    ->displayFormat('d-m-Y')
+                                                                    ->weekStartsOnSunday()
+                                                                    ->closeOnDateSelection(),
+                                                                Forms\Components\DatePicker::make('RegDate')
+                                                                    ->label(__('Registration Date'))
+                                                                    ->timezone('Asia/Jerusalem')
+                                                                    ->native(false)
+                                                                    ->locale('he')
+                                                                    ->format('yyyy-mm-dd')
+                                                                    ->displayFormat('d-m-Y')
+                                                                    ->weekStartsOnSunday()
+                                                                    ->closeOnDateSelection()
+                                                                    ->default(now()),
+                                                            ])
+                                                                ->columns(3)
+                                                                ->columnSpan(3),
+                                                            Select::make('RaceID')
+                                                                ->label(__('Breed'))
+                                                                ->relationship('breed', 'BreedName')
+                                                                ->searchable()
+                                                                ->preload()
+                                                                ->default(fn(Pages\EditPrevDog $livewire) => $livewire->getRecord()->RaceID),
+                                                            Select::make('ColorID')
+                                                                ->label(__('Color'))
+                                                                ->relationship('color', 'ColorNameHE')
+                                                                ->searchable()
+                                                                ->preload()
+                                                                ->default(9000),
+                                                            Select::make('HairID')
+                                                                ->label(__('Hair'))
+                                                                ->relationship('hair', 'HairNameHE')
+                                                                ->searchable()
+                                                                ->preload()
+                                                                ->default(4),
+                                                            Forms\Components\TextInput::make('Chip')
+                                                                ->label(__('Chip'))
+                                                                ->unique()
+                                                                ->maxLength(200),
+                                                            Forms\Components\TextInput::make('DnaID')
+                                                                ->label(__('DNA ID'))
+                                                                ->maxLength(200),
+                                                            Forms\Components\TextInput::make('Breeder_Name')
+                                                                ->label(__('Breeder Name'))
+                                                                ->maxLength(300),
+                                                            Forms\Components\Textarea::make('HealthNotes')
+                                                                ->label(__('Health Notes'))
+                                                                ->maxLength(4000),
+                                                            Forms\Components\Textarea::make('Notes')
+                                                                ->label(__('Notes'))
+                                                                ->maxLength(1000),
+                                                            Forms\Components\TextInput::make('PedigreeNotes')
+                                                                ->label(__('Titles (Pedigree Notes)'))
+                                                                ->helperText('Comma separated'),
+                                                            Forms\Components\ToggleButtons::make('GenderID')
+                                                                ->label(__('Gender'))
+                                                                ->grouped()
+                                                                ->options(LegacyDogGender::class)
+                                                                ->default(fn(Forms\Get $get) => LegacyDogGender::Female->value),
+                                                            Forms\Components\Select::make('sagir_prefix')
+                                                                ->label(__('Sagir Prefix'))
+                                                                ->options(LegacySagirPrefix::class)
+                                                                ->default(LegacySagirPrefix::NUL->value),
+                                                            Forms\Components\Hidden::make('SagirID'),
+                                                            Forms\Components\Hidden::make('DataID'),
+                                                        ])
+                                                ])
+                                                ->createOptionUsing(function (array $data, Forms\Get $get): int|string {
+                                                    // Auto gender: father
+                                                    $data['GenderID'] = LegacyDogGender::Female->value;
 
-                                                $father = PrevDog::create($data);
+                                                    // Default sagir_prefix to NUL if empty
+                                                    $data['sagir_prefix'] = $data['sagir_prefix'] ?? LegacySagirPrefix::NUL->value;
 
-                                                return $father->SagirID; // Return the PK used in the select
-                                            })
-                                            ->createOptionAction(fn(Action $action) => $action
-                                                ->modalHeading(__('Create Father'))
-                                                ->modalWidth('4xl')
-                                            ),
+                                                    // Temporary SagirID and DataID = max+1
+                                                    $maxSagir = PrevDog::query()->max('SagirID');
+                                                    $maxData = PrevDog::query()->max('DataID');
+                                                    $data['SagirID'] = (int)($maxSagir) + 1;
+                                                    $data['DataID'] = (int)($maxData) + 1;
 
-                                        Select::make('MotherSAGIR')
-                                            ->label(__('Mother'))
-                                            ->columnSpan(2)
-                                            ->searchable()
-                                            ->getSearchResultsUsing(function (string $search) {
-                                                return PrevDog::query()
-                                                    ->where('SagirID', 'like', "%{$search}%")
-                                                    ->orWhere('Heb_Name', 'like', "%{$search}%")
-                                                    ->orWhere('Eng_Name', 'like', "%{$search}%")
-                                                    ->orWhere('Chip', 'like', "%{$search}%")
-                                                    ->orWhere('ImportNumber', 'like', "%{$search}%")
-                                                    ->limit(50)
-                                                    ->get()
-                                                    ->mapWithKeys(fn($d) => [$d->SagirID => $d->SagirID . ' - ' . $d->full_name])
-                                                    ->all();
-                                            })
-                                            ->getOptionLabelUsing(function ($value) {
-                                                $d = PrevDog::query()->where('SagirID', $value)->first();
+                                                    // Create the father dog record
+                                                    $mother = PrevDog::create($data);
 
-                                                return $d ? ($d->SagirID . ' - ' . $d->full_name) : null;
-                                            }),
-                                        Forms\Components\TextInput::make('sheger_id')
-                                            ->label(__('Sheger ID'))
-                                            ->numeric(),
-                                        Forms\Components\Toggle::make('red_pedigree')
-                                            ->label(__('Red Pedigree'))
-                                            ->inline(false)
-                                            ->onColor('danger')
-                                            ->offColor('gray'),
-                                        Forms\Components\ToggleButtons::make('pedigree_color')
-                                            ->label(__('Pedigree Color'))
-                                            ->options(LegacyPedigreeColor::class)
-                                            ->grouped(),
-                                        Forms\Components\Textarea::make('PedigreeNotes')
-                                            ->label(__('Pedigree Notes'))
-                                            ->maxLength(4000)
+                                                    return $mother->id; // Return the PK used in the select
+                                                })
+                                                ->createOptionAction(fn(Action $action) => $action
+                                                    ->modalHeading(__('Create Mother'))
+                                                    ->modalWidth('6xl')
+                                                    ->label(__('Create new dog as Mother'))
+                                                    ->color('warning')
+                                                    ->icon('fas-circle-plus')
+                                                ),
+                                        ])
+                                            ->columns(2)
                                             ->columnSpan(2),
-                                        Forms\Components\Textarea::make('PedigreeNotes_2')
-                                            ->label(__('Pedigree Notes (2)'))
-                                            ->maxLength(1000)
+                                        Forms\Components\Group::make([
+                                            Forms\Components\TextInput::make('sheger_id')
+                                                ->label(__('Sheger ID'))
+                                                ->numeric(),
+                                            Forms\Components\ToggleButtons::make('pedigree_color')
+                                                ->label(__('Pedigree Color'))
+                                                ->options(LegacyPedigreeColor::class)
+                                                ->grouped(),
+                                            Forms\Components\Toggle::make('red_pedigree')
+                                                ->label(__('Red Pedigree'))
+                                                ->inline(false)
+                                                ->onColor('danger')
+                                                ->offColor('gray'),
+                                        ])
+                                            ->columns(4)
+                                            ->columnSpan(2),
+                                        Forms\Components\Group::make([
+                                            Forms\Components\Textarea::make('PedigreeNotes')
+                                                ->label(__('Pedigree Notes'))
+                                                ->maxLength(4000)
+                                                ->columnSpan(1),
+                                            Forms\Components\Textarea::make('PedigreeNotes_2')
+                                                ->label(__('Pedigree Notes (2)'))
+                                                ->maxLength(1000)
+                                                ->columnSpan(1),
+                                        ])
+                                            ->columns(2)
                                             ->columnSpan(2),
                                     ])
                                     ->heading(__('Pedigree'))
                                     ->columns(4),
-                                Section::make('ancestry')
+                                Section::make('pedigree')
                                     ->schema([
                                         Forms\Components\Placeholder::make('pedigree_placeholder')
                                             ->content(new HtmlString(__('A 3-generation pedigree view will appear here soon.'))),
                                     ])
-                                    ->heading(__('Ancestry (coming soon)')),
+                                    ->heading(__('Pedigree (coming soon)')),
                             ])
                             ->label(__('Pedigree')),
 
