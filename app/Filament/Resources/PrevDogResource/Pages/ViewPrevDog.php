@@ -24,6 +24,6 @@ class ViewPrevDog extends ViewRecord
 
     public function getContentTabLabel(): ?string
     {
-        return __('Dog');
+        return __('dog/model/general.labels.singular');
     }
 }

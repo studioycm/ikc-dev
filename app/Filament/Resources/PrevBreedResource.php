@@ -34,7 +34,7 @@ class PrevBreedResource extends Resource
 
     public static function getNavigationGroup(): string
     {
-        return __('Dogs Management');
+        return __('dog/model/general.labels.navigation_group');
     }
 
     public static function getNavigationLabel(): string

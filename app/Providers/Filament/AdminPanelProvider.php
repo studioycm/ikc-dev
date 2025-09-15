@@ -3,7 +3,6 @@
 namespace App\Providers\Filament;
 
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use Filament\Facades\Filament;
 use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -17,7 +16,6 @@ use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Widgets;
-use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -108,7 +106,7 @@ class AdminPanelProvider extends PanelProvider
             // )
             ->navigationGroups([
                 NavigationGroup::make()
-                    ->label(fn (): string => __('Dogs Management'))
+                    ->label(fn(): string => __('dog/model/general.labels.navigation_group'))
                     ->icon('fas-dog'),
                 NavigationGroup::make()
                     ->label(fn (): string => __('Owners Management'))

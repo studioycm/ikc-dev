@@ -77,7 +77,7 @@ class PrevShowPaymentResource extends Resource
                     ->numeric(),
 
                 TextInput::make('DogID')
-                    ->label(__('Dog'))
+                    ->label(__('Dog DataID'))
                     ->numeric(),
 
                 TextInput::make('PaymentAmount')
@@ -133,7 +133,7 @@ class PrevShowPaymentResource extends Resource
 
                 TextColumn::make('RegistrationID')->label(__('Registration')),
 
-                TextColumn::make('DogID')->label(__('Dog')),
+                TextColumn::make('DogID')->label(__('Dog DataID')),
 
                 TextColumn::make('PaymentAmount')->label(__('Amount')),
 

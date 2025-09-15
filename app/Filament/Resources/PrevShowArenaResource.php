@@ -130,7 +130,7 @@ class PrevShowArenaResource extends Resource
                             ->schema([
                                 TextEntry::make('OrderID')->label(__('Position'))->numeric(decimalPlaces: 0, thousandsSeparator: false),
                                 TextEntry::make('SagirID')->label(__('Sagir'))->numeric(decimalPlaces: 0, thousandsSeparator: false),
-                                TextEntry::make('BirthDate')->label(__('B.Date'))->since()->dateTooltip(),
+                                TextEntry::make('BirthDate')->label(__('Birth Date'))->since()->dateTooltip(),
                                 TextEntry::make('hebDogName')->label(__('Name'))->columnSpan(2),
                                 TextEntry::make('engDogName')->label(__('English Name'))->columnSpan(2),
                             ])
@@ -165,7 +165,7 @@ class PrevShowArenaResource extends Resource
                     ->label(__('Judges'))
                     ->toggleable(),
                 TextColumn::make('show_dogs_count')
-                    ->label(__('Dogs'))
+                    ->label(__('dog/model/general.labels.plural'))
                     ->counts('show_dogs')
                     ->sortable(['show_dogs_count'])
                     ->toggleable(),
