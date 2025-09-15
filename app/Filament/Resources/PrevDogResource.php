@@ -72,22 +72,22 @@ class PrevDogResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('Dog');
+        return __('dog/model/general.labels.singular');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Dogs');
+        return __('dog/model/general.labels.plural');
     }
 
     public static function getNavigationGroup(): string
     {
-        return __('Dogs Management');
+        return __('dog/model/general.labels.navigation_group');
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('Dogs');
+        return __('dog/model/general.labels.navigation_label');
     }
 
     public static function form(Form $form): Form
@@ -187,18 +187,18 @@ class PrevDogResource extends Resource
                                             ->label(__('Hair'))
                                             ->relationship('hair', 'HairNameHE')
                                             ->searchable(),
-                                        Forms\Components\ToggleButtons::make('SizeID')
-                                            ->label(__('Size'))
-                                            ->options(LegacyDogSize::class)
-                                            ->grouped(),
                                         Forms\Components\Select::make('GroupID')
                                             ->label(__('Group ID'))
                                             ->options(array_combine(range(0, 7), range(0, 7)))
                                             ->searchable(),
+                                        Forms\Components\ToggleButtons::make('SizeID')
+                                            ->label(__('Size'))
+                                            ->options(LegacyDogSize::class)
+                                            ->grouped(),
                                     ])
                                     ->heading(__('Breed & Appearance'))
                                     ->columns(4),
-                                Section::make('misc_system')
+                                Section::make('miscellaneous')
                                     ->schema([
                                         Forms\Components\DateTimePicker::make('ModificationDateTime')
                                             ->label(__('Modified On'))
@@ -236,7 +236,7 @@ class PrevDogResource extends Resource
                                             ->label(__('Message Test'))
                                             ->maxLength(255),
                                     ])
-                                    ->heading(__('Misc. System'))
+                                    ->heading(__('Miscellaneous'))
                                     ->columns(4),
                             ])
                             ->label(__('General')),
@@ -323,7 +323,108 @@ class PrevDogResource extends Resource
                                                 $d = PrevDog::query()->where('SagirID', $value)->first();
 
                                                 return $d ? ($d->SagirID . ' - ' . $d->full_name) : null;
-                                            }),
+                                            })
+                                            ->createOptionForm([
+                                                Forms\Components\TextInput::make('Eng_Name')
+                                                    ->label(__('English Name'))
+                                                    ->maxLength(200),
+                                                Forms\Components\TextInput::make('Heb_Name')
+                                                    ->label(__('Hebrew Name'))
+                                                    ->maxLength(200),
+                                                Forms\Components\TextInput::make('ImportNumber')
+                                                    ->label(__('Import Number'))
+                                                    ->maxLength(200),
+                                                Forms\Components\DatePicker::make('BirthDate')
+                                                    ->label(__('Birth Date'))
+                                                    ->timezone('Asia/Jerusalem')
+                                                    ->native(false)
+                                                    ->locale('he')
+                                                    ->format('yyyy-mm-dd')
+                                                    ->displayFormat('d-m-Y')
+                                                    ->weekStartsOnSunday()
+                                                    ->closeOnDateSelection(),
+                                                Select::make('RaceID')
+                                                    ->label(__('Breed'))
+                                                    ->relationship('breed', 'BreedName')
+                                                    ->searchable(),
+                                                Select::make('HairID')
+                                                    ->label(__('Hair'))
+                                                    ->relationship('hair', 'HairNameHE')
+                                                    ->searchable(),
+                                                Select::make('ColorID')
+                                                    ->label(__('Color'))
+                                                    ->relationship('color', 'ColorNameHE')
+                                                    ->searchable(),
+                                                Forms\Components\ToggleButtons::make('GenderID')
+                                                    ->label(__('Gender'))
+                                                    ->grouped()
+                                                    ->options(LegacyDogGender::class)
+                                                    ->default(fn(Forms\Get $get) => LegacyDogGender::Male->value),
+                                                Forms\Components\Select::make('sagir_prefix')
+                                                    ->label(__('Sagir Prefix'))
+                                                    ->options(\App\Enums\Legacy\LegacySagirPrefix::class)
+                                                    ->default(\App\Enums\Legacy\LegacySagirPrefix::NUL->value),
+                                                Forms\Components\TextInput::make('Chip')
+                                                    ->label(__('Chip'))
+                                                    ->maxLength(200),
+                                                Forms\Components\TextInput::make('DnaID')
+                                                    ->label(__('DNA ID'))
+                                                    ->maxLength(200),
+                                                Forms\Components\TextInput::make('breeder_name')
+                                                    ->label(__('Breeder Name'))
+                                                    ->maxLength(300),
+                                                Forms\Components\Textarea::make('HealthNotes')
+                                                    ->label(__('Health Notes'))
+                                                    ->maxLength(4000),
+                                                Forms\Components\TextInput::make('PedigreeNotes')
+                                                    ->label(__('Titles'))
+                                                    ->helperText('Comma separated'),
+                                                Forms\Components\Textarea::make('Notes')
+                                                    ->label(__('Notes'))
+                                                    ->maxLength(1000),
+                                                Forms\Components\TextInput::make('SagirID')
+                                                    ->label(__('Sagir'))
+                                                    ->numeric()
+                                                    ->helperText(__('Temporary value will be auto-set')),
+                                                Forms\Components\TextInput::make('DataID')
+                                                    ->label(__('Data ID'))
+                                                    ->numeric()
+                                                    ->helperText(__('Temporary value will be auto-set')),
+                                            ])
+                                            ->createOptionUsing(function (array $data, Forms\Get $get): int|string {
+                                                // Auto gender: father
+                                                $data['GenderID'] = \App\Enums\Legacy\LegacyDogGender::Male->value;
+
+                                                // Default sagir_prefix to NUL if empty
+                                                $data['sagir_prefix'] = $data['sagir_prefix'] ?? \App\Enums\Legacy\LegacySagirPrefix::NUL->value;
+
+                                                // Auto-select breed from current "son" record RaceID if not chosen
+                                                /** @var PrevDog|null $current */
+                                                $current = request()->route('record') ? PrevDog::find(request()->route('record')) : null;
+                                                if (!($data['RaceID'] ?? null) && $current) {
+                                                    $data['RaceID'] = $current->RaceID;
+                                                }
+
+                                                // Temporary SagirID and DataID = max+1
+                                                $maxSagir = PrevDog::query()->max('SagirID') ?? 0;
+                                                $maxData = PrevDog::query()->max('DataID') ?? 0;
+                                                $data['SagirID'] = (int)($maxSagir) + 1;
+                                                $data['DataID'] = (int)($maxData) + 1;
+
+                                                // Map optional alias fields from form to model
+                                                if (isset($data['breeder_name'])) {
+                                                    $data['Breeder_Name'] = $data['breeder_name'];
+                                                }
+
+                                                $father = PrevDog::create($data);
+
+                                                return $father->SagirID; // Return the PK used in the select
+                                            })
+                                            ->createOptionAction(fn(Action $action) => $action
+                                                ->modalHeading(__('Create Father'))
+                                                ->modalWidth('4xl')
+                                            ),
+
                                         Select::make('MotherSAGIR')
                                             ->label(__('Mother'))
                                             ->columnSpan(2)

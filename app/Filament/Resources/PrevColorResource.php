@@ -3,18 +3,13 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PrevColorResource\Pages;
-use App\Filament\Resources\PrevColorResource\RelationManagers;
 use App\Models\PrevColor;
-use App\Models\PrevDog;
-use App\Models\PrevBreed;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Support\Colors\Color;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+
 // use App\Filament\Exports\DogExporter;
 // use App\Filament\Imports\DogImporter;
 // use Filament\Tables\Actions\ExportAction;
@@ -34,7 +29,7 @@ class PrevColorResource extends Resource
     }
     public static function getNavigationGroup(): string
     {
-        return __('Dogs Management');
+        return __('dog/model/general.labels.navigation_group');
     }
     public static function getNavigationLabel(): string
     {

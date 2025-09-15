@@ -23,3 +23,7 @@ yarn-error.log
 /.zed
 /docs/
 /docs/*
+/public/css/filament/admin/
+/app/Console/Commands/BuildTranslationMapping.php
+/app/Console/Commands/ExportFilamentLabels.php
+/app/Console/Commands/FilamentLabelScanner.php

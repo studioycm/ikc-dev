@@ -53,7 +53,8 @@ class PrevShowResult extends Model
 
     public function registration(): BelongsTo
     {
-        return $this->belongsTo(PrevShowRegistration::class, 'RegDogID', 'DogId');
+        return $this->belongsTo(PrevShowRegistration::class, 'RegDogID', 'DogId')
+            ->where('ShowID', $this->ShowID);
     }
 
     public function dog(): BelongsTo
