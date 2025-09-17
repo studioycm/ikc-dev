@@ -189,8 +189,7 @@ class PrevDogResource extends Resource
                                             ->searchable(),
                                         Forms\Components\Select::make('GroupID')
                                             ->label(__('Group ID'))
-                                            ->options(array_combine(range(0, 7), range(0, 7)))
-                                            ->searchable(),
+                                            ->options(array_combine(range(0, 7), range(0, 7))),
                                         Forms\Components\ToggleButtons::make('SizeID')
                                             ->label(__('Size'))
                                             ->options(LegacyDogSize::class)
@@ -198,55 +197,10 @@ class PrevDogResource extends Resource
                                     ])
                                     ->heading(__('Breed & Appearance'))
                                     ->columns(4),
-                                Section::make('miscellaneous')
-                                    ->schema([
-                                        Forms\Components\DateTimePicker::make('ModificationDateTime')
-                                            ->label(__('Modified On'))
-                                            ->format('Y-m-d H:i:s')
-                                            ->timezone('Asia/Jerusalem')
-                                            ->native(false)
-                                            ->locale('he')
-                                            ->displayFormat('d-m-Y H:i:s')
-                                            ->weekStartsOnSunday()
-                                            ->closeOnDateSelection()
-                                            ->default(now()),
-                                        Forms\Components\Toggle::make('encoding')
-                                            ->label(__('Encoding Issue'))
-                                            ->inline(false),
-                                        Forms\Components\Toggle::make('is_correct')
-                                            ->label(__('Is Correct'))
-                                            ->inline(false),
-                                        Forms\Components\Toggle::make('not_relevant')
-                                            ->label(__('Not Relevant'))
-                                            ->inline(false),
-                                        Forms\Components\Select::make('RemarkCode')
-                                            ->label(__('Remark Code'))
-                                            ->options(fn() => array_combine(range(0, 36), range(0, 36)))
-                                            ->searchable(),
-                                        Forms\Components\Textarea::make('Notes')
-                                            ->label(__('Notes'))
-                                            ->maxLength(1000),
-                                        Forms\Components\Textarea::make('Notes_2')
-                                            ->label(__('Notes (2)'))
-                                            ->maxLength(1000),
-                                        Forms\Components\Textarea::make('message')
-                                            ->label(__('Message'))
-                                            ->maxLength(255),
-                                        Forms\Components\Textarea::make('message_test')
-                                            ->label(__('Message Test'))
-                                            ->maxLength(255),
-                                    ])
-                                    ->heading(__('Miscellaneous'))
-                                    ->columns(4),
-                            ])
-                            ->label(__('General')),
-
-                        FormTab::make('owners')
-                            ->schema([
                                 Section::make('ownership')
                                     ->schema([
                                         Select::make('CurrentOwnerId')
-                                            ->label(__('Owner Pre 2022'))
+                                            ->label(__('Owner pre 2022'))
                                             ->searchable()
                                             ->getSearchResultsUsing(function (string $search) {
                                                 return PrevUser::query()
@@ -278,9 +232,6 @@ class PrevDogResource extends Resource
                                         Forms\Components\TextInput::make('BeitGidulName')
                                             ->label(__('Beit Gidul Name'))
                                             ->maxLength(200),
-                                        Forms\Components\TextInput::make('GidulShowType')
-                                            ->label(__('Gidul Show Type'))
-                                            ->maxLength(200),
                                         Forms\Components\TextInput::make('GrowerId')
                                             ->label(__('Breeder ID'))
                                             ->numeric(),
@@ -293,11 +244,54 @@ class PrevDogResource extends Resource
                                         Forms\Components\TextInput::make('Breeding_ManagerID')
                                             ->label(__('Breeding Manager ID'))
                                             ->numeric(),
+                                        Forms\Components\TextInput::make('GidulShowType')
+                                            ->label(__('Gidul Show Type'))
+                                            ->maxLength(200),
                                     ])
-                                    ->heading(__('Pre 2022 Ownership'))
+                                    ->heading(__('Ownership, Kennel and Breeder'))
+                                    ->columns(4),
+                                Section::make('miscellaneous')
+                                    ->schema([
+                                        Forms\Components\Select::make('RemarkCode')
+                                            ->label(__('Remark Code'))
+                                            ->options(fn() => array_combine(range(0, 36), range(0, 36)))
+                                            ->searchable(),
+                                        Forms\Components\Toggle::make('encoding')
+                                            ->label(__('Encoding Issue'))
+                                            ->inline(false),
+                                        Forms\Components\Toggle::make('is_correct')
+                                            ->label(__('Is Correct'))
+                                            ->inline(false),
+                                        Forms\Components\Toggle::make('not_relevant')
+                                            ->label(__('Not Relevant'))
+                                            ->inline(false),
+                                        Forms\Components\Textarea::make('Notes')
+                                            ->label(__('Notes'))
+                                            ->maxLength(1000),
+                                        Forms\Components\Textarea::make('Notes_2')
+                                            ->label(__('Notes (2)'))
+                                            ->maxLength(1000),
+                                        Forms\Components\Textarea::make('message')
+                                            ->label(__('Message'))
+                                            ->maxLength(255),
+                                        Forms\Components\Textarea::make('message_test')
+                                            ->label(__('Message Test'))
+                                            ->maxLength(255),
+                                        Forms\Components\DateTimePicker::make('ModificationDateTime')
+                                            ->label(__('Modified On'))
+                                            ->format('Y-m-d H:i:s')
+                                            ->timezone('Asia/Jerusalem')
+                                            ->native(false)
+                                            ->locale('he')
+                                            ->displayFormat('d-m-Y H:i:s')
+                                            ->weekStartsOnSunday()
+                                            ->closeOnDateSelection()
+                                            ->default(now()),
+                                    ])
+                                    ->heading(__('Miscellaneous'))
                                     ->columns(4),
                             ])
-                            ->label(__('Owners Pre 2022')),
+                            ->label(__('General')),
 
                         FormTab::make('pedigree_and_parents')
                             ->schema([
@@ -556,7 +550,7 @@ class PrevDogResource extends Resource
                                                 ->onColor('danger')
                                                 ->offColor('gray'),
                                         ])
-                                            ->columns(4)
+                                            ->columns(3)
                                             ->columnSpan(2),
                                         Forms\Components\Group::make([
                                             Forms\Components\Textarea::make('PedigreeNotes')
@@ -568,15 +562,18 @@ class PrevDogResource extends Resource
                                                 ->maxLength(1000)
                                                 ->columnSpan(1),
                                         ])
-                                            ->columns(2)
+                                            ->columns(3)
                                             ->columnSpan(2),
                                     ])
                                     ->heading(__('Pedigree'))
-                                    ->columns(4),
+                                    ->columns(3),
                                 Section::make('pedigree')
                                     ->schema([
+                                        Forms\Components\Placeholder::make('pedigree_form_placeholder')
+                                            ->content(new HtmlString(__('<img src="' . asset('images/pedigree-form-placeholder.png') . '" alt="Dog pedigree form" />')))
+                                            ->label(false),
                                         Forms\Components\Placeholder::make('pedigree_placeholder')
-                                            ->content(new HtmlString(__('A 3-generation pedigree view will appear here soon.'))),
+                                            ->content(new HtmlString(__('A 3-generation pedigree form view will appear here soon.'))),
                                     ])
                                     ->heading(__('Pedigree (coming soon)')),
                             ])
@@ -585,21 +582,20 @@ class PrevDogResource extends Resource
                         FormTab::make('Shows')
                             ->schema([
                                 Forms\Components\TextInput::make('ShowsCount')
-                                    ->label(__('Shows Count'))
+                                    ->label(__('Shows Count (pre 2022)'))
                                     ->numeric()
                                     ->disabled(),
-                                Forms\Components\Placeholder::make('shows_hint')
-                                    ->content(new HtmlString(__('Shows list will be available via a relation manager.')))
-                                    ->columnSpanFull(),
                             ])
                             ->label(__('Shows'))
                             ->columns(4),
 
-                        FormTab::make('Documents')
+                        FormTab::make('documents')
                             ->schema([
-                                Forms\Components\Placeholder::make('documents_hint')
-                                    ->content(new HtmlString(__('Documents management is coming soon.')))
-                                    ->columnSpanFull(),
+                                Section::make('documents_section')
+                                    ->schema([
+                                    ])
+                                    ->heading(__('Documents & Files'))
+                                    ->columns(2),
                                 Section::make('media')
                                     ->schema([
                                         Forms\Components\TextInput::make('ProfileImage')
@@ -616,7 +612,7 @@ class PrevDogResource extends Resource
 
                         FormTab::make('health')
                             ->schema([
-                                Section::make(__('health_identification'))
+                                Section::make(__('health_section'))
                                     ->schema([
                                         Forms\Components\TextInput::make('Pelvis')
                                             ->label(__('Pelvis'))
@@ -629,7 +625,7 @@ class PrevDogResource extends Resource
                                             ->maxLength(4000)
                                             ->columnSpan(2),
                                     ])
-                                    ->heading(__('Health & Identification'))
+                                    ->heading(__('Health Information'))
                                     ->columns(4),
                                 Section::make('mag')
                                     ->schema([
@@ -859,7 +855,7 @@ class PrevDogResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 //                Tables\Columns\TextColumn::make('CurrentOwnerId')
-                //                    ->label(__('Owner (depracted)'))
+                //                    ->label(__('Owner pre 2022'))
                 //                    ->wrapHeader()
                 //                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                 //                    ->formatStateUsing(function (PrevDog $record): string {
@@ -900,7 +896,7 @@ class PrevDogResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('BreedID')
-                    ->label(__('Breed ID - depracted'))
+                    ->label(__('Breed ID - pre 2022'))
                     ->wrapHeader()
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
@@ -940,7 +936,7 @@ class PrevDogResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('TitleName')
-                    ->label(__('Titles (pre ~2010)'))
+                    ->label(__('Titles pre 2022'))
                     ->wrapHeader()
                     ->separator(',')
                     ->sortable()
@@ -1365,6 +1361,7 @@ class PrevDogResource extends Resource
             ->paginated([5, 10, 15, 25, 50, 100, 200, 250, 300])
             ->defaultPaginationPageOption(15)
             ->defaultSort('SagirID', 'desc')
+            ->persistFiltersInSession()
             ->searchOnBlur()
             ->striped()
             ->deferLoading()
@@ -1495,7 +1492,7 @@ class PrevDogResource extends Resource
                             TextEntry::make('ShowsCount')->label(__('Shows Count')),
                         ])
                             ->label(__('Titles & Shows')),
-                        TextEntry::make('TitleName')->label(__('Titles (pre‑2010)')),
+                        TextEntry::make('TitleName')->label(__('Titles pre 2022')),
                     ])
                         ->label(__('Pedigree & Titles')),
 
