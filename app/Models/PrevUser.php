@@ -9,10 +9,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 
 class PrevUser extends Model implements HasName
 {
     use SoftDeletes;
+    use Notifiable;
+
 
     /**
      * The connection name for the model.
@@ -214,4 +217,14 @@ class PrevUser extends Model implements HasName
         // 4. final validation
         return preg_match('/^05\d{8}$/', $digits) ? $digits : null;
     }
+
+    /**
+     * Route notifications for the mail channel.
+     */
+    public function routeNotificationForMail(): ?string
+    {
+        // prefer explicit email, then owner_email
+        return $this->email ?: $this->owner_email ?: null;
+    }
+
 }

@@ -2,15 +2,15 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use App\Models\PrevBreed;
+use App\Models\PrevDog;
+use App\Observers\PrevBreedObserver;
+use App\Observers\PrevDogObserver;
 use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\HtmlString;
-use App\Models\PrevDog;
-use App\Models\PrevBreed;
-use App\Observers\PrevDogObserver;
-use App\Observers\PrevBreedObserver;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,10 +27,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+
         LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
             $switch
-                ->locales(['he','en']); // also accepts a closure
+                ->locales(['he', 'en']); // also accepts a closure
         });
 
         // Register observers that clear club counts cache when dogs/breeds change.

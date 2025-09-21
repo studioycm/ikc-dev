@@ -11,98 +11,98 @@ class PrevShowClassPolicy
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can view any prev show classes.
+     * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_prev::show');
+        return $user->can('view_any_prev::show::class');
     }
 
     /**
-     * Determine whether the user can view the prev show class.
+     * Determine whether the user can view the model.
      */
     public function view(User $user, PrevShowClass $prevShowClass): bool
     {
-        return $user->can('view_prev::show');
+        return $user->can('view_prev::show::class');
     }
 
     /**
-     * Determine whether the user can create prev show classes.
+     * Determine whether the user can create models.
      */
     public function create(User $user): bool
     {
-        return $user->can('create_prev::show');
+        return $user->can('create_prev::show::class');
     }
 
     /**
-     * Determine whether the user can update the prev show class.
+     * Determine whether the user can update the model.
      */
     public function update(User $user, PrevShowClass $prevShowClass): bool
     {
-        return $user->can('update_prev::show');
+        return $user->can('update_prev::show::class');
     }
 
     /**
-     * Determine whether the user can delete the prev show class.
+     * Determine whether the user can delete the model.
      */
     public function delete(User $user, PrevShowClass $prevShowClass): bool
     {
-        return $user->can('delete_prev::show');
+        return $user->can('delete_prev::show::class');
     }
 
     /**
-     * Determine whether the user can bulk delete prev show classes.
+     * Determine whether the user can bulk delete.
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_prev::show');
+        return $user->can('delete_any_prev::show::class');
     }
 
     /**
-     * Determine whether the user can restore the prev show class.
-     */
-    public function restore(User $user, PrevShowClass $prevShowClass): bool
-    {
-        return $user->can('restore_prev::show');
-    }
-
-    /**
-     * Determine whether the user can bulk restore prev show classes.
-     */
-    public function restoreAny(User $user): bool
-    {
-        return $user->can('restore_any_prev::show');
-    }
-
-    /**
-     * Determine whether the user can permanently delete the prev show class.
+     * Determine whether the user can permanently delete.
      */
     public function forceDelete(User $user, PrevShowClass $prevShowClass): bool
     {
-        return $user->can('force_delete_prev::show');
+        return $user->can('force_delete_prev::show::class');
     }
 
     /**
-     * Determine whether the user can permanently bulk delete prev show classes.
+     * Determine whether the user can permanently bulk delete.
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_prev::show');
+        return $user->can('force_delete_any_prev::show::class');
     }
 
     /**
-     * Determine whether the user can replicate the prev show class.
+     * Determine whether the user can restore.
+     */
+    public function restore(User $user, PrevShowClass $prevShowClass): bool
+    {
+        return $user->can('restore_prev::show::class');
+    }
+
+    /**
+     * Determine whether the user can bulk restore.
+     */
+    public function restoreAny(User $user): bool
+    {
+        return $user->can('restore_any_prev::show::class');
+    }
+
+    /**
+     * Determine whether the user can replicate.
      */
     public function replicate(User $user, PrevShowClass $prevShowClass): bool
     {
-        return $user->can('replicate_prev::show');
+        return $user->can('replicate_prev::show::class');
     }
 
     /**
-     * Determine whether the user can reorder prev show classes.
+     * Determine whether the user can reorder.
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_prev::show');
+        return $user->can('reorder_prev::show::class');
     }
 }

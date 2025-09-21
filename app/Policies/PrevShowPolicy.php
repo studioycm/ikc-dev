@@ -11,7 +11,7 @@ class PrevShowPolicy
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can view any prev shows.
+     * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
@@ -19,7 +19,7 @@ class PrevShowPolicy
     }
 
     /**
-     * Determine whether the user can view the prev show.
+     * Determine whether the user can view the model.
      */
     public function view(User $user, PrevShow $prevShow): bool
     {
@@ -27,7 +27,7 @@ class PrevShowPolicy
     }
 
     /**
-     * Determine whether the user can create prev shows.
+     * Determine whether the user can create models.
      */
     public function create(User $user): bool
     {
@@ -35,7 +35,7 @@ class PrevShowPolicy
     }
 
     /**
-     * Determine whether the user can update the prev show.
+     * Determine whether the user can update the model.
      */
     public function update(User $user, PrevShow $prevShow): bool
     {
@@ -43,7 +43,7 @@ class PrevShowPolicy
     }
 
     /**
-     * Determine whether the user can delete the prev show.
+     * Determine whether the user can delete the model.
      */
     public function delete(User $user, PrevShow $prevShow): bool
     {
@@ -51,7 +51,7 @@ class PrevShowPolicy
     }
 
     /**
-     * Determine whether the user can bulk delete prev shows.
+     * Determine whether the user can bulk delete.
      */
     public function deleteAny(User $user): bool
     {
@@ -59,23 +59,7 @@ class PrevShowPolicy
     }
 
     /**
-     * Determine whether the user can restore the prev show.
-     */
-    public function restore(User $user, PrevShow $prevShow): bool
-    {
-        return $user->can('restore_prev::show');
-    }
-
-    /**
-     * Determine whether the user can bulk restore prev shows.
-     */
-    public function restoreAny(User $user): bool
-    {
-        return $user->can('restore_any_prev::show');
-    }
-
-    /**
-     * Determine whether the user can permanently delete the prev show.
+     * Determine whether the user can permanently delete.
      */
     public function forceDelete(User $user, PrevShow $prevShow): bool
     {
@@ -83,7 +67,7 @@ class PrevShowPolicy
     }
 
     /**
-     * Determine whether the user can permanently bulk delete prev shows.
+     * Determine whether the user can permanently bulk delete.
      */
     public function forceDeleteAny(User $user): bool
     {
@@ -91,7 +75,23 @@ class PrevShowPolicy
     }
 
     /**
-     * Determine whether the user can replicate the prev show.
+     * Determine whether the user can restore.
+     */
+    public function restore(User $user, PrevShow $prevShow): bool
+    {
+        return $user->can('restore_prev::show');
+    }
+
+    /**
+     * Determine whether the user can bulk restore.
+     */
+    public function restoreAny(User $user): bool
+    {
+        return $user->can('restore_any_prev::show');
+    }
+
+    /**
+     * Determine whether the user can replicate.
      */
     public function replicate(User $user, PrevShow $prevShow): bool
     {
@@ -99,7 +99,7 @@ class PrevShowPolicy
     }
 
     /**
-     * Determine whether the user can reorder prev shows.
+     * Determine whether the user can reorder.
      */
     public function reorder(User $user): bool
     {

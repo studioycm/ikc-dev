@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\PrevShowPayment;
+use App\Models\PrevHealth;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class PrevShowPaymentPolicy
+class PrevHealthPolicy
 {
     use HandlesAuthorization;
 
@@ -15,15 +15,15 @@ class PrevShowPaymentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_prev::show::payment');
+        return $user->can('view_any_prev::health');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, PrevShowPayment $prevShowPayment): bool
+    public function view(User $user, PrevHealth $prevHealth): bool
     {
-        return $user->can('view_prev::show::payment');
+        return $user->can('view_prev::health');
     }
 
     /**
@@ -31,23 +31,23 @@ class PrevShowPaymentPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_prev::show::payment');
+        return $user->can('create_prev::health');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, PrevShowPayment $prevShowPayment): bool
+    public function update(User $user, PrevHealth $prevHealth): bool
     {
-        return $user->can('update_prev::show::payment');
+        return $user->can('update_prev::health');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, PrevShowPayment $prevShowPayment): bool
+    public function delete(User $user, PrevHealth $prevHealth): bool
     {
-        return $user->can('delete_prev::show::payment');
+        return $user->can('delete_prev::health');
     }
 
     /**
@@ -55,15 +55,15 @@ class PrevShowPaymentPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_prev::show::payment');
+        return $user->can('delete_any_prev::health');
     }
 
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, PrevShowPayment $prevShowPayment): bool
+    public function forceDelete(User $user, PrevHealth $prevHealth): bool
     {
-        return $user->can('force_delete_prev::show::payment');
+        return $user->can('force_delete_prev::health');
     }
 
     /**
@@ -71,15 +71,15 @@ class PrevShowPaymentPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_prev::show::payment');
+        return $user->can('force_delete_any_prev::health');
     }
 
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, PrevShowPayment $prevShowPayment): bool
+    public function restore(User $user, PrevHealth $prevHealth): bool
     {
-        return $user->can('restore_prev::show::payment');
+        return $user->can('restore_prev::health');
     }
 
     /**
@@ -87,15 +87,15 @@ class PrevShowPaymentPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_prev::show::payment');
+        return $user->can('restore_any_prev::health');
     }
 
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, PrevShowPayment $prevShowPayment): bool
+    public function replicate(User $user, PrevHealth $prevHealth): bool
     {
-        return $user->can('replicate_prev::show::payment');
+        return $user->can('replicate_prev::health');
     }
 
     /**
@@ -103,6 +103,6 @@ class PrevShowPaymentPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_prev::show::payment');
+        return $user->can('reorder_prev::health');
     }
 }

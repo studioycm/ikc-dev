@@ -32,6 +32,8 @@ class PrevShowClassRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('id')->label('ID')->toggleable(),
                 Tables\Columns\TextColumn::make('ClassID')->label('Code')->toggleable(),
+                Tables\Columns\TextColumn::make('ClassName')->label('Class Name')->toggleable(),
+                Tables\Columns\TextColumn::make('show.TitleName')->label('Show')->toggleable(),
                 Tables\Columns\TextColumn::make('arena.GroupName')->label('Arena')->toggleable(),
                 Tables\Columns\TextColumn::make('judge.JudgeNameEN')->label('Judge')->toggleable(),
                 Tables\Columns\TextColumn::make('OrderID')->label('Order')->numeric()->toggleable(),

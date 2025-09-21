@@ -4,8 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PrevUserResource\Pages;
 use App\Models\PrevUser;
+use App\Notifications\UserMessageNotification;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Enums\FiltersLayout;
@@ -15,6 +17,8 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Notification as LaravelNotification;
 
 // use App\Filament\Resources\PrevUserResource\RelationManagers;
 
@@ -603,9 +607,118 @@ class PrevUserResource extends Resource
             ->filtersFormColumns(4)
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('send_email')
+                    ->label(__('Send Email'))
+                    ->button()
+                    ->tooltip(__('Send an email to this owner'))
+                    ->color('primary')
+                    ->icon('heroicon-o-envelope')
+                    ->modalHeading(__('Send Email'))
+                    ->modalSubmitActionLabel(__('Queue Email'))
+                    ->modalIcon('heroicon-o-envelope')
+                    ->form([
+                        Forms\Components\TextInput::make('subject')
+                            ->label(__('Subject'))
+                            ->required()
+                            ->maxLength(150),
+                        Forms\Components\RichEditor::make('body')
+                            ->label(__('Message'))
+                            ->toolbarButtons([
+                                'attachFiles',
+                                'blockquote',
+                                'bold',
+                                'bulletList',
+                                'codeBlock',
+                                'h1',
+                                'h2',
+                                'h3',
+                                'italic',
+                                'link',
+                                'orderedList',
+                                'redo',
+                                'strike',
+                                'underline',
+                                'undo',
+                            ])
+                            ->fileAttachmentsDisk('public')
+                            ->fileAttachmentsDirectory('editor-attachments')
+                            ->fileAttachmentsVisibility('public')
+                            ->disableGrammarly()
+                            ->columnSpanFull()
+                            ->required(),
+                    ])
+                    ->action(function (PrevUser $record, array $data): void {
+                        // Queue mail notification
+                        LaravelNotification::send($record, new UserMessageNotification(
+                            subject: (string)$data['subject'],
+                            body: (string)$data['body'],
+                            channels: ['mail'],
+                        ));
+
+                        Notification::make()
+                            ->title(__('Email queued'))
+                            ->body(__('Email queued to :email', ['email' => $record->email ?: __('(no email)')]))
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    // Bulk send (queued) to many PrevUsers
+                    Tables\Actions\BulkAction::make('bulk_send_email')
+                        ->label(__('Send Email'))
+                        ->icon('heroicon-o-envelope')
+                        ->color('primary')
+                        ->requiresConfirmation()
+                        ->modalHeading(__('Send Email'))
+                        ->modalSubmitActionLabel(__('Queue Emails'))
+                        ->form([
+                            Forms\Components\TextInput::make('subject')
+                                ->label(__('Subject'))
+                                ->required()
+                                ->maxLength(150),
+                            Forms\Components\RichEditor::make('body')
+                                ->label(__('Message'))
+                                ->toolbarButtons([
+                                    'attachFiles',
+                                    'blockquote',
+                                    'bold',
+                                    'bulletList',
+                                    'codeBlock',
+                                    'h1',
+                                    'h2',
+                                    'h3',
+                                    'italic',
+                                    'link',
+                                    'orderedList',
+                                    'redo',
+                                    'strike',
+                                    'underline',
+                                    'undo',
+                                ])
+                                ->fileAttachmentsDisk('public')
+                                ->fileAttachmentsDirectory('editor-attachments')
+                                ->fileAttachmentsVisibility('public')
+                                ->disableGrammarly()
+                                ->columnSpanFull()
+                                ->required(),
+                        ])
+                        ->action(function (Collection $records, array $data): void {
+                            $notification = new UserMessageNotification(
+                                subject: (string)$data['subject'],
+                                body: (string)$data['body'],
+                                channels: ['mail'],
+                            );
+
+                            // Queue notifications to the selected owners
+                            LaravelNotification::send($records, $notification);
+
+                            Notification::make()
+                                ->title(__('Emails queued'))
+                                ->body(__('Emails queued to :count owners', ['count' => $records->count()]))
+                                ->success()
+                                ->send();
+                        }),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])

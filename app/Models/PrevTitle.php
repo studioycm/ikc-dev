@@ -55,7 +55,7 @@ class PrevTitle extends Model
     // count the number of dogs with this title
 
     // get name using TitleName attribute
-    public function name(): Attribute
+    protected function name(): Attribute
     {
         return Attribute::make(
             get: fn ($value, $attributes) => $this->TitleName,
