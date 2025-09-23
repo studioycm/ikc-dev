@@ -210,12 +210,6 @@ class PrevShowResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->searchable(),
-                TextColumn::make('club.Name')
-                    ->label(__('Club'))
-                    ->searchable(['clubs.Name'], isIndividual: true, isGlobal: false)
-                    ->sortable('clubs.Name'),
-                TextColumn::make('TitleName')
-                    ->label(__('Show Title')),
                 TextColumn::make('ShowType')
                     ->label(__('Show Type'))
                     ->badge()
@@ -223,6 +217,12 @@ class PrevShowResource extends Resource
                     ->color(fn(PrevShow $r): ?string => $r->ShowType?->getColor())
                     ->searchable(['ShowsDB.ShowType'], isIndividual: true, isGlobal: false)
                     ->sortable('ShowsDB.ShowType'),
+                TextColumn::make('club.Name')
+                    ->label(__('Club'))
+                    ->searchable(['clubs.Name'], isIndividual: true, isGlobal: false)
+                    ->sortable('clubs.Name'),
+                TextColumn::make('TitleName')
+                    ->label(__('Show Title')),
                 TextColumn::make('location')
                     ->label(__('Location'))
                     ->searchable(isIndividual: true, isGlobal: false)
@@ -234,20 +234,20 @@ class PrevShowResource extends Resource
                     ->toggleable()
                     ->html()
                     ->limit(400)
-                    ->wrap(),
+                    ->extraHeaderAttributes(['style' => 'max-width: 320px']),
                 TextColumn::make('StartDate')
                     ->label(__('Starts'))
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('EndDate')
                     ->label(__('Ends'))
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('EndRegistrationDate')
                     ->label(__('Registration Ends'))
-                    ->date()
+                    ->date('d/m/Y')
                     ->sortable()
                     ->toggleable(),
 
@@ -255,8 +255,8 @@ class PrevShowResource extends Resource
                     ->label(__('Show Status'))
                     ->boolean(fn($state): bool => $state === 2)
                     ->color(fn($state): string => $state === 2 ? 'success' : 'danger')
-                    ->toggleable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
 
                 TextColumn::make('arenas_count')
                     ->label(__('Arenas'))
@@ -332,7 +332,6 @@ class PrevShowResource extends Resource
 
                 ImageColumn::make('banner_image')
                     ->toggleable(),
-
             ])
             ->filters([
                 TrashedFilter::make('trashed'),

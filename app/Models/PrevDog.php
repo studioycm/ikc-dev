@@ -156,6 +156,22 @@ class PrevDog extends Model
         return $this->belongsTo(PrevUser::class, 'CurrentOwnerId', 'owner_code');
     }
 
+    /**
+     * All documents linked to this dog (by SagirID).
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(PrevDogDocument::class, 'SagirID', 'SagirID');
+    }
+
+    /**
+     * All health records linked to this dog (by SagirID).
+     */
+    public function healthRecords(): HasMany
+    {
+        return $this->hasMany(PrevHealth::class, 'SagirID', 'SagirID');
+    }
+
     public function duplicates(): HasMany
     {
         $relation = $this->hasMany(self::class, 'SagirID', 'SagirID');
@@ -210,5 +226,13 @@ class PrevDog extends Model
         return Attribute::make(
             get: fn(): string => $this->SizeID->getLabel()
         );
+    }
+
+    /**
+     * All show entries for this dog.
+     */
+    public function showDogs(): HasMany
+    {
+        return $this->hasMany(PrevShowDog::class, 'SagirID', 'SagirID');
     }
 }

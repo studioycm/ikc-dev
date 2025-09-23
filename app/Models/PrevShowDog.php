@@ -71,7 +71,7 @@ class PrevShowDog extends Model
 
     public function registration(): BelongsTo
     {
-        return $this->belongsTo(PrevShowRegistration::class, 'ShowRegistrationID');
+        return $this->belongsTo(PrevShowRegistration::class, 'ShowRegistrationID', '');
     }
 
     public function newRegistration(): BelongsTo

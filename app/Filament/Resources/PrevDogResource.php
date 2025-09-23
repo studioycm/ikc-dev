@@ -249,7 +249,7 @@ class PrevDogResource extends Resource
                                             ->label(__('Breeding Manager ID'))
                                             ->numeric(),
                                         Forms\Components\TextInput::make('GidulShowType')
-                                            ->label(__('Gidul Show Type'))
+                                            ->label(__('Beit Gidul Name Position'))
                                             ->maxLength(200),
                                     ])
                                     ->heading(__('Ownership, Kennel and Breeder'))
@@ -677,7 +677,7 @@ class PrevDogResource extends Resource
                         'currentOwner' => fn($r) => $r->select(['users.id', 'owner_code', 'first_name', 'last_name', 'first_name_en', 'last_name_en', 'mobile_phone', 'email']),
                         'titles' => fn($r) => $r->select(['dogs_titles_db.TitleCode', 'dogs_titles_db.TitleName']),
                     ]);
-//                    ->with('duplicates');
+                //                    ->with('duplicates');
             })
             ->columns([
                 Tables\Columns\TextColumn::make('id')
@@ -935,7 +935,7 @@ class PrevDogResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('GidulShowType')
-                    ->label(__('Gidul Show'))
+                    ->label(__('Beit Gidul Name Position'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('pedigree_color')
@@ -1571,6 +1571,9 @@ class PrevDogResource extends Resource
         return [
             PrevDogResource\RelationManagers\OwnersRelationManager::class,
             PrevDogResource\RelationManagers\TitlesRelationManager::class,
+            PrevDogResource\RelationManagers\HealthRecordsRelationManager::class,
+            PrevDogResource\RelationManagers\PrevDogDocumentRelationManager::class,
+            PrevDogResource\RelationManagers\PrevShowDogRelationManager::class,
         ];
     }
 

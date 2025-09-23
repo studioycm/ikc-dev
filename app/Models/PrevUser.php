@@ -13,9 +13,8 @@ use Illuminate\Notifications\Notifiable;
 
 class PrevUser extends Model implements HasName
 {
-    use SoftDeletes;
     use Notifiable;
-
+    use SoftDeletes;
 
     /**
      * The connection name for the model.
@@ -55,6 +54,14 @@ class PrevUser extends Model implements HasName
     {
         return $this->hasMany(PrevDog::class, 'CurrentOwnerId', 'owner_code')
             ->where('deleted_at', null);
+    }
+
+    // Breeding houses linked to this user via pivot table
+    public function breedingHouses(): BelongsToMany
+    {
+        return $this->belongsToMany(PrevBreedingHouse::class, 'breedhouses2users', 'user_id', 'breedinghouse_id', 'id', 'id')
+            ->withTimestamps()
+            ->using(PrevBreedingHouseUser::class);
     }
 
     /**
@@ -226,5 +233,4 @@ class PrevUser extends Model implements HasName
         // prefer explicit email, then owner_email
         return $this->email ?: $this->owner_email ?: null;
     }
-
 }

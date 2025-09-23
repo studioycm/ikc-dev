@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -63,11 +64,17 @@ class PrevBreedingHouse extends Model
         );
     }
 
-
     public function dogs(): HasMany
     {
-        return $this->hasMany(PrevDog::class, 'BeitGidulID', 'GidulCode');
+        return $this->hasMany(PrevDog::class, 'BeitGidulID', 'GidulCode')
+            ->whereNotNull('BeitGidulID')
+            ->whereNot('BeitGidulID', '=', 0);
     }
 
-
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(PrevUser::class, 'breedhouses2users', 'breedinghouse_id', 'user_id', 'id', 'id')
+            ->withTimestamps()
+            ->using(PrevBreedingHouseUser::class);
+    }
 }

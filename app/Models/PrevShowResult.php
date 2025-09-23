@@ -61,7 +61,7 @@ class PrevShowResult extends Model
     {
         return $this->belongsTo(PrevShowDog::class, 'SagirID', 'SagirID')
             ->where('ShowID', $this->ShowID)
-            ->where('MainArenaID', $this->ArenaID)
+            ->where('ArenaID', $this->MainArenaID)
             ->where('ClassID', $this->ClassID);
     }
 
