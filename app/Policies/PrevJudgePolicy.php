@@ -11,7 +11,7 @@ class PrevJudgePolicy
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can view any prev judges.
+     * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
@@ -59,7 +59,7 @@ class PrevJudgePolicy
     }
 
     /**
-     * Determine whether the user can permanently delete the model.
+     * Determine whether the user can permanently delete.
      */
     public function forceDelete(User $user, PrevJudge $prevJudge): bool
     {
@@ -75,7 +75,7 @@ class PrevJudgePolicy
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * Determine whether the user can restore.
      */
     public function restore(User $user, PrevJudge $prevJudge): bool
     {
@@ -91,7 +91,7 @@ class PrevJudgePolicy
     }
 
     /**
-     * Determine whether the user can replicate the model.
+     * Determine whether the user can replicate.
      */
     public function replicate(User $user, PrevJudge $prevJudge): bool
     {
@@ -99,7 +99,7 @@ class PrevJudgePolicy
     }
 
     /**
-     * Determine whether the user can reorder models.
+     * Determine whether the user can reorder.
      */
     public function reorder(User $user): bool
     {

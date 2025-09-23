@@ -45,7 +45,7 @@ class PrevDogTitle extends Pivot
     }
 
     // get title name using AwardID
-    public function name(): Attribute
+    protected function name(): Attribute
     {
         return Attribute::make(
             get: fn($value, $attributes) => PrevTitle::query()->where('TitleCode', $attributes['AwardID'])->first()?->name,

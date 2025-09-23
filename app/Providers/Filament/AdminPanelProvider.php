@@ -121,7 +121,7 @@ class AdminPanelProvider extends PanelProvider
                     ->label(fn (): string => __('Clubs Management'))
                     ->icon('heroicon-o-flag'),
                 NavigationGroup::make()
-                    ->label(fn (): string => __('Kennels Management'))
+                    ->label(fn(): string => __('dog/kennel/general.labels.navigation_group'))
                     ->icon('heroicon-o-home'),
                 NavigationGroup::make()
                     ->label(fn (): string => __('Finances Management'))
@@ -146,13 +146,6 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('fas-seedling')
                     ->group(fn (): string => __('Breedings Management'))
                     ->sort(40),
-
-                NavigationItem::make('kennels')
-                    ->label(fn (): string => __('Kennels'))
-                    ->url(fn (): string => Pages\Dashboard::getUrl())
-                    ->icon('heroicon-o-home')
-                    ->group(fn (): string => __('Kennels Management'))
-                    ->sort(80),
 
                 NavigationItem::make('payments')
                     ->label(fn (): string => __('Payments'))

@@ -11,58 +11,98 @@ class PrevShowDogPolicy
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can view any show dogs.
+     * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_prev::show');
+        return $user->can('view_any_prev::show::dog');
     }
 
     /**
-     * Determine whether the user can view the show dog.
+     * Determine whether the user can view the model.
      */
     public function view(User $user, PrevShowDog $prevShowDog): bool
     {
-        return $user->can('view_prev::show');
+        return $user->can('view_prev::show::dog');
     }
 
     /**
-     * Determine whether the user can create show dogs.
+     * Determine whether the user can create models.
      */
     public function create(User $user): bool
     {
-        return $user->can('create_prev::show');
+        return $user->can('create_prev::show::dog');
     }
 
     /**
-     * Determine whether the user can update the show dog.
+     * Determine whether the user can update the model.
      */
     public function update(User $user, PrevShowDog $prevShowDog): bool
     {
-        return $user->can('update_prev::show');
+        return $user->can('update_prev::show::dog');
     }
 
     /**
-     * Determine whether the user can delete the show dog.
+     * Determine whether the user can delete the model.
      */
     public function delete(User $user, PrevShowDog $prevShowDog): bool
     {
-        return $user->can('delete_prev::show');
+        return $user->can('delete_prev::show::dog');
     }
 
     /**
-     * Determine whether the user can restore the show dog.
+     * Determine whether the user can bulk delete.
      */
-    public function restore(User $user, PrevShowDog $prevShowDog): bool
+    public function deleteAny(User $user): bool
     {
-        return $user->can('restore_prev::show');
+        return $user->can('delete_any_prev::show::dog');
     }
 
     /**
-     * Determine whether the user can permanently delete the show dog.
+     * Determine whether the user can permanently delete.
      */
     public function forceDelete(User $user, PrevShowDog $prevShowDog): bool
     {
-        return $user->can('force_delete_prev::show');
+        return $user->can('force_delete_prev::show::dog');
+    }
+
+    /**
+     * Determine whether the user can permanently bulk delete.
+     */
+    public function forceDeleteAny(User $user): bool
+    {
+        return $user->can('force_delete_any_prev::show::dog');
+    }
+
+    /**
+     * Determine whether the user can restore.
+     */
+    public function restore(User $user, PrevShowDog $prevShowDog): bool
+    {
+        return $user->can('restore_prev::show::dog');
+    }
+
+    /**
+     * Determine whether the user can bulk restore.
+     */
+    public function restoreAny(User $user): bool
+    {
+        return $user->can('restore_any_prev::show::dog');
+    }
+
+    /**
+     * Determine whether the user can replicate.
+     */
+    public function replicate(User $user, PrevShowDog $prevShowDog): bool
+    {
+        return $user->can('replicate_prev::show::dog');
+    }
+
+    /**
+     * Determine whether the user can reorder.
+     */
+    public function reorder(User $user): bool
+    {
+        return $user->can('reorder_prev::show::dog');
     }
 }

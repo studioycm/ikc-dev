@@ -51,7 +51,7 @@ class PrevClubPolicy
     }
 
     /**
-     * Determine whether the user can bulk delete models.
+     * Determine whether the user can bulk delete.
      */
     public function deleteAny(User $user): bool
     {
@@ -59,7 +59,7 @@ class PrevClubPolicy
     }
 
     /**
-     * Determine whether the user can permanently delete the model.
+     * Determine whether the user can permanently delete.
      */
     public function forceDelete(User $user, PrevClub $prevClub): bool
     {
@@ -67,7 +67,7 @@ class PrevClubPolicy
     }
 
     /**
-     * Determine whether the user can permanently bulk delete models.
+     * Determine whether the user can permanently bulk delete.
      */
     public function forceDeleteAny(User $user): bool
     {
@@ -75,7 +75,7 @@ class PrevClubPolicy
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * Determine whether the user can restore.
      */
     public function restore(User $user, PrevClub $prevClub): bool
     {
@@ -83,7 +83,7 @@ class PrevClubPolicy
     }
 
     /**
-     * Determine whether the user can bulk restore models.
+     * Determine whether the user can bulk restore.
      */
     public function restoreAny(User $user): bool
     {
@@ -91,7 +91,7 @@ class PrevClubPolicy
     }
 
     /**
-     * Determine whether the user can replicate the model.
+     * Determine whether the user can replicate.
      */
     public function replicate(User $user, PrevClub $prevClub): bool
     {
@@ -99,7 +99,7 @@ class PrevClubPolicy
     }
 
     /**
-     * Determine whether the user can reorder models.
+     * Determine whether the user can reorder.
      */
     public function reorder(User $user): bool
     {

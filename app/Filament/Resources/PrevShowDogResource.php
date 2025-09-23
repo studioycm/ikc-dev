@@ -177,7 +177,7 @@ class PrevShowDogResource extends Resource
 //                    ->url(function ($state) {
 //                        return $state ? PrevShowResultResource::getUrl('edit', ['record' => $state]) : null;
 //                    })
-                    ->searchable(isGlobal: false, isIndividual: true)
+                    ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(),
 
             ])

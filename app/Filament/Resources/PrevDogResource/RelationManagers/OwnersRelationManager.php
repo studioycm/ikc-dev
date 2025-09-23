@@ -31,7 +31,7 @@ class OwnersRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Owner'))
-                    ->description(fn($record) => $record->id)
+                    ->description(fn(PrevUser $record) => $record->id)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('mobile_phone')
                     ->label(__('Phone'))

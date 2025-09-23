@@ -34,6 +34,7 @@ class PrevDog extends Model
 
     // Disable Fillable Attributes
     protected $guarded = [];
+
     // casting the attributes to the correct types
     protected $casts = [
         'SagirID' => 'integer',
@@ -44,6 +45,8 @@ class PrevDog extends Model
         'ColorID' => 'integer',
         'HairID' => 'integer',
         'RaceID' => 'integer',
+        'BeitGidulID' => 'integer',
+        'CurrentOwnerId' => 'integer',
         'GenderID' => LegacyDogGenderCast::class,
         'SizeID' => LegacyDogSizeCast::class,
         'Status' => LegacyDogStatusCast::class,
@@ -56,10 +59,10 @@ class PrevDog extends Model
      *
      * @return string
      */
-//    public function getRouteKeyName(): string
-//    {
-//        return 'SagirID';
-//    }
+    //    public function getRouteKeyName(): string
+    //    {
+    //        return 'SagirID';
+    //    }
 
     // create mapping for GenderID and Sex fields: 1="M", 2="F","ז"="M","נ"="F",null or any other = "n/a"
     const array GenderMap = [
@@ -111,6 +114,11 @@ class PrevDog extends Model
         return $this->hasMany(self::class, 'MotherSAGIR', 'SagirID');
     }
 
+    public function breedinghouse(): BelongsTo
+    {
+        return $this->belongsTo(PrevBreedingHouse::class, 'BeitGidulID', 'GidulCode');
+    }
+
     // users that are dog owners using dogs2users table or PrevUserDog model
     public function owners(): BelongsToMany
     {
@@ -148,6 +156,22 @@ class PrevDog extends Model
         return $this->belongsTo(PrevUser::class, 'CurrentOwnerId', 'owner_code');
     }
 
+    /**
+     * All documents linked to this dog (by SagirID).
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(PrevDogDocument::class, 'SagirID', 'SagirID');
+    }
+
+    /**
+     * All health records linked to this dog (by SagirID).
+     */
+    public function healthRecords(): HasMany
+    {
+        return $this->hasMany(PrevHealth::class, 'SagirID', 'SagirID');
+    }
+
     public function duplicates(): HasMany
     {
         $relation = $this->hasMany(self::class, 'SagirID', 'SagirID');
@@ -158,7 +182,7 @@ class PrevDog extends Model
     }
 
     // appends full_name and prefixed_sagir, removed the "sagir_prefix" and "gender" attributes
-    protected $appends = ['full_name'];
+    protected $appends = ['full_name', 'breeding_house_name'];
 
     public function fullName(): Attribute
     {
@@ -182,6 +206,13 @@ class PrevDog extends Model
         );
     }
 
+    protected function breedingHouseName(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->breedinghouse?->name ?? '---'
+        );
+    }
+
     // simple accessor to get a human-friendly label anywhere.
     public function genderLabel(): Attribute
     {
@@ -195,5 +226,13 @@ class PrevDog extends Model
         return Attribute::make(
             get: fn(): string => $this->SizeID->getLabel()
         );
+    }
+
+    /**
+     * All show entries for this dog.
+     */
+    public function showDogs(): HasMany
+    {
+        return $this->hasMany(PrevShowDog::class, 'SagirID', 'SagirID');
     }
 }

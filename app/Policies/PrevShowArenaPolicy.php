@@ -15,7 +15,7 @@ class PrevShowArenaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_prev::show');
+        return $user->can('view_any_prev::show::arena');
     }
 
     /**
@@ -23,7 +23,7 @@ class PrevShowArenaPolicy
      */
     public function view(User $user, PrevShowArena $prevShowArena): bool
     {
-        return $user->can('view_prev::show');
+        return $user->can('view_prev::show::arena');
     }
 
     /**
@@ -31,7 +31,7 @@ class PrevShowArenaPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_prev::show');
+        return $user->can('create_prev::show::arena');
     }
 
     /**
@@ -39,7 +39,7 @@ class PrevShowArenaPolicy
      */
     public function update(User $user, PrevShowArena $prevShowArena): bool
     {
-        return $user->can('update_prev::show');
+        return $user->can('update_prev::show::arena');
     }
 
     /**
@@ -47,7 +47,7 @@ class PrevShowArenaPolicy
      */
     public function delete(User $user, PrevShowArena $prevShowArena): bool
     {
-        return $user->can('delete_prev::show');
+        return $user->can('delete_prev::show::arena');
     }
 
     /**
@@ -55,15 +55,15 @@ class PrevShowArenaPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_prev::show');
+        return $user->can('delete_any_prev::show::arena');
     }
 
     /**
-     * Determine whether the user can permanently delete the model.
+     * Determine whether the user can permanently delete.
      */
     public function forceDelete(User $user, PrevShowArena $prevShowArena): bool
     {
-        return $user->can('force_delete_prev::show');
+        return $user->can('force_delete_prev::show::arena');
     }
 
     /**
@@ -71,15 +71,15 @@ class PrevShowArenaPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_prev::show');
+        return $user->can('force_delete_any_prev::show::arena');
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * Determine whether the user can restore.
      */
     public function restore(User $user, PrevShowArena $prevShowArena): bool
     {
-        return $user->can('restore_prev::show');
+        return $user->can('restore_prev::show::arena');
     }
 
     /**
@@ -87,22 +87,22 @@ class PrevShowArenaPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_prev::show');
+        return $user->can('restore_any_prev::show::arena');
     }
 
     /**
-     * Determine whether the user can replicate the model.
+     * Determine whether the user can replicate.
      */
     public function replicate(User $user, PrevShowArena $prevShowArena): bool
     {
-        return $user->can('replicate_prev::show');
+        return $user->can('replicate_prev::show::arena');
     }
 
     /**
-     * Determine whether the user can reorder models.
+     * Determine whether the user can reorder.
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_prev::show');
+        return $user->can('reorder_prev::show::arena');
     }
 }

@@ -28,6 +28,11 @@ class UserMessageNotification extends Notification
 
     public function via(object $notifiable): array
     {
+        // If database channel requested but notifiable is not App\Models\User, drop it.
+        if (in_array('database', $this->channels, true) && !$notifiable instanceof User) {
+            return array_values(array_diff($this->channels, ['database']));
+        }
+
         return $this->channels;
     }
 

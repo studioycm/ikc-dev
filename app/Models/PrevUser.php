@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 
 class PrevUser extends Model implements HasName
 {
+    use Notifiable;
     use SoftDeletes;
 
     /**
@@ -52,6 +54,14 @@ class PrevUser extends Model implements HasName
     {
         return $this->hasMany(PrevDog::class, 'CurrentOwnerId', 'owner_code')
             ->where('deleted_at', null);
+    }
+
+    // Breeding houses linked to this user via pivot table
+    public function breedingHouses(): BelongsToMany
+    {
+        return $this->belongsToMany(PrevBreedingHouse::class, 'breedhouses2users', 'user_id', 'breedinghouse_id', 'id', 'id')
+            ->withTimestamps()
+            ->using(PrevBreedingHouseUser::class);
     }
 
     /**
@@ -213,5 +223,14 @@ class PrevUser extends Model implements HasName
 
         // 4. final validation
         return preg_match('/^05\d{8}$/', $digits) ? $digits : null;
+    }
+
+    /**
+     * Route notifications for the mail channel.
+     */
+    public function routeNotificationForMail(): ?string
+    {
+        // prefer explicit email, then owner_email
+        return $this->email ?: $this->owner_email ?: null;
     }
 }
