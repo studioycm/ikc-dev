@@ -167,7 +167,6 @@ class PrevDogResource extends Resource
                                         Forms\Components\ToggleButtons::make('Status')
                                             ->label(__('Status'))
                                             ->options(LegacyDogStatus::class)
-                                            ->grouped()
                                             ->nullable()
                                             ->columnSpan(2),
                                     ])
@@ -192,8 +191,7 @@ class PrevDogResource extends Resource
                                             ->options(array_combine(range(0, 7), range(0, 7))),
                                         Forms\Components\ToggleButtons::make('SizeID')
                                             ->label(__('Size'))
-                                            ->options(LegacyDogSize::class)
-                                            ->grouped(),
+                                            ->options(LegacyDogSize::class),
                                     ])
                                     ->heading(__('Breed & Appearance'))
                                     ->columns(4),
@@ -685,29 +683,17 @@ class PrevDogResource extends Resource
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('duplicates_count')
-                    ->label(__('Duplicates Count'))
-                    ->numeric()
-                    ->counts('duplicates')
-                    ->sortable(['duplicates_count'])
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('duplicates')
-                    ->label(__('Other Duplicate IDs'))
-                    ->formatStateUsing(function (PrevDog $record): HtmlString {
-                        // format the related duplicates so each of the duplicates array items will be a link to the route of PrevDogResource view page using the id as the parameter
-                        $duplicatesLinks = $record->duplicates?->pluck('id')
-                            ->filter(fn ($id) => $id != $record->id)
-                            ->map(fn($id) => '<a href="' . PrevDogResource::getUrl('view', ['record' => $id]) . '" target="_blank">' . $id . '</a>'
-                            )
-                            ->implode(', ');
-
-                        return new HtmlString($duplicatesLinks);
-                    })
-                    ->wrap()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('SagirID')
                     ->label(__('Sagir'))
+                    ->color(function (PrevDog $record): string {
+                        return $record->sagir_prefix?->getColor() ?? 'grey';
+                    })
                     ->prefix(fn(PrevDog $record): string => ($record->sagir_prefix?->code() ?? 'NUL') . ' | ')
+                    ->icon(function (PrevDog $record): ?string {
+                        return $record->sagir_prefix?->getIcon();
+                    })
+                    ->size('lg')
+                    ->tooltip(__('Copy Sagir'))
                     ->copyable()
                     ->copyMessageDuration(duration: 1200)
                     ->copyMessage(fn($state): string => __('Copied Sagir: :id', ['id' => $state]))
@@ -740,27 +726,27 @@ class PrevDogResource extends Resource
                 Tables\Columns\TextColumn::make('GenderID')
                     ->label(__('Gender'))
                     ->badge()
-                    ->formatStateUsing(function ($state) {
-                        $g = $state instanceof LegacyDogGender
-                            ? $state
-                            : (isset($state) ? LegacyDogGender::tryFrom((int)$state) : null);
-
-                        return $g?->getLabel();
-                    })
-                    ->color(function ($state) {
-                        $g = $state instanceof LegacyDogGender
-                            ? $state
-                            : (isset($state) ? LegacyDogGender::tryFrom((int)$state) : null);
-
-                        return $g?->getColor();
-                    })
-                    ->icon(function ($state) {
-                        $g = $state instanceof LegacyDogGender
-                            ? $state
-                            : (isset($state) ? LegacyDogGender::tryFrom((int)$state) : null);
-
-                        return $g?->getIcon();
-                    })
+//                    ->formatStateUsing(function ($state) {
+//                        $g = $state instanceof LegacyDogGender
+//                            ? $state
+//                            : (isset($state) ? LegacyDogGender::tryFrom((int)$state) : null);
+//
+//                        return $g?->getLabel();
+//                    })
+//                    ->color(function ($state) {
+//                        $g = $state instanceof LegacyDogGender
+//                            ? $state
+//                            : (isset($state) ? LegacyDogGender::tryFrom((int)$state) : null);
+//
+//                        return $g?->getColor();
+//                    })
+//                    ->icon(function ($state) {
+//                        $g = $state instanceof LegacyDogGender
+//                            ? $state
+//                            : (isset($state) ? LegacyDogGender::tryFrom((int)$state) : null);
+//
+//                        return $g?->getIcon();
+//                    })
                     ->description(fn(PrevDog $r) => !empty($r->Sex) ? "({$r->Sex})" : null, position: 'under')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('Sex')
@@ -1090,7 +1076,26 @@ class PrevDogResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-
+//                Tables\Columns\TextColumn::make('duplicates_count')
+//                    ->label(__('Duplicates Count'))
+//                    ->numeric()
+//                    ->counts('duplicates')
+//                    ->sortable(['duplicates_count'])
+//                    ->toggleable(isToggledHiddenByDefault: true),
+//                Tables\Columns\TextColumn::make('duplicates')
+//                    ->label(__('Other Duplicate IDs'))
+//                    ->formatStateUsing(function (PrevDog $record): HtmlString {
+//                        // format the related duplicates so each of the duplicates array items will be a link to the route of PrevDogResource view page using the id as the parameter
+//                        $duplicatesLinks = $record->duplicates?->pluck('id')
+//                            ->filter(fn ($id) => $id != $record->id)
+//                            ->map(fn($id) => '<a href="' . PrevDogResource::getUrl('view', ['record' => $id]) . '" target="_blank">' . $id . '</a>'
+//                            )
+//                            ->implode(', ');
+//
+//                        return new HtmlString($duplicatesLinks);
+//                    })
+//                    ->wrap()
+//                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Filter::make('trashed')
@@ -1127,28 +1132,23 @@ class PrevDogResource extends Resource
                         Forms\Components\ToggleButtons::make('GenderID')
                             ->label(__('Gender'))
                             ->options(LegacyDogGender::class)
-                            ->colors([
-                                1 => 'blue',
-                                2 => 'pink',
-                            ])
-                            ->icons([
-                                1 => 'fas-mars',
-                                2 => 'fas-venus',
-                            ])
-                            ->inline()
+                            ->multiple()
                             ->grouped()
                             ->nullable(),
                     ])
                     ->query(fn(Builder $query, array $data): Builder => $query->when(
                         filled($data['GenderID'] ?? null),
-                        fn(Builder $q): Builder => $q->where('GenderID', $data['GenderID'])
+                        fn(Builder $q): Builder => $q->whereIn('GenderID', $data['GenderID'])
                     )),
                 Filter::make('sagir_prefix')
                     ->form([
                         Forms\Components\ToggleButtons::make('sagir_prefix')
                             ->label(__('Sagir Prefix'))
                             ->options(LegacySagirPrefix::class)
-                            ->grouped(),
+                            ->colors(LegacySagirPrefix::colors())
+                            ->multiple()
+                            ->grouped()
+                            ->nullable(),
                     ])
                     ->query(function (Builder $query, array $data) {
                         // If no specific prefix is chosen, return unfiltered results.
@@ -1156,7 +1156,7 @@ class PrevDogResource extends Resource
                             return $query;
                         }
 
-                        return $query->where('sagir_prefix', $data['sagir_prefix']);
+                        return $query->whereIn('sagir_prefix', $data['sagir_prefix']);
                     }),
                 Tables\Filters\SelectFilter::make('breed')
                     ->label(__('Breed'))
@@ -1272,57 +1272,127 @@ class PrevDogResource extends Resource
                 // Date filters for RegDate, BirthDate, OwnershipDate
                 Filter::make('RegDate')
                     ->form([
-                        DatePicker::make('RegDate')
-                            ->label(__('Registration Date'))
-                            ->timezone('Asia/Jerusalem')
-                            ->native(false)
-                            ->locale('he')
-                            ->format('yyyy-mm-dd')
-                            ->displayFormat('d-m-Y')
-                            ->weekStartsOnSunday()
-                            ->closeOnDateSelection(),
+                        Section::make(__('Registration Date Range'))
+                            ->description(__('Leave “Until” empty to include up to today'))
+                            ->schema([
+                                DatePicker::make('RegDate_from')
+                                    ->label(__('Registration Date From'))
+                                    ->timezone('Asia/Jerusalem')
+                                    ->native(false)
+                                    ->locale('he')
+                                    ->format('yyyy-mm-dd')
+                                    ->displayFormat('d-m-Y')
+                                    ->weekStartsOnSunday()
+                                    ->closeOnDateSelection(),
+                                DatePicker::make('RegDate_until')
+                                    ->label(__('Registration Date Until'))
+                                    ->timezone('Asia/Jerusalem')
+                                    ->native(false)
+                                    ->locale('he')
+                                    ->format('yyyy-mm-dd')
+                                    ->displayFormat('d-m-Y')
+                                    ->weekStartsOnSunday()
+                                    ->closeOnDateSelection(),
+                            ])
+                            ->columns(2),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query->when(
-                            $data['RegDate'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('RegDate', '>=', $date)
-                        );
+                        return $query
+                            ->when(
+                                $data['RegDate_from'] ?? null,
+                                fn(Builder $q, $date): Builder => $q->whereDate('RegDate', '>=', $date),
+                            )
+                            ->when(
+                            // If only "from" is provided and no "until", cap at today
+                                ($data['RegDate_from'] ?? null) && !($data['RegDate_until'] ?? null),
+                                fn(Builder $q): Builder => $q->whereDate('RegDate', '<=', now()->toDateString()),
+                            )
+                            ->when(
+                                $data['RegDate_until'] ?? null,
+                                fn(Builder $q, $date): Builder => $q->whereDate('RegDate', '<=', $date),
+                            );
                     }),
                 Filter::make('BirthDate')
                     ->form([
-                        DatePicker::make('BirthDate')
-                            ->label(__('Birth Date'))
-                            ->timezone('Asia/Jerusalem')
-                            ->native(false)
-                            ->locale('he')
-                            ->format('yyyy-mm-dd')
-                            ->displayFormat('d-m-Y')
-                            ->weekStartsOnSunday()
-                            ->closeOnDateSelection(),
+                        Section::make(__('Birth Date Range'))
+                            ->description(__('Leave “Until” empty to include up to today'))
+                            ->schema([
+                                DatePicker::make('BirthDate_from')
+                                    ->label(__('Birth Date From'))
+                                    ->timezone('Asia/Jerusalem')
+                                    ->native(false)
+                                    ->locale('he')
+                                    ->format('yyyy-mm-dd')
+                                    ->displayFormat('d-m-Y')
+                                    ->weekStartsOnSunday()
+                                    ->closeOnDateSelection(),
+                                DatePicker::make('BirthDate_until')
+                                    ->label(__('Birth Date Until'))
+                                    ->timezone('Asia/Jerusalem')
+                                    ->native(false)
+                                    ->locale('he')
+                                    ->format('yyyy-mm-dd')
+                                    ->displayFormat('d-m-Y')
+                                    ->weekStartsOnSunday()
+                                    ->closeOnDateSelection(),
+                            ])
+                            ->columns(2),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query->when(
-                            $data['BirthDate'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('BirthDate', '>=', $date)
-                        );
+                        return $query
+                            ->when(
+                                $data['BirthDate_from'] ?? null,
+                                fn(Builder $q, $date): Builder => $q->whereDate('BirthDate', '>=', $date),
+                            )
+                            ->when(
+                                ($data['BirthDate_from'] ?? null) && !($data['BirthDate_until'] ?? null),
+                                fn(Builder $q): Builder => $q->whereDate('BirthDate', '<=', now()->toDateString()),
+                            )
+                            ->when(
+                                $data['BirthDate_until'] ?? null,
+                                fn(Builder $q, $date): Builder => $q->whereDate('BirthDate', '<=', $date),
+                            );
                     }),
                 Filter::make('OwnershipDate')
                     ->form([
-                        DatePicker::make('OwnershipDate')
-                            ->label(__('Ownership Date'))
-                            ->timezone('Asia/Jerusalem')
-                            ->native(false)
-                            ->locale('he')
-                            ->format('yyyy-mm-dd')
-                            ->displayFormat('d-m-Y')
-                            ->weekStartsOnSunday()
-                            ->closeOnDateSelection(),
+                        Section::make(__('Ownership Date Range'))
+                            ->description(__('Leave “Until” empty to include up to today'))
+                            ->schema([
+                                DatePicker::make('OwnershipDate_from')
+                                    ->label(__('Ownership Date From'))
+                                    ->timezone('Asia/Jerusalem')
+                                    ->native(false)
+                                    ->locale('he')
+                                    ->format('yyyy-mm-dd')
+                                    ->displayFormat('d-m-Y')
+                                    ->weekStartsOnSunday()
+                                    ->closeOnDateSelection(),
+                                DatePicker::make('OwnershipDate_until')
+                                    ->label(__('Ownership Date Until'))
+                                    ->timezone('Asia/Jerusalem')
+                                    ->native(false)
+                                    ->locale('he')
+                                    ->format('yyyy-mm-dd')
+                                    ->displayFormat('d-m-Y')
+                                    ->weekStartsOnSunday()
+                                    ->closeOnDateSelection(),
+                            ])
+                            ->columns(2),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query->when(
-                            $data['OwnershipDate'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('OwnershipDate', '>=', $date)
-                        );
+                        return $query
+                            ->when(
+                                $data['OwnershipDate_from'] ?? null,
+                                fn(Builder $q, $date): Builder => $q->whereDate('OwnershipDate', '>=', $date),
+                            )
+                            ->when(
+                                ($data['OwnershipDate_from'] ?? null) && !($data['OwnershipDate_until'] ?? null),
+                                fn(Builder $q): Builder => $q->whereDate('OwnershipDate', '<=', now()->toDateString()),
+                            )
+                            ->when(
+                                $data['OwnershipDate_until'] ?? null,
+                                fn(Builder $q, $date): Builder => $q->whereDate('OwnershipDate', '<=', $date),
+                            );
                     }),
                 Tables\Filters\TernaryFilter::make('duplicates_count')
                     ->label(__('Duplicates'))

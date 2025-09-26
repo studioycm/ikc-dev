@@ -189,8 +189,7 @@ class PrevBreedResource extends Resource
                                 'deleted' => 'danger',
                                 'all' => 'gray',
                             ])
-                            ->default('not_deleted')
-                            ->grouped(),
+                            ->default('not_deleted'),
                     ])
                     ->query(function (Builder $query, array $data) {
                         if (empty($data['trashed']) || $data['trashed'] === 'all') {

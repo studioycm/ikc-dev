@@ -40,11 +40,11 @@ enum LegacySagirPrefix: int
     public function getIcon(): string
     {
         return match ($this) {
-            self::ISR => 'fas-user-tie',
-            self::IMP => 'fas-user-graduate',
-            self::APX => 'fas-user-ninja',
-            self::EXT => 'fas-user-secret',
-            self::NUL => 'fas-user-slash',
+            self::ISR => 'fas-star-of-david',
+            self::IMP => 'fas-globe',
+            self::APX => 'fas-plus-square',
+            self::EXT => 'fas-external-link-square-alt',
+            self::NUL => 'fas-window-close',
         };
     }
 
@@ -53,6 +53,28 @@ enum LegacySagirPrefix: int
         $out = [];
         foreach (self::cases() as $case) {
             $out[$case->value] = $case->getLabel();
+        }
+
+        return $out;
+    }
+
+    public function description(): string
+    {
+        return match ($this) {
+            self::ISR => 'Israeli',
+            self::IMP => 'Imported',
+            self::APX => 'Apex',
+            self::EXT => 'External',
+            self::NUL => 'No prefix',
+        };
+    }
+
+    // colors array for filament form input options
+    public static function colors(): array
+    {
+        $out = [];
+        foreach (self::cases() as $case) {
+            $out[$case->value] = $case->getColor();
         }
 
         return $out;
