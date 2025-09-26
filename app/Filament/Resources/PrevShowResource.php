@@ -95,7 +95,6 @@ class PrevShowResource extends Resource
                 ToggleButtons::make('ShowType')
                     ->label(__('Show Type'))
                     ->options(LegacyShowTypeEnum::class)
-                    ->grouped()
                     ->nullable(),
 
 

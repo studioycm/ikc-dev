@@ -533,8 +533,7 @@ class PrevUserResource extends Resource
                                 'Members' => 'danger',
                                 'without' => 'gray',
                             ])
-                            ->default('all')
-                            ->grouped(),
+                            ->default('all'),
                     ])
                     ->query(function (Builder $query, array $data) {
                         if (empty($data['record_type']) || $data['record_type'] === 'all') {
