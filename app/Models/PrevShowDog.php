@@ -53,6 +53,14 @@ class PrevShowDog extends Model
         );
     }
 
+    protected function dogName(): Attribute
+    {
+        // return hebrew name if available, else english name
+        return Attribute::make(
+            get: fn($value) => $this->dog?->Heb_Name ?? $this->dog?->Eng_Name ?? '-',
+        );
+    }
+
     // Normalized relation names
     public function show(): BelongsTo
     {
@@ -93,8 +101,11 @@ class PrevShowDog extends Model
     public function result(): HasOne
     {
         return $this->hasOne(PrevShowResult::class, 'SagirID', 'SagirID')
-            ->where('ShowID', $this->ShowID)
-            ->where('MainArenaID', $this->ArenaID)
-            ->where('ClassID', $this->ClassID);
+            ->whereExists(function ($query) {
+                $query->selectRaw('1')
+                    ->from('Shows_Dogs_DB as sd')
+                    ->whereColumn('sd.SagirID', 'shows_results.SagirID')
+                    ->whereColumn('sd.ShowID', 'shows_results.ShowID');
+            });
     }
 }

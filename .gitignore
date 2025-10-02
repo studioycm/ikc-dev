@@ -5,6 +5,7 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/logs/*.log
 /vendor
 .env
 .env.backup
@@ -20,10 +21,9 @@ yarn-error.log
 /.idea
 /.nova
 /.vscode
+/.github
+/.junie
 /.zed
-/docs/
-/docs/*
+/docs
 /public/css/filament/admin/
-/app/Console/Commands/BuildTranslationMapping.php
-/app/Console/Commands/ExportFilamentLabels.php
-/app/Console/Commands/FilamentLabelScanner.php
+/app/Console/Commands/LegacyResearch

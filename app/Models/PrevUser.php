@@ -29,11 +29,28 @@ class PrevUser extends Model implements HasName
      * @var string
      */
     protected $table = 'users';
+    protected $primaryKey = 'id';
+
+    public $timestamps = true;
 
     // disable fillable attributes
     protected $guarded = [];
 
-    protected $primaryKey = 'id';
+    protected $casts = [
+        'owner_code' => 'integer',
+        'info_id' => 'integer',
+        'sagir_owner_id' => 'integer',
+        'is_current_owner' => 'boolean',
+        'order_id' => 'integer',
+        'new_org_data_id' => 'integer',
+        'club_id' => 'integer',
+        'member_status' => 'integer',
+        'owner_total_payment' => 'integer',
+        'record_source' => 'integer',
+        'city_id' => 'integer',
+        'breed_id' => 'integer',
+        'beit_gidul_id' => 'integer',
+    ];
 
     protected $appends = ['full_name', 'full_name_heb', 'full_name_eng', 'name', 'normalised_phone'];
 
@@ -62,6 +79,12 @@ class PrevUser extends Model implements HasName
         return $this->belongsToMany(PrevBreedingHouse::class, 'breedhouses2users', 'user_id', 'breedinghouse_id', 'id', 'id')
             ->withTimestamps()
             ->using(PrevBreedingHouseUser::class);
+    }
+
+    public function breedingManagerOf(): HasMany
+    {
+        return $this->hasMany(PrevDog::class, 'Breeding_ManagerID', 'id')
+            ->where('deleted_at', null);
     }
 
     /**
