@@ -25,6 +25,8 @@ class PrevBreed extends Model
      */
     protected $table = 'BreedsDB';
 
+    public $timestamps = true;
+
     // Disable Fillable Attributes
     protected $guarded = [];
 

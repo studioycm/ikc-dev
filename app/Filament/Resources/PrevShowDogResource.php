@@ -127,26 +127,25 @@ class PrevShowDogResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function (Builder $query) {
-                return $query->with(['show', 'result']);
+                return $query->with(['show', 'dog', 'result']);
             })
             ->columns([
                 TextColumn::make('id')
                     ->label(__('id'))
-                    ->searchable()
+                    ->searchable(isIndividual: true, isGlobal: false)
                     ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('show.TitleName')
                     ->label(__('Show Title'))
                     ->description(fn(PrevShowDog $record): int => (int)$record->ShowID),
-                TextColumn::make('dog_summary')
+                TextColumn::make('dog.full_name')
                     ->label(__('Dog name'))
-                    ->state(fn(PrevShowDog $r) => $r->dog?->full_name ?? ($r->DogName ?: '—'))
                     ->description(fn(PrevShowDog $r) => ($r->SagirID ?? '—'))
                     ->url(fn(PrevShowDog $r) => $r->dog ? PrevDogResource::getUrl('view', ['record' => $r->dog->getKey()]) : null)
                     ->openUrlInNewTab()
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(['DogsDB.Heb_Name', 'DogsDB.Eng_Name', 'DogsDB.SagirID'], isIndividual: true, isGlobal: false)
+                    ->sortable(['DogsDB.Heb_Name', 'DogsDB.Eng_Name']),
 
                 TextColumn::make('arena_summary')
                     ->label(__('Arena name'))
@@ -174,10 +173,10 @@ class PrevShowDogResource extends Resource
 
                 TextColumn::make('result.DataID')
                     ->label(__('Result'))
-//                    ->url(function ($state) {
-//                        return $state ? PrevShowResultResource::getUrl('edit', ['record' => $state]) : null;
-//                    })
-                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->description(fn(PrevShowDog $record): int => (int)$record->result?->SagirID)
+                    ->url(function ($state) {
+                        return $state ? PrevShowResultResource::getUrl('edit', ['record' => $state]) : null;
+                    })
                     ->toggleable(),
 
             ])

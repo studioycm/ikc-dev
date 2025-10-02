@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PrevDogResource\RelationManagers;
 
+use App\Filament\Resources\PrevShowResultResource;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -49,8 +50,10 @@ class PrevShowDogRelationManager extends RelationManager
                     ->toggleable(),
                 TextColumn::make('result.DataID')
                     ->label(__('Result'))
+                    ->url(function ($state) {
+                        return $state ? PrevShowResultResource::getUrl('edit', ['record' => $state]) : null;
+                    })
                     ->sortable()
-                    ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(),
                 TextColumn::make('id')
                     ->label(__('Show Dog'))
@@ -68,6 +71,6 @@ class PrevShowDogRelationManager extends RelationManager
             ])
             ->bulkActions([
             ])
-            ->defaultSort('ShowID', 'desc');
+            ->defaultSort('Shows_Dogs_DB.ShowID', 'desc');
     }
 }

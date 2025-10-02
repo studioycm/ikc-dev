@@ -30,7 +30,11 @@ class PrevDog extends Model
      *
      * @var string
      */
+
+
     protected $table = 'DogsDB';
+
+    public $timestamps = true;
 
     // Disable Fillable Attributes
     protected $guarded = [];
@@ -47,6 +51,13 @@ class PrevDog extends Model
         'RaceID' => 'integer',
         'BeitGidulID' => 'integer',
         'CurrentOwnerId' => 'integer',
+        'GrowerId' => 'integer',
+        'GroupID' => 'integer',
+        'ShowsCount' => 'integer',
+        'IsMagPass' => 'integer',
+        'IsMagPass_2' => 'integer',
+        'SCH' => 'integer',
+        'BreedID' => 'integer',
         'GenderID' => LegacyDogGenderCast::class,
         'SizeID' => LegacyDogSizeCast::class,
         'Status' => LegacyDogStatusCast::class,
@@ -147,10 +158,11 @@ class PrevDog extends Model
     // breedingManager using PrevUser model
     public function breedingManager(): BelongsTo
     {
-        return $this->belongsTo(PrevUser::class, 'BreedingManagerID', 'id');
+        return $this->belongsTo(PrevUser::class, 'Breeding_ManagerID', 'id');
     }
 
-    // current_owner using "DogsOwners" table from connection "mysql_prev" without a dedicated model
+    // current_owner dog owner registered pre 2022 using belongs-to relation with foreign key.
+    // post 2022 we use belongs-to-many relation "owners" with pivot model PrevUserDog
     public function currentOwner(): BelongsTo
     {
         return $this->belongsTo(PrevUser::class, 'CurrentOwnerId', 'owner_code');

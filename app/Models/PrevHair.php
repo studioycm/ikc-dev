@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PrevHair extends Model
@@ -23,10 +24,17 @@ class PrevHair extends Model
      */
     protected $table = 'HairsDB';
 
+    public $timestamps = true;
+
     // Disable Fillable Attributes
     protected $guarded = [];
 
     protected $casts = [
         'OldCode' => 'integer',
     ];
+
+    public function dogs(): HasMany
+    {
+        return $this->hasMany(PrevDog::class, 'HairID', 'OldCode');
+    }
 }

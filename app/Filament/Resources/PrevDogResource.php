@@ -167,6 +167,7 @@ class PrevDogResource extends Resource
                                         Forms\Components\ToggleButtons::make('Status')
                                             ->label(__('Status'))
                                             ->options(LegacyDogStatus::class)
+                                            ->columns(4)
                                             ->nullable()
                                             ->columnSpan(2),
                                     ])
@@ -177,15 +178,20 @@ class PrevDogResource extends Resource
                                         Select::make('RaceID')
                                             ->label(__('Breed'))
                                             ->relationship('breed', 'BreedName')
-                                            ->searchable(),
+                                            ->searchable()
+                                            ->required(),
                                         Select::make('ColorID')
                                             ->label(__('Color'))
                                             ->relationship('color', 'ColorNameHE')
-                                            ->searchable(),
+                                            ->searchable()
+                                            ->required(),
                                         Select::make('HairID')
                                             ->label(__('Hair'))
                                             ->relationship('hair', 'HairNameHE')
-                                            ->searchable(),
+                                            ->searchable()
+                                            ->preload()
+                                            ->default(4)
+                                            ->required(),
                                         Forms\Components\Select::make('GroupID')
                                             ->label(__('Group ID'))
                                             ->options(array_combine(range(0, 7), range(0, 7))),
@@ -726,27 +732,6 @@ class PrevDogResource extends Resource
                 Tables\Columns\TextColumn::make('GenderID')
                     ->label(__('Gender'))
                     ->badge()
-//                    ->formatStateUsing(function ($state) {
-//                        $g = $state instanceof LegacyDogGender
-//                            ? $state
-//                            : (isset($state) ? LegacyDogGender::tryFrom((int)$state) : null);
-//
-//                        return $g?->getLabel();
-//                    })
-//                    ->color(function ($state) {
-//                        $g = $state instanceof LegacyDogGender
-//                            ? $state
-//                            : (isset($state) ? LegacyDogGender::tryFrom((int)$state) : null);
-//
-//                        return $g?->getColor();
-//                    })
-//                    ->icon(function ($state) {
-//                        $g = $state instanceof LegacyDogGender
-//                            ? $state
-//                            : (isset($state) ? LegacyDogGender::tryFrom((int)$state) : null);
-//
-//                        return $g?->getIcon();
-//                    })
                     ->description(fn(PrevDog $r) => !empty($r->Sex) ? "({$r->Sex})" : null, position: 'under')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('Sex')
