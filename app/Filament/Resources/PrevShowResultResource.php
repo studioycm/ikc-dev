@@ -59,51 +59,75 @@ class PrevShowResultResource extends Resource
                 Grid::make(2)
                     ->schema([
                         Group::make([
+                            Section::make('result_general')
+                                ->schema([
+                                    Group::make([
+                                        Placeholder::make('DataID')
+                                            ->label(__('Result ID'))
+                                            ->content(fn(PrevShowResult $record): string => $record->DataID),
+
+                                        Placeholder::make('created_at')
+                                            ->label('Created Date')
+                                            ->content(fn(?PrevShowResult $record): string => $record?->created_at?->diffForHumans() ?? '-'),
+
+                                        Placeholder::make('updated_at')
+                                            ->label('Last Modified Date')
+                                            ->content(fn(?PrevShowResult $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
+
+                                        Placeholder::make('ModificationDateTime')
+                                            ->label(__('Modification Date'))
+                                            ->content(fn(?PrevShowResult $record): string => $record?->ModificationDateTime ?? '-'),
+
+                                        Placeholder::make('CreationDateTime')
+                                            ->label(__('Creation Date'))
+                                            ->content(fn(?PrevShowResult $record): string => $record?->CreationDateTime ?? '-'),
+                                    ])
+                                        ->columns(5)
+                                        ->columnSpanFull(),
+                                    Group::make([
+                                        TextInput::make('Rank')
+                                            ->label(__('Rank'))
+                                            ->integer()
+                                            ->maxValue(99)
+                                            ->columnSpan(1),
+                                        Textarea::make('Remarks')
+                                            ->label(__('Remarks'))
+                                            ->rows(3)
+                                            ->autosize()
+                                            ->columnSpan(4),
+                                    ])
+                                        ->columns(5)
+                                        ->columnSpanFull(),
+                                ])
+                                ->heading(__('Result Details'))
+                                ->columns(5),
                             Section::make('dog_info')
                                 ->schema([
-                                    TextInput::make('DataID')
-                                        ->label(__('Result ID'))
-                                        ->disabled()
-                                        ->unique()
-                                        ->integer(),
-
-                                    TextInput::make('RegDogID')
+                                    Placeholder::make('RegDogID')
                                         ->label(__('Dog DataID'))
-                                        ->integer(),
+                                        ->content(fn(PrevShowResult $record): string => $record->RegDogID),
 
-                                    TextInput::make('SagirID')
+                                    Placeholder::make('SagirID')
                                         ->label(__('Sagir ID'))
-                                        ->integer(),
+                                        ->content(fn(PrevShowResult $record): string => $record->SagirID),
 
-                                    TextInput::make('BreedID')
-                                        ->label(__('Breed ID'))
-                                        ->integer(),
+                                    Placeholder::make('dogName')
+                                        ->label(__('Name'))
+                                        ->content(fn(PrevShowResult $record): string => $record->dogName),
 
-                                    TextInput::make('GenderID')
+                                    Placeholder::make('breedName')
+                                        ->label(__('Breed'))
+                                        ->content(fn(PrevShowResult $record): string => $record->breedName),
+
+                                    Placeholder::make('GenderID')
                                         ->label(__('Gender'))
-                                        ->integer(),
+                                        ->content(fn(PrevShowResult $record): string => $record->GenderID->getLabel()),
                                 ])
                                 ->heading(__('Dog Information'))
                                 ->columns(5),
 
                             Section::make('show_info')
                                 ->schema([
-                                    Placeholder::make('created_at')
-                                        ->label('Created Date')
-                                        ->content(fn(?PrevShowResult $record): string => $record?->created_at?->diffForHumans() ?? '-'),
-
-                                    Placeholder::make('updated_at')
-                                        ->label('Last Modified Date')
-                                        ->content(fn(?PrevShowResult $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
-
-                                    Placeholder::make('ModificationDateTime')
-                                        ->label(__('Modification Date'))
-                                        ->content(fn(?PrevShowResult $record): string => $record?->ModificationDateTime ?? '-'),
-
-                                    Placeholder::make('CreationDateTime')
-                                        ->label(__('Creation Date'))
-                                        ->content(fn(?PrevShowResult $record): string => $record?->CreationDateTime ?? '-'),
-
                                     TextInput::make('ShowOrderID')
                                         ->label(__('Position'))
                                         ->integer(),
@@ -120,26 +144,10 @@ class PrevShowResultResource extends Resource
                                         ->label(__('Class ID'))
                                         ->integer(),
 
-
                                     TextInput::make('JudgeName')
                                         ->label(__('Judge')),
                                 ])
                                 ->heading(__('Show Information'))
-                                ->columns(5),
-                            Section::make('result_general')
-                                ->schema([
-                                    TextInput::make('Rank')
-                                        ->label(__('Rank'))
-                                        ->integer()
-                                        ->maxValue(99)
-                                        ->columnSpan(1),
-                                    Textarea::make('Remarks')
-                                        ->label(__('Remarks'))
-                                        ->rows(3)
-                                        ->autosize()
-                                        ->columnSpan(4),
-                                ])
-                                ->heading(__('Result Details'))
                                 ->columns(5),
                         ]),
                         Group::make([
@@ -474,7 +482,7 @@ class PrevShowResultResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function (Builder $query) {
-                return $query->with(['show', 'showDog']);
+                return $query->with(['show', 'showDog', 'resultDog']);
             })
             ->columns([
                 TextColumn::make('DataID')
@@ -485,9 +493,19 @@ class PrevShowResultResource extends Resource
                     ->label(__('Show Title'))
                     ->searchable(['ShowsDB.TitleName', 'ShowsDB.id'], isIndividual: true, isGlobal: false)
                     ->description(fn(PrevShowResult $record): int => (int)$record->ShowID),
-                TextColumn::make('showDog.SagirID')
-                    ->label(__('Dog Name'))
-                    ->description(fn(PrevShowResult $record) => $record->showDog?->dog_name),
+                TextColumn::make('resultDog.fullName')
+                    ->label(__('Dog'))
+                    ->searchable(['SagirID'], isIndividual: true, isGlobal: false)
+                    ->description(fn(PrevShowResult $record) => $record->SagirID),
+                TextColumn::make('GenderID')
+                    ->label(__('Gender'))
+                    ->badge(),
+                TextColumn::make('resultsLabels')
+                    ->label(__('Results'))
+                    ->badge(),
+                TextColumn::make('titlesLabels')
+                    ->label(__('Titles'))
+                    ->badge(),
             ])
             ->filters([
             ])
@@ -496,7 +514,10 @@ class PrevShowResultResource extends Resource
             ])
             ->bulkActions([
             ])
-            ->defaultSort('DataID', 'desc');
+            ->defaultSort('DataID', 'desc')
+            ->searchOnBlur()
+            ->striped()
+            ->deferLoading();
     }
 
     public static function getPages(): array
