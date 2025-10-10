@@ -199,21 +199,20 @@ class PrevDog extends Model
     public function fullName(): Attribute
     {
         return Attribute::make(
-            get: function () {
-                $heb = $this->attributes['Heb_Name'] ?? null;
-                $eng = $this->attributes['Eng_Name'] ?? null;
+            get: function (): string {
+                $heb = (($v = trim((string)($this->Heb_Name ?? ''))) !== '') ? $v : null;
+                $eng = (($v = trim((string)($this->Eng_Name ?? ''))) !== '') ? $v : null;
 
-                if ($heb && $eng) {
-                    return $heb . ' | ' . $eng;
+                if ($heb === null && $eng === null) {
+                    return '---';
                 }
-                if ($heb) {
-                    return $heb;
-                }
-                if ($eng) {
+                if ($heb === null) {
                     return $eng;
                 }
-
-                return '<< Name Not Found >>';
+                if ($eng === null) {
+                    return $heb;
+                }
+                return "{$heb} | {$eng}";
             }
         );
     }
@@ -247,4 +246,6 @@ class PrevDog extends Model
     {
         return $this->hasMany(PrevShowDog::class, 'SagirID', 'SagirID');
     }
+
+
 }

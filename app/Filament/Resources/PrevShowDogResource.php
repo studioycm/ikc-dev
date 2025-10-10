@@ -195,7 +195,10 @@ class PrevShowDogResource extends Resource
                     ForceDeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('id', 'desc');
+            ->defaultSort('id', 'desc')
+            ->searchOnBlur()
+            ->striped()
+            ->deferLoading();
     }
 
     public static function getPages(): array

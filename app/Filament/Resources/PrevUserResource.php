@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters;
 use Filament\Tables\Table;
@@ -605,13 +606,15 @@ class PrevUserResource extends Resource
             ], layout: FiltersLayout::AboveContentCollapsible)
             ->filtersFormColumns(4)
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip(__('Edit')),
                 Tables\Actions\Action::make('send_email')
-                    ->label(__('Send Email'))
-                    ->button()
-                    ->tooltip(__('Send an email to this owner'))
-                    ->color('primary')
+                    ->label(false)
                     ->icon('heroicon-o-envelope')
+                    ->iconButton()
+                    ->tooltip(__('Send an email message'))
+                    ->color('primary')
                     ->modalHeading(__('Send Email'))
                     ->modalSubmitActionLabel(__('Queue Email'))
                     ->modalIcon('heroicon-o-envelope')
@@ -660,7 +663,7 @@ class PrevUserResource extends Resource
                             ->success()
                             ->send();
                     }),
-            ])
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     // Bulk send (queued) to many PrevUsers
@@ -698,7 +701,6 @@ class PrevUserResource extends Resource
                                 ->fileAttachmentsDisk('public')
                                 ->fileAttachmentsDirectory('editor-attachments')
                                 ->fileAttachmentsVisibility('public')
-                                ->disableGrammarly()
                                 ->columnSpanFull()
                                 ->required(),
                         ])

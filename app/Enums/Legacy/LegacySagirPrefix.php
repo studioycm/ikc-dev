@@ -2,7 +2,11 @@
 
 namespace App\Enums\Legacy;
 
-enum LegacySagirPrefix: int
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasIcon;
+use Filament\Support\Contracts\HasLabel;
+
+enum LegacySagirPrefix: int implements HasLabel, HasColor, HasIcon
 {
     case ISR = 1;
     case IMP = 2;
@@ -42,9 +46,9 @@ enum LegacySagirPrefix: int
         return match ($this) {
             self::ISR => 'fas-star-of-david',
             self::IMP => 'fas-globe',
-            self::APX => 'fas-plus-square',
-            self::EXT => 'fas-external-link-square-alt',
-            self::NUL => 'fas-window-close',
+            self::APX => 'fas-notes-medical',
+            self::EXT => 'fas-file-export',
+            self::NUL => 'fas-exclamation-circle',
         };
     }
 
@@ -69,14 +73,5 @@ enum LegacySagirPrefix: int
         };
     }
 
-    // colors array for filament form input options
-    public static function colors(): array
-    {
-        $out = [];
-        foreach (self::cases() as $case) {
-            $out[$case->value] = $case->getColor();
-        }
 
-        return $out;
-    }
 }
