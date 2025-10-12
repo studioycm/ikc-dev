@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PrevBreedingHouseResource\RelationManagers;
 use App\Filament\Resources\PrevUserResource;
 use App\Models\PrevUser;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -22,12 +23,17 @@ class UsersRelationManager extends RelationManager
         return __('Users');
     }
 
+    public function form(Form $form): Form
+    {
+        return PrevUserResource::form($form);
+    }
+
     public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                TextColumn::make('name')->label(__('Name'))->searchable(),
+                TextColumn::make('name')->label(__('Name'))->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en']),
                 TextColumn::make('email')->label(__('Email'))->toggleable(),
                 TextColumn::make('mobile_phone')->label(__('Phone'))->toggleable(),
                 TextColumn::make('pivot.created_at')->dateTime()->label(__('Linked At')),
@@ -36,10 +42,10 @@ class UsersRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\AttachAction::make()
                     ->label(__('Attach User'))
-                    ->preloadRecordSelect()
+//                    ->preloadRecordSelect()
                     ->recordSelect(function (Forms\Components\Select $select) {
                         return $select
-                            ->searchable()
+                            ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en'])
                             ->getSearchResultsUsing(fn(string $search) => PrevUser::selectOptions($search))
                             ->getOptionLabelUsing(fn($value) => PrevUser::query()->find($value)?->name);
                     }),
