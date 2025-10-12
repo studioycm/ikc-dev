@@ -102,7 +102,7 @@ class PrevBreedingHouseResource extends Resource
                     TextEntry::make('GidulCode')->label(__('common.labels.code'))->numeric(decimalPlaces: 0, thousandsSeparator: ''),
                     TextEntry::make('HebName')->label(__('common.labels.hebrew_name')),
                     TextEntry::make('EngName')->label(__('common.labels.english_name')),
-                    TextEntry::make('status')->label(__('common.labels.active'))->badge(),
+                    IconEntry::make('status')->label(__('common.labels.active'))->boolean(),
                 ]),
                 InfolistGrid::make(4)->schema([
                     IconEntry::make('recommended')->label(__('common.labels.recommended'))->boolean(),
@@ -119,6 +119,11 @@ class PrevBreedingHouseResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                return $query
+                    ->with(['users'])
+                    ->withCount(['dogs']);
+            })
             ->columns([
                 TextColumn::make('GidulCode')->label(__('Code'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
@@ -130,9 +135,17 @@ class PrevBreedingHouseResource extends Resource
                 TextColumn::make('EngName')
                     ->label(__('English Name'))
                     ->searchable(isIndividual: true, isGlobal: false),
-                TextColumn::make('dogs_count')->label(__('dog/model/general.labels.plural'))
+                TextColumn::make('dogs_count')
+                    ->label(__('dog/model/general.labels.plural'))
                     ->counts('dogs')
-                    ->sortable(['dogs_count']),
+                    ->sortable(['dogs_count'])
+                    ->toggleable(),
+                TextColumn::make('users.name')
+                    ->label(__('Owners'))
+                    ->listWithLineBreaks()
+                    ->limitList(2)
+                    ->searchable(['users.first_name', 'users.last_name', 'users.first_name_en', 'users.last_name_en'], isIndividual: true, isGlobal: false)
+                    ->toggleable(),
                 IconColumn::make('recommended')->label(__('Recommended'))->boolean()->toggleable(),
                 TextColumn::make('recommended_from_date')->label(__('Recommended From'))->date()->toggleable(),
                 IconColumn::make('perfect')->label(__('Perfect'))->boolean()->toggleable(),

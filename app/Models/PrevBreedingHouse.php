@@ -59,7 +59,7 @@ class PrevBreedingHouse extends Model
                     return $heb . ' | ' . $eng;
                 }
 
-                return $heb !== '' ? $heb : ($eng !== '' ? $eng : '<< Name Not Found >>');
+                return $heb !== '' ? $heb : ($eng !== '' ? $eng : '---');
             }
         );
     }
@@ -68,13 +68,13 @@ class PrevBreedingHouse extends Model
     {
         return $this->hasMany(PrevDog::class, 'BeitGidulID', 'GidulCode')
             ->whereNotNull('BeitGidulID')
-            ->whereNot('BeitGidulID', '=', 0);
+            ->where('BeitGidulID', '!=', 0);
     }
 
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(PrevUser::class, 'breedhouses2users', 'breedinghouse_id', 'user_id', 'id', 'id')
-            ->withTimestamps()
-            ->using(PrevBreedingHouseUser::class);
+            ->using(PrevBreedingHouseUser::class)
+            ->withTimestamps();
     }
 }

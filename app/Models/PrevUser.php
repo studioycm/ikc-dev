@@ -74,11 +74,11 @@ class PrevUser extends Model implements HasName
     }
 
     // Breeding houses linked to this user via pivot table
-    public function breedingHouses(): BelongsToMany
+    public function prevBreedingHouses(): BelongsToMany
     {
         return $this->belongsToMany(PrevBreedingHouse::class, 'breedhouses2users', 'user_id', 'breedinghouse_id', 'id', 'id')
-            ->withTimestamps()
-            ->using(PrevBreedingHouseUser::class);
+            ->using(PrevBreedingHouseUser::class)
+            ->withTimestamps();
     }
 
     public function breedingManagerOf(): HasMany
@@ -154,7 +154,7 @@ class PrevUser extends Model implements HasName
     protected function searchLabel(): Attribute
     {
         return Attribute::make(
-            get: fn () => collect([$this->full_name, $this->mobile_phone])
+            get: fn() => collect([$this->full_name, $this->mobile_phone, $this->email])
                 ->filter()
                 ->join(' | ')
         );
