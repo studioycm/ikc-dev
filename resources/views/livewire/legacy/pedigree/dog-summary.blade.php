@@ -1,0 +1,3 @@
+<div>
+    {{ $this->summary }}
+</div>

@@ -30,8 +30,6 @@ class PrevDog extends Model
      *
      * @var string
      */
-
-
     protected $table = 'DogsDB';
 
     public $timestamps = true;
@@ -58,6 +56,8 @@ class PrevDog extends Model
         'IsMagPass_2' => 'integer',
         'SCH' => 'integer',
         'BreedID' => 'integer',
+        'BirthDate' => 'datetime',
+        'RegDate' => 'datetime',
         'GenderID' => LegacyDogGenderCast::class,
         'SizeID' => LegacyDogSizeCast::class,
         'Status' => LegacyDogStatusCast::class,
@@ -212,6 +212,7 @@ class PrevDog extends Model
                 if ($eng === null) {
                     return $heb;
                 }
+
                 return "{$heb} | {$eng}";
             }
         );
@@ -246,6 +247,4 @@ class PrevDog extends Model
     {
         return $this->hasMany(PrevShowDog::class, 'SagirID', 'SagirID');
     }
-
-
 }

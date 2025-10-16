@@ -19,6 +19,7 @@ class EditPrevDog extends EditRecord
     public function getHeading(): string|Htmlable
     {
         $dog = $this->getRecord();
+
         return __('Edit dog:') . ' ' . $dog->full_name . ' #' . $dog->SagirID;
     }
 
@@ -26,6 +27,10 @@ class EditPrevDog extends EditRecord
     {
         return [
             Actions\DeleteAction::make(),
+            Actions\Action::make('pedigree')
+                ->label(__('Manage Pedigree'))
+                ->icon('heroicon-m-share')
+                ->url(PrevDogResource::getUrl('pedigree', ['record' => $this->record])),
         ];
     }
 

@@ -14,6 +14,10 @@ class ViewPrevDog extends ViewRecord
     {
         return [
             EditAction::make(),
+            \Filament\Actions\Action::make('pedigree')
+                ->label(__('Manage Pedigree'))
+                ->icon('heroicon-m-share')
+                ->url(PrevDogResource::getUrl('pedigree', ['record' => $this->record])),
         ];
     }
 

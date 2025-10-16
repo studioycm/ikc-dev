@@ -125,6 +125,10 @@ class PrevBreedingHouseResource extends Resource
                     ->withCount(['dogs']);
             })
             ->columns([
+                TextColumn::make('id')
+                    ->label(__('ID'))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('GidulCode')->label(__('Code'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
@@ -157,18 +161,18 @@ class PrevBreedingHouseResource extends Resource
             ->actions([
                 ViewAction::make()->label(__('common.actions.view')),
                 EditAction::make()->label(__('common.actions.edit')),
-//                DeleteAction::make()->label(__('common.actions.delete')),
-//                RestoreAction::make()->label(__('common.actions.restore')),
-//                ForceDeleteAction::make()->label(__('common.actions.force_delete')),
+                //                DeleteAction::make()->label(__('common.actions.delete')),
+                //                RestoreAction::make()->label(__('common.actions.restore')),
+                //                ForceDeleteAction::make()->label(__('common.actions.force_delete')),
             ])
             ->bulkActions([
-//                BulkActionGroup::make([
-//                    DeleteBulkAction::make(),
-//                    RestoreBulkAction::make(),
-//                    ForceDeleteBulkAction::make(),
-//                ]),
+                //                BulkActionGroup::make([
+                //                    DeleteBulkAction::make(),
+                //                    RestoreBulkAction::make(),
+                //                    ForceDeleteBulkAction::make(),
+                //                ]),
             ]);
-//            ->defaultSort('updated_at', 'desc');
+        //            ->defaultSort('updated_at', 'desc');
     }
 
     public static function getRelations(): array

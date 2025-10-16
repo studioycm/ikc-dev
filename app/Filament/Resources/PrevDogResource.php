@@ -13,6 +13,7 @@ use App\Models\PrevColor;
 use App\Models\PrevDog;
 use App\Models\PrevHair;
 use App\Models\PrevUser;
+use App\Services\Legacy\PrevDogService;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -139,8 +140,8 @@ class PrevDogResource extends Resource
                                             ->timezone('Asia/Jerusalem')
                                             ->native(false)
                                             ->locale('he')
-                                            ->format('yyyy-mm-dd')
-                                            ->displayFormat('d-m-Y')
+                                            ->format('Y-m-d')
+                                            ->displayFormat('Y-m-d')
                                             ->weekStartsOnSunday()
                                             ->closeOnDateSelection(),
                                         Forms\Components\DatePicker::make('RegDate')
@@ -148,8 +149,8 @@ class PrevDogResource extends Resource
                                             ->timezone('Asia/Jerusalem')
                                             ->native(false)
                                             ->locale('he')
-                                            ->format('yyyy-mm-dd')
-                                            ->displayFormat('d-m-Y')
+                                            ->format('Y-m-d')
+                                            ->displayFormat('Y-m-d')
                                             ->weekStartsOnSunday()
                                             ->closeOnDateSelection(),
                                         Forms\Components\TextInput::make('Chip')
@@ -229,11 +230,11 @@ class PrevDogResource extends Resource
                                             ->timezone('Asia/Jerusalem')
                                             ->native(false)
                                             ->locale('he')
-                                            ->format('yyyy-mm-dd')
-                                            ->displayFormat('d-m-Y')
+                                            ->format('Y-m-d')
+                                            ->displayFormat('Y-m-d')
                                             ->weekStartsOnSunday()
                                             ->closeOnDateSelection(),
-                                        Forms\Components\Select::make('breedinghouse')
+                                        Forms\Components\Select::make('BeitGidulID')
                                             ->label(__('Beit Gidul'))
                                             ->relationship('breedinghouse', 'GidulCode')
                                             ->searchable(['breedinghouses.HebName', 'breedinghouses.EngName', 'GidulCode'])
@@ -345,8 +346,8 @@ class PrevDogResource extends Resource
                                                                     ->timezone('Asia/Jerusalem')
                                                                     ->native(false)
                                                                     ->locale('he')
-                                                                    ->format('yyyy-mm-dd')
-                                                                    ->displayFormat('d-m-Y')
+                                                                    ->format('Y-m-d')
+                                                                    ->displayFormat('Y-m-d')
                                                                     ->weekStartsOnSunday()
                                                                     ->closeOnDateSelection(),
                                                                 Forms\Components\DatePicker::make('RegDate')
@@ -354,8 +355,8 @@ class PrevDogResource extends Resource
                                                                     ->timezone('Asia/Jerusalem')
                                                                     ->native(false)
                                                                     ->locale('he')
-                                                                    ->format('yyyy-mm-dd')
-                                                                    ->displayFormat('d-m-Y')
+                                                                    ->format('Y-m-d')
+                                                                    ->displayFormat('Y-m-d')
                                                                     ->weekStartsOnSunday()
                                                                     ->closeOnDateSelection()
                                                                     ->default(now()),
@@ -413,22 +414,10 @@ class PrevDogResource extends Resource
                                                         ]),
                                                 ])
                                                 ->createOptionUsing(function (array $data, Forms\Get $get): int|string {
-                                                    // Auto gender: father
-                                                    $data['GenderID'] = LegacyDogGender::Male->value;
+                                                    $service = app(PrevDogService::class);
+                                                    $father = $service->createMinimalParent($data, LegacyDogGender::Male);
 
-                                                    // Default sagir_prefix to NUL if empty
-                                                    $data['sagir_prefix'] = $data['sagir_prefix'] ?? LegacySagirPrefix::NUL->value;
-
-                                                    // Temporary SagirID and DataID = max+1
-                                                    $maxSagir = PrevDog::query()->max('SagirID');
-                                                    $maxData = PrevDog::query()->max('DataID');
-                                                    $data['SagirID'] = (int)($maxSagir) + 1;
-                                                    $data['DataID'] = (int)($maxData) + 1;
-
-                                                    // Create the father dog record
-                                                    $father = PrevDog::create($data);
-
-                                                    return $father->id; // Return the PK used in the select
+                                                    return $father->SagirID;
                                                 })
                                                 ->createOptionAction(fn(Action $action) => $action
                                                     ->modalHeading(__('Create Father'))
@@ -463,8 +452,8 @@ class PrevDogResource extends Resource
                                                                     ->timezone('Asia/Jerusalem')
                                                                     ->native(false)
                                                                     ->locale('he')
-                                                                    ->format('yyyy-mm-dd')
-                                                                    ->displayFormat('d-m-Y')
+                                                                    ->format('Y-m-d')
+                                                                    ->displayFormat('Y-m-d')
                                                                     ->weekStartsOnSunday()
                                                                     ->closeOnDateSelection(),
                                                                 Forms\Components\DatePicker::make('RegDate')
@@ -472,8 +461,8 @@ class PrevDogResource extends Resource
                                                                     ->timezone('Asia/Jerusalem')
                                                                     ->native(false)
                                                                     ->locale('he')
-                                                                    ->format('yyyy-mm-dd')
-                                                                    ->displayFormat('d-m-Y')
+                                                                    ->format('Y-m-d')
+                                                                    ->displayFormat('Y-m-d')
                                                                     ->weekStartsOnSunday()
                                                                     ->closeOnDateSelection()
                                                                     ->default(now()),
@@ -531,22 +520,10 @@ class PrevDogResource extends Resource
                                                         ]),
                                                 ])
                                                 ->createOptionUsing(function (array $data, Forms\Get $get): int|string {
-                                                    // Auto gender: father
-                                                    $data['GenderID'] = LegacyDogGender::Female->value;
+                                                    $service = app(PrevDogService::class);
+                                                    $mother = $service->createMinimalParent($data, LegacyDogGender::Female);
 
-                                                    // Default sagir_prefix to NUL if empty
-                                                    $data['sagir_prefix'] = $data['sagir_prefix'] ?? LegacySagirPrefix::NUL->value;
-
-                                                    // Temporary SagirID and DataID = max+1
-                                                    $maxSagir = PrevDog::query()->max('SagirID');
-                                                    $maxData = PrevDog::query()->max('DataID');
-                                                    $data['SagirID'] = (int)($maxSagir) + 1;
-                                                    $data['DataID'] = (int)($maxData) + 1;
-
-                                                    // Create the father dog record
-                                                    $mother = PrevDog::create($data);
-
-                                                    return $mother->id; // Return the PK used in the select
+                                                    return $mother->SagirID;
                                                 })
                                                 ->createOptionAction(fn(Action $action) => $action
                                                     ->modalHeading(__('Create Mother'))
@@ -626,8 +603,8 @@ class PrevDogResource extends Resource
                                             ->timezone('Asia/Jerusalem')
                                             ->native(false)
                                             ->locale('he')
-                                            ->format('yyyy-mm-dd')
-                                            ->displayFormat('d-m-Y')
+                                            ->format('Y-m-d')
+                                            ->displayFormat('Y-m-d')
                                             ->weekStartsOnSunday()
                                             ->closeOnDateSelection(),
                                         Forms\Components\TextInput::make('MagJudge')
@@ -644,8 +621,8 @@ class PrevDogResource extends Resource
                                             ->timezone('Asia/Jerusalem')
                                             ->native(false)
                                             ->locale('he')
-                                            ->format('yyyy-mm-dd')
-                                            ->displayFormat('d-m-Y')
+                                            ->format('Y-m-d')
+                                            ->displayFormat('Y-m-d')
                                             ->weekStartsOnSunday()
                                             ->closeOnDateSelection(),
                                         Forms\Components\TextInput::make('MagJudge_2')
@@ -681,7 +658,7 @@ class PrevDogResource extends Resource
                         'mother' => fn($r) => $r->select(['id', 'SagirID', 'Heb_Name', 'Eng_Name']),
                         // Many-to-many Owners: include related PK + fields shown in list
                         'owners' => fn($r) => $r->select(['users.id', 'first_name', 'last_name', 'first_name_en', 'last_name_en', 'mobile_phone', 'email']),
-//                        'currentOwner' => fn($r) => $r->select(['users.id', 'owner_code', 'first_name', 'last_name', 'first_name_en', 'last_name_en', 'mobile_phone', 'email']),
+                        //                        'currentOwner' => fn($r) => $r->select(['users.id', 'owner_code', 'first_name', 'last_name', 'first_name_en', 'last_name_en', 'mobile_phone', 'email']),
                         'titles' => fn($r) => $r->select(['dogs_titles_db.TitleCode', 'dogs_titles_db.TitleName']),
                     ]);
                 //                    ->with('duplicates');
@@ -1050,26 +1027,26 @@ class PrevDogResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-//                Tables\Columns\TextColumn::make('duplicates_count')
-//                    ->label(__('Duplicates Count'))
-//                    ->numeric()
-//                    ->counts('duplicates')
-//                    ->sortable(['duplicates_count'])
-//                    ->toggleable(isToggledHiddenByDefault: true),
-//                Tables\Columns\TextColumn::make('duplicates')
-//                    ->label(__('Other Duplicate IDs'))
-//                    ->formatStateUsing(function (PrevDog $record): HtmlString {
-//                        // format the related duplicates so each of the duplicates array items will be a link to the route of PrevDogResource view page using the id as the parameter
-//                        $duplicatesLinks = $record->duplicates?->pluck('id')
-//                            ->filter(fn ($id) => $id != $record->id)
-//                            ->map(fn($id) => '<a href="' . PrevDogResource::getUrl('view', ['record' => $id]) . '" target="_blank">' . $id . '</a>'
-//                            )
-//                            ->implode(', ');
-//
-//                        return new HtmlString($duplicatesLinks);
-//                    })
-//                    ->wrap()
-//                    ->toggleable(isToggledHiddenByDefault: true),
+                //                Tables\Columns\TextColumn::make('duplicates_count')
+                //                    ->label(__('Duplicates Count'))
+                //                    ->numeric()
+                //                    ->counts('duplicates')
+                //                    ->sortable(['duplicates_count'])
+                //                    ->toggleable(isToggledHiddenByDefault: true),
+                //                Tables\Columns\TextColumn::make('duplicates')
+                //                    ->label(__('Other Duplicate IDs'))
+                //                    ->formatStateUsing(function (PrevDog $record): HtmlString {
+                //                        // format the related duplicates so each of the duplicates array items will be a link to the route of PrevDogResource view page using the id as the parameter
+                //                        $duplicatesLinks = $record->duplicates?->pluck('id')
+                //                            ->filter(fn ($id) => $id != $record->id)
+                //                            ->map(fn($id) => '<a href="' . PrevDogResource::getUrl('view', ['record' => $id]) . '" target="_blank">' . $id . '</a>'
+                //                            )
+                //                            ->implode(', ');
+                //
+                //                        return new HtmlString($duplicatesLinks);
+                //                    })
+                //                    ->wrap()
+                //                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Filter::make('trashed')
@@ -1253,8 +1230,8 @@ class PrevDogResource extends Resource
                                     ->timezone('Asia/Jerusalem')
                                     ->native(false)
                                     ->locale('he')
-                                    ->format('yyyy-mm-dd')
-                                    ->displayFormat('d-m-Y')
+                                    ->format('Y-m-d')
+                                    ->displayFormat('Y-m-d')
                                     ->weekStartsOnSunday()
                                     ->closeOnDateSelection(),
                                 DatePicker::make('RegDate_until')
@@ -1262,8 +1239,8 @@ class PrevDogResource extends Resource
                                     ->timezone('Asia/Jerusalem')
                                     ->native(false)
                                     ->locale('he')
-                                    ->format('yyyy-mm-dd')
-                                    ->displayFormat('d-m-Y')
+                                    ->format('Y-m-d')
+                                    ->displayFormat('Y-m-d')
                                     ->weekStartsOnSunday()
                                     ->closeOnDateSelection(),
                             ])
@@ -1273,7 +1250,7 @@ class PrevDogResource extends Resource
                         return $query
                             ->when(
                                 $data['RegDate_from'] ?? null,
-                                fn(Builder $q, $date): Builder => $q->whereDate('RegDate', '>=', $date),
+                                    fn(Builder $q, $date): Builder => $q->whereDate('RegDate', '>=', $date),
                             )
                             ->when(
                             // If only "from" is provided and no "until", cap at today
@@ -1282,7 +1259,7 @@ class PrevDogResource extends Resource
                             )
                             ->when(
                                 $data['RegDate_until'] ?? null,
-                                fn(Builder $q, $date): Builder => $q->whereDate('RegDate', '<=', $date),
+                                    fn(Builder $q, $date): Builder => $q->whereDate('RegDate', '<=', $date),
                             );
                     }),
                 Filter::make('BirthDate')
@@ -1295,8 +1272,8 @@ class PrevDogResource extends Resource
                                     ->timezone('Asia/Jerusalem')
                                     ->native(false)
                                     ->locale('he')
-                                    ->format('yyyy-mm-dd')
-                                    ->displayFormat('d-m-Y')
+                                    ->format('Y-m-d')
+                                    ->displayFormat('Y-m-d')
                                     ->weekStartsOnSunday()
                                     ->closeOnDateSelection(),
                                 DatePicker::make('BirthDate_until')
@@ -1304,8 +1281,8 @@ class PrevDogResource extends Resource
                                     ->timezone('Asia/Jerusalem')
                                     ->native(false)
                                     ->locale('he')
-                                    ->format('yyyy-mm-dd')
-                                    ->displayFormat('d-m-Y')
+                                    ->format('Y-m-d')
+                                    ->displayFormat('Y-m-d')
                                     ->weekStartsOnSunday()
                                     ->closeOnDateSelection(),
                             ])
@@ -1315,7 +1292,7 @@ class PrevDogResource extends Resource
                         return $query
                             ->when(
                                 $data['BirthDate_from'] ?? null,
-                                fn(Builder $q, $date): Builder => $q->whereDate('BirthDate', '>=', $date),
+                                    fn(Builder $q, $date): Builder => $q->whereDate('BirthDate', '>=', $date),
                             )
                             ->when(
                                 ($data['BirthDate_from'] ?? null) && !($data['BirthDate_until'] ?? null),
@@ -1323,7 +1300,7 @@ class PrevDogResource extends Resource
                             )
                             ->when(
                                 $data['BirthDate_until'] ?? null,
-                                fn(Builder $q, $date): Builder => $q->whereDate('BirthDate', '<=', $date),
+                                    fn(Builder $q, $date): Builder => $q->whereDate('BirthDate', '<=', $date),
                             );
                     }),
                 Filter::make('OwnershipDate')
@@ -1336,8 +1313,8 @@ class PrevDogResource extends Resource
                                     ->timezone('Asia/Jerusalem')
                                     ->native(false)
                                     ->locale('he')
-                                    ->format('yyyy-mm-dd')
-                                    ->displayFormat('d-m-Y')
+                                    ->format('Y-m-d')
+                                    ->displayFormat('Y-m-d')
                                     ->weekStartsOnSunday()
                                     ->closeOnDateSelection(),
                                 DatePicker::make('OwnershipDate_until')
@@ -1345,8 +1322,8 @@ class PrevDogResource extends Resource
                                     ->timezone('Asia/Jerusalem')
                                     ->native(false)
                                     ->locale('he')
-                                    ->format('yyyy-mm-dd')
-                                    ->displayFormat('d-m-Y')
+                                    ->format('Y-m-d')
+                                    ->displayFormat('Y-m-d')
                                     ->weekStartsOnSunday()
                                     ->closeOnDateSelection(),
                             ])
@@ -1356,7 +1333,7 @@ class PrevDogResource extends Resource
                         return $query
                             ->when(
                                 $data['OwnershipDate_from'] ?? null,
-                                fn(Builder $q, $date): Builder => $q->whereDate('OwnershipDate', '>=', $date),
+                                    fn(Builder $q, $date): Builder => $q->whereDate('OwnershipDate', '>=', $date),
                             )
                             ->when(
                                 ($data['OwnershipDate_from'] ?? null) && !($data['OwnershipDate_until'] ?? null),
@@ -1364,29 +1341,55 @@ class PrevDogResource extends Resource
                             )
                             ->when(
                                 $data['OwnershipDate_until'] ?? null,
-                                fn(Builder $q, $date): Builder => $q->whereDate('OwnershipDate', '<=', $date),
+                                    fn(Builder $q, $date): Builder => $q->whereDate('OwnershipDate', '<=', $date),
                             );
                     }),
-                Tables\Filters\TernaryFilter::make('duplicates_count')
-                    ->label(__('Duplicates'))
-                    ->placeholder('All')
-                    ->trueLabel('Duplicates')
-                    ->falseLabel('No Duplicates')
-                    ->queries(
-                        true: fn (Builder $query) => $query->has('duplicates', '>', 1),
-                        false: fn (Builder $query) => $query->has('duplicates', '<=', 1),
-                        blank: fn (Builder $query) => $query,
-                    ),
+                //                Tables\Filters\TernaryFilter::make('duplicates_count')
+                //                    ->label(__('Duplicates'))
+                //                    ->placeholder('All')
+                //                    ->trueLabel('Duplicates')
+                //                    ->falseLabel('No Duplicates')
+                //                    ->queries(
+                //                        true: fn (Builder $query) => $query->has('duplicates', '>', 1),
+                //                        false: fn (Builder $query) => $query->has('duplicates', '<=', 1),
+                //                        blank: fn (Builder $query) => $query,
+                //                    ),
 
             ], layout: FiltersLayout::AboveContentCollapsible)
             ->filtersFormColumns(3)
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('pedigree')
+                    ->label(__('Pedigree'))
+                    ->icon('heroicon-m-share')
+                    ->url(fn(PrevDog $record): string => PrevDogResource::getUrl('pedigree', ['record' => $record])),
+                Tables\Actions\DeleteAction::make()
+                    ->label(__('Delete'))
+                    ->icon('fas-trash-alt')
+                    ->requiresConfirmation()
+                    ->hidden(fn($record) => $record->trashed()),
+                Tables\Actions\ForceDeleteAction::make()
+                    ->label(__('Force Delete'))
+                    ->icon('fas-trash')
+                    ->requiresConfirmation()
+                    ->color('danger')
+                    ->visible(fn($record) => $record->trashed()),
+
+            ])
+            ->headerActions([
+                //
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label(__('Delete'))
+                        ->icon('fas-trash-alt')
+                        ->requiresConfirmation(),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->label(__('Force Delete'))
+                        ->icon('fas-trash')
+                        ->requiresConfirmation(),
                 ]),
             ])
             ->paginated([5, 10, 15, 25, 50, 100, 200, 250, 300])
@@ -1633,6 +1636,8 @@ class PrevDogResource extends Resource
         return [
             'index' => Pages\ListPrevDogs::route('/'),
             'create' => Pages\CreatePrevDog::route('/create'),
+            // Place custom routes before the generic `{record}` routes to avoid collisions.
+            'pedigree' => Pages\ManagePedigree::route('/pedigree/{record?}'),
             'view' => Pages\ViewPrevDog::route('/{record}'),
             'edit' => Pages\EditPrevDog::route('/{record}/edit'),
         ];
