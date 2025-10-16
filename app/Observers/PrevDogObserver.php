@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
-use App\Models\PrevDog;
 use App\Models\PrevClub;
+use App\Models\PrevDog;
 use Illuminate\Support\Facades\DB;
 
 class PrevDogObserver
@@ -13,6 +13,16 @@ class PrevDogObserver
      * We compute affected club IDs and clear their cached counts.
      */
     protected function clearAffectedClubs(?PrevDog $dog): void
+    {
+        static::clearAffectedClubsForDog($dog);
+    }
+
+    /**
+     * Public helper to clear affected clubs for a given dog.
+     * Useful when model events are intentionally suppressed (e.g., within a table lock),
+     * allowing callers to perform the cache clearing afterwards.
+     */
+    public static function clearAffectedClubsForDog(?PrevDog $dog): void
     {
         if (! $dog) {
             return;
