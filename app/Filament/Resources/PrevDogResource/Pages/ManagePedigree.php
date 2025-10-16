@@ -13,7 +13,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Contracts\View\View;
 
 class ManagePedigree extends Page implements HasForms
 {
@@ -21,8 +20,6 @@ class ManagePedigree extends Page implements HasForms
     use InteractsWithRecord;
 
     protected static string $resource = PrevDogResource::class;
-
-//    protected static string $layout = 'filament-panels::components.layout.index';
 
     protected static string $view = 'filament.resources.prev-dog-resource.pages.manage-pedigree';
 
@@ -128,8 +125,4 @@ class ManagePedigree extends Page implements HasForms
         return "{$idPart} • {$namePart}{$breed}{$color}";
     }
 
-    public function render(): View
-    {
-        return view(static::$view);
-    }
 }

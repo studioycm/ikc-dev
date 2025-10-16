@@ -272,14 +272,16 @@ class ParentsPairForm extends Component implements HasForms
         return "{$idPart} • {$namePart}{$breed}{$color}";
     }
 
-    protected function headingForDepth(string $sagirID): string
+    protected function headingForDepth(string $subject_dog): string
     {
-        return match ($this->depth) {
-            1 => __('Parents'),
-            2 => __('Grandparents'),
-            3 => __('Great Grandparents'),
+        $depth_heading = match ($this->depth) {
+            1 => __('Parent'),
+            2 => __('Grandparent'),
+            3 => __('Great Grandparent'),
             default => __('Generation :n', ['n' => $this->depth]),
         };
+        $parent_of = __('Parent of');
+        return "$depth_heading: $parent_of $subject_dog";
     }
 
     public function render(): View
