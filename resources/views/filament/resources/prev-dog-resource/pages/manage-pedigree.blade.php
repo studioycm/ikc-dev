@@ -1,12 +1,12 @@
 <x-filament-panels::page>
     <div class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="lg:col-span-1">
-                <div class="max-w-4xl">
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div class="md:col-span-1">
+                <div class="">
                     {{ $this->form }}
                 </div>
             </div>
-            <div class="lg:col-span-1">
+            <div class="md:col-span-2 lg:col-span-3">
                 <x-filament::section>
                     <x-slot name="heading">{{ __('Summary') }}</x-slot>
 

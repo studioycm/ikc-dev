@@ -33,28 +33,28 @@ class DogSummary extends Component implements HasForms, HasInfolists
         $d = $this->subject;
 
         return $infolist->record($d)->schema([
-            Grid::make(6)->schema([
-                TextEntry::make('name')
+            Grid::make(8)->schema([
+                TextEntry::make('full_name')
                     ->label('')
-                    ->state(function () use ($d) {
-                        $name = trim(($d->Eng_Name ?? '') . (($d->Eng_Name && $d->Heb_Name) ? ' / ' : '') . ($d->Heb_Name ?? ''));
-
-                        return $name !== '' ? $name : '—';
-                    })
                     ->size(TextEntry\TextEntrySize::Large)
-                    ->weight('bold'),
-
+                    ->weight('bold')
+                    ->columnSpan(2),
                 TextEntry::make('isbr')
                     ->label(__('I.S.B.R'))
-                    ->state(fn() => $d->SagirID ? ($d->sagir_prefix?->code() . $d->SagirID) : ($d->ImportNumber ?: '—')),
-
+                    ->state(fn() => $d->SagirID ? ($d->sagir_prefix?->code() . ' - ' . $d->SagirID) : ($d->ImportNumber ?: '—')),
                 TextEntry::make('birth')->label(__('D.O.B'))->state(fn() => optional($d->BirthDate)->format('Y-m-d') ?? '—'),
                 TextEntry::make('breed')->label(__('Breed'))->state(fn() => $d->breed?->BreedName ?? $d->breed?->name ?? '—'),
                 TextEntry::make('color')->label(__('Color'))->state(fn() => $d->color?->ColorNameHE ?? $d->color?->name ?? '—'),
-                TextEntry::make('owners')->label(__('Owners'))->state(fn() => $d->owners?->pluck('name')->implode(', ') ?: '—'),
-                TextEntry::make('titles')->label(__('Titles'))->state(fn() => $d->titles?->pluck('name')->implode(', ') ?: '—'),
                 TextEntry::make('dna')->label(__('DNA'))->state(fn() => $d->DnaID ?: '—'),
                 TextEntry::make('chip')->label(__('Chip'))->state(fn() => $d->Chip ?: '—'),
+                TextEntry::make('owners')
+                    ->label(__('Owners'))
+                    ->state(fn() => $d->owners?->pluck('name')->implode(', ') ?: '—')
+                    ->columnSpan(2),
+                TextEntry::make('titles')
+                    ->label(__('Titles'))
+                    ->state(fn() => $d->titles?->pluck('name')->implode(', ') ?: '—')
+                    ->columnSpan(2),
             ]),
         ]);
     }

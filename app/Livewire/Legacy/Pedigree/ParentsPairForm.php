@@ -67,7 +67,7 @@ class ParentsPairForm extends Component implements HasForms
         return $form
             ->model($this->subject)
             ->schema([
-                Section::make($this->headingForDepth($this->subject->full_name))
+                Section::make($this->headingForDepth($this->subject))
                     ->schema([
                         Grid::make([
                             'default' => 2,
@@ -272,16 +272,16 @@ class ParentsPairForm extends Component implements HasForms
         return "{$idPart} • {$namePart}{$breed}{$color}";
     }
 
-    protected function headingForDepth(string $subject_dog): string
+    protected function headingForDepth(PrevDog $subject_dog): string
     {
         $depth_heading = match ($this->depth) {
-            1 => __('Parent'),
-            2 => __('Grandparent'),
-            3 => __('Great Grandparent'),
+            1 => __('Parents'),
+            2 => __('Grandparents'),
+//            3 => __('Great Grandparent'),
             default => __('Generation :n', ['n' => $this->depth]),
         };
-        $parent_of = __('Parent of');
-        return "$depth_heading: $parent_of $subject_dog";
+        $parent_of = __('Parents of');
+        return "$depth_heading | $parent_of $subject_dog->SagirID";
     }
 
     public function render(): View

@@ -72,7 +72,7 @@ class ManagePedigree extends Page implements HasForms
                     ->schema([
                         Grid::make(1)->schema([
                             Select::make('rootSagir')
-                                ->label(__('Dog'))
+                                ->label(__('Main Dog'))
                                 ->searchable()
                                 ->getSearchResultsUsing(function (string $search) {
                                     return PrevDog::query()
