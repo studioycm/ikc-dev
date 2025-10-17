@@ -105,7 +105,9 @@ class PrevShowDog extends Model
                 $query->selectRaw('1')
                     ->from('Shows_Dogs_DB as sd')
                     ->whereColumn('sd.SagirID', 'shows_results.SagirID')
-                    ->whereColumn('sd.ShowID', 'shows_results.ShowID');
+                    ->whereColumn('sd.ShowID', 'shows_results.ShowID')
+                    ->whereColumn('sd.ArenaID', 'shows_results.MainArenaID')
+                    ->whereColumn('sd.ClassID', 'shows_results.ClassID');
             });
     }
 }

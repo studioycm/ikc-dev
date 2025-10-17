@@ -38,6 +38,7 @@ use Filament\Tables;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -89,6 +90,32 @@ class PrevDogResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('dog/model/general.labels.navigation_label');
+    }
+
+    protected static ?string $recordTitleAttribute = 'Heb_Name';
+
+    public static function getGlobalSearchResultTitle(Model $record): Htmlable|string
+    {
+        return $record->full_name;
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['Heb_Name', 'Eng_Name', 'SagirID', 'ImportNumber', 'Chip'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Sagir' => $record->SagirID,
+            'Import' => $record->ImportNumber,
+            'Breed' => $record->breed->BreedName,
+        ];
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with(['breed']);
     }
 
     public static function form(Form $form): Form
@@ -1619,7 +1646,7 @@ class PrevDogResource extends Resource
             PrevDogResource\RelationManagers\TitlesRelationManager::class,
             PrevDogResource\RelationManagers\HealthRecordsRelationManager::class,
             PrevDogResource\RelationManagers\PrevDogDocumentRelationManager::class,
-            PrevDogResource\RelationManagers\PrevShowDogRelationManager::class,
+            PrevDogResource\RelationManagers\ShowDogsRelationManager::class,
         ];
     }
 

@@ -7,6 +7,7 @@ use App\Casts\Legacy\LegacyDogSizeCast;
 use App\Casts\Legacy\LegacyDogStatusCast;
 use App\Enums\Legacy\LegacyPedigreeColor;
 use App\Enums\Legacy\LegacySagirPrefix;
+use Filament\Models\Contracts\HasName;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class PrevDog extends Model
+class PrevDog extends Model implements HasName
 {
     use SoftDeletes;
 
@@ -216,6 +217,21 @@ class PrevDog extends Model
                 return "{$heb} | {$eng}";
             }
         );
+    }
+
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->full_name
+        );
+    }
+
+    /**
+     * Get the name of the user for Filament.
+     */
+    public function getFilamentName(): string
+    {
+        return $this->full_name;
     }
 
     protected function breedingHouseName(): Attribute

@@ -2,13 +2,15 @@
 
 namespace App\Filament\Resources\PrevDogResource\RelationManagers;
 
+
 use App\Filament\Resources\PrevShowResultResource;
+use App\Models\PrevShowDog;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
-class PrevShowDogRelationManager extends RelationManager
+class ShowDogsRelationManager extends RelationManager
 {
     protected static string $relationship = 'showDogs';
 
@@ -16,12 +18,15 @@ class PrevShowDogRelationManager extends RelationManager
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return __('Show Entries');
+        return __('Shows');
     }
 
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function ($query) {
+                $query->with(['show', 'arena', 'showClass', 'result']);
+            })
             ->columns([
                 TextColumn::make('ShowID')
                     ->label(__('Show ID'))
@@ -40,7 +45,7 @@ class PrevShowDogRelationManager extends RelationManager
                     ->toggleable(),
                 TextColumn::make('arena.GroupName')
                     ->label(__('Arena'))
-                    ->description(fn(Model $record): string => $record->ArenaID)
+                    ->description(fn(PrevShowDog $record): ?string => $record->ArenaID ?? '-')
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(),
                 TextColumn::make('showClass.ClassName')
