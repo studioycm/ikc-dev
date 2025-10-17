@@ -83,7 +83,7 @@ class ManagePedigree extends Page implements HasForms
                                                 ->orWhere('Chip', 'like', "%{$search}%")
                                                 ->orWhere('ImportNumber', 'like', "%{$search}%");
                                         })
-                                        ->limit(30)
+                                        ->limit(50)
                                         ->get()
                                         ->mapWithKeys(fn(PrevDog $d) => [
                                             $d->SagirID => $this->optionLabel($d),

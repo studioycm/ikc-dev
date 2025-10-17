@@ -97,8 +97,7 @@ class ParentsPairForm extends Component implements HasForms
                                     $this->expanded = true;
                                 }),
                         ])->fullWidth(),
-                    ])
-                    ->maxWidth('md'),
+                    ]),
             ])
             ->statePath('data');
     }
@@ -254,9 +253,9 @@ class ParentsPairForm extends Component implements HasForms
             ])
             ->native(false)
             ->columnSpan([
-                'default' => 1,
                 'sm' => 2,
-                'md' => 2,
+                'md' => 1,
+                'default' => 1,
             ]);
     }
 

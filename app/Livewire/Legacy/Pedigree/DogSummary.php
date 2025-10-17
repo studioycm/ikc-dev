@@ -18,19 +18,29 @@ class DogSummary extends Component implements HasForms, HasInfolists
     use InteractsWithForms;
     use InteractsWithInfolists;
 
-    public int $subjectId;
+    public ?int $subjectId = null;
 
-    public PrevDog $subject;
+    public ?PrevDog $subject = null;
 
-    public function mount(int $subjectId): void
+    public function mount(?int $subjectId = null): void
     {
         $this->subjectId = $subjectId;
-        $this->subject = PrevDog::with(['breed', 'color', 'owners', 'titles'])->findOrFail($subjectId);
+        if ($subjectId) {
+            $this->subject = PrevDog::with(['breed', 'color', 'owners', 'titles'])->find($subjectId);
+        }
     }
 
     public function summary(Infolist $infolist): Infolist
     {
         $d = $this->subject;
+
+        if (!$d) {
+            return $infolist->schema([
+                TextEntry::make('placeholder')
+                    ->label(false)
+                    ->state(__('Select a dog to view its summary')),
+            ]);
+        }
 
         return $infolist->record($d)->schema([
             Grid::make(8)->schema([
@@ -38,15 +48,17 @@ class DogSummary extends Component implements HasForms, HasInfolists
                     ->label('')
                     ->size(TextEntry\TextEntrySize::Large)
                     ->weight('bold')
-                    ->columnSpan(2),
+                    ->columnSpan(3),
                 TextEntry::make('isbr')
                     ->label(__('I.S.B.R'))
-                    ->state(fn() => $d->sagir_prefix?->code() . ' - ' . $d->SagirID . ' | ' . ($d->ImportNumber ?: '—')),
-                TextEntry::make('birth')->label(__('D.O.B'))->state(fn() => optional($d->BirthDate)->format('Y-m-d') ?? '—'),
-                TextEntry::make('breed')->label(__('Breed'))->state(fn() => $d->breed?->BreedName ?? $d->breed?->name ?? '—'),
-                TextEntry::make('color')->label(__('Color'))->state(fn() => $d->color?->ColorNameHE ?? $d->color?->name ?? '—'),
-                TextEntry::make('dna')->label(__('DNA'))->state(fn() => $d->DnaID ?: '—'),
-                TextEntry::make('chip')->label(__('Chip'))->state(fn() => $d->Chip ?: '—'),
+                    ->state(fn() => $d->sagir_prefix?->code() . ' - ' . $d->SagirID . ' | ' . ($d->ImportNumber ?: '—'))
+                    ->columnSpan(2),
+                TextEntry::make('DnaID')->label(__('DNA')),
+                TextEntry::make('Chip')->label(__('Chip')),
+                TextEntry::make('id')->label(__('ID')),
+                TextEntry::make('BirthDate')->label(__('D.O.B'))->date('Y-m-d'),
+                TextEntry::make('breed.BreedName')->label(__('Breed')),
+                TextEntry::make('color.ColorNameHE')->label(__('Color')),
                 TextEntry::make('owners')
                     ->label(__('Owners'))
                     ->state(fn() => $d->owners?->pluck('name')->implode(', ') ?: '—')
