@@ -107,19 +107,18 @@ class ManagePedigree extends Page implements HasForms
                                 })
                                 ->native(false),
                         ]),
-                    ])
-                    ->maxWidth('md'),
+                    ]),
             ])
             ->statePath('data');
     }
 
     protected function optionLabel(PrevDog $d): string
     {
-        $idPart = $d->SagirID ? ($d->sagir_prefix?->code() . $d->SagirID) : ($d->ImportNumber ?: '—');
-        $namePart = trim(($d->Eng_Name ?? '') . (($d->Eng_Name && $d->Heb_Name) ? ' / ' : '') . ($d->Heb_Name ?? '')) ?: '—';
-        $breed = $d->breed?->BreedName ?? $d->breed?->name ?? null;
+        $idPart = $d->sagir_prefix?->code() . $d->SagirID . ($d->ImportNumber ? " | $d->ImportNumber" : ' | —');
+        $namePart = $d->full_name;
+        $breed = $d->breed?->BreedName ?? null;
         $breed = $breed ? " • {$breed}" : '';
-        $color = $d->color?->ColorNameHE ?? $d->color?->name ?? null;
+        $color = $d->color?->ColorNameHE ?? $d->color?->ColorNameEN ?? null;
         $color = $color ? " • {$color}" : '';
 
         return "{$idPart} • {$namePart}{$breed}{$color}";

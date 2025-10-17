@@ -8,11 +8,17 @@
             </div>
             <div class="md:col-span-2 lg:col-span-3">
                 <x-filament::section>
-                    <x-slot name="heading">{{ __('Summary') }}</x-slot>
+                    <x-slot name="heading">{{ __('Dog Summary') }}</x-slot>
 
-                    <livewire:legacy.pedigree.dog-summary
-                        :subjectId="$record->getKey()"
-                        :key="'summary-'.$record->getKey()"/>
+                    @if($record?->exists)
+                        <livewire:legacy.pedigree.dog-summary
+                            :subjectId="$record->getKey()"
+                            :key="'summary-'.$record->getKey()"/>
+                    @else
+                        <div class="text-sm text-gray-500">
+                            {{ __('Select a dog to view its summary') }}
+                        </div>
+                    @endif
                 </x-filament::section>
             </div>
         </div>

@@ -41,7 +41,7 @@ class DogSummary extends Component implements HasForms, HasInfolists
                     ->columnSpan(2),
                 TextEntry::make('isbr')
                     ->label(__('I.S.B.R'))
-                    ->state(fn() => $d->SagirID ? ($d->sagir_prefix?->code() . ' - ' . $d->SagirID) : ($d->ImportNumber ?: '—')),
+                    ->state(fn() => $d->sagir_prefix?->code() . ' - ' . $d->SagirID . ' | ' . ($d->ImportNumber ?: '—')),
                 TextEntry::make('birth')->label(__('D.O.B'))->state(fn() => optional($d->BirthDate)->format('Y-m-d') ?? '—'),
                 TextEntry::make('breed')->label(__('Breed'))->state(fn() => $d->breed?->BreedName ?? $d->breed?->name ?? '—'),
                 TextEntry::make('color')->label(__('Color'))->state(fn() => $d->color?->ColorNameHE ?? $d->color?->name ?? '—'),

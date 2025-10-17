@@ -120,7 +120,7 @@ class ParentsPairForm extends Component implements HasForms
             ->relationship($relation, 'SagirID', modifyQueryUsing: fn(Builder $query) => $query->where('GenderID', '=', $genderForCreate->value), ignoreRecord: true)
             ->optionsLimit(50)
             ->searchDebounce(2000)
-            ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->import_number} {$record->SagirID} \ {$record->full_name}")
+            ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->ImportNumber} | {$record->SagirID} \ {$record->full_name}")
             ->createOptionForm([
                 Grid::make(3)
                     ->schema([
