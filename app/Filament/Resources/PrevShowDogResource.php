@@ -127,7 +127,7 @@ class PrevShowDogResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function (Builder $query) {
-                return $query->with(['show', 'dog', 'result']);
+                return $query->with(['show', 'arena', 'showClass', 'breed', 'dog', 'result']);
             })
             ->columns([
                 TextColumn::make('id')
@@ -139,12 +139,13 @@ class PrevShowDogResource extends Resource
                 TextColumn::make('show.TitleName')
                     ->label(__('Show Title'))
                     ->description(fn(PrevShowDog $record): int => (int)$record->ShowID),
+
                 TextColumn::make('dog.full_name')
                     ->label(__('Dog name'))
                     ->description(fn(PrevShowDog $r) => ($r->SagirID ?? '—'))
                     ->url(fn(PrevShowDog $r) => $r->dog ? PrevDogResource::getUrl('view', ['record' => $r->dog->getKey()]) : null)
                     ->openUrlInNewTab()
-                    ->searchable(['DogsDB.Heb_Name', 'DogsDB.Eng_Name', 'DogsDB.SagirID'], isIndividual: true, isGlobal: false)
+                    ->searchable(['DogsDB.Heb_Name', 'DogsDB.Eng_Name', 'Shows_Dogs_DB.SagirID'], isIndividual: true, isGlobal: false)
                     ->sortable(['DogsDB.Heb_Name', 'DogsDB.Eng_Name']),
 
                 TextColumn::make('arena_summary')
@@ -174,9 +175,9 @@ class PrevShowDogResource extends Resource
                 TextColumn::make('result.DataID')
                     ->label(__('Result'))
                     ->description(fn(PrevShowDog $record): int => (int)$record->result?->SagirID)
-                    ->url(function ($state) {
-                        return $state ? PrevShowResultResource::getUrl('edit', ['record' => $state]) : null;
-                    })
+//                    ->url(function ($state) {
+//                        return $state ? PrevShowResultResource::getUrl('edit', ['record' => $state]) : null;
+//                    })
                     ->toggleable(),
 
             ])

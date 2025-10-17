@@ -66,6 +66,8 @@ class DogSummary extends Component implements HasForms, HasInfolists
                 TextEntry::make('titles')
                     ->label(__('Titles'))
                     ->state(fn() => $d->titles?->pluck('name')->implode(', ') ?: '—')
+                    ->limit(30)
+                    ->tooltip(fn() => $d->titles?->pluck('name')->implode(', '))
                     ->columnSpan(2),
             ]),
         ]);

@@ -69,11 +69,7 @@ class ParentsPairForm extends Component implements HasForms
             ->schema([
                 Section::make($this->headingForDepth($this->subject))
                     ->schema([
-                        Grid::make([
-                            'default' => 2,
-                            'sm' => 1,
-                            'md' => 2,
-                        ])
+                        Grid::make(2)
                             ->schema([
                                 $this->parentSelect(
                                     relation: 'father',
@@ -90,13 +86,13 @@ class ParentsPairForm extends Component implements HasForms
                             ]),
                         Actions::make([
                             Action::make('expand')
-                                ->label(__('Parents'))
+                                ->label(__('Add Parents'))
                                 ->icon('heroicon-m-plus')
                                 ->visible(fn() => $this->canExpand())
                                 ->action(function () {
                                     $this->expanded = true;
                                 }),
-                        ])->fullWidth(),
+                        ])->maxWidth('md'),
                     ]),
             ])
             ->statePath('data');
@@ -233,30 +229,9 @@ class ParentsPairForm extends Component implements HasForms
                     'MotherSAGIR' => $this->subject->MotherSAGIR,
                 ]);
             })
-            ->suffixActions([
-//                Action::make('clear')
-//                    ->label(__('Clear'))
-//                    ->icon('heroicon-m-x-mark')
-//                    ->visible(fn ($get) => filled($get($field)))
-//                    ->disabled(fn () => $this->expanded) // must clear children first
-//                    ->requiresConfirmation()
-//                    ->action(function () use ($field) {
-//                        $this->subject->setAttribute($field, null);
-//                        $this->subject->save();
-//                        $this->subject->unsetRelations();
-//                        $this->subject->load(['father', 'mother']);
-//                        $this->form->fill([
-//                            'FatherSAGIR' => $this->subject->FatherSAGIR,
-//                            'MotherSAGIR' => $this->subject->MotherSAGIR,
-//                        ]);
-//                    }),
-            ])
             ->native(false)
-            ->columnSpan([
-                'sm' => 2,
-                'md' => 1,
-                'default' => 1,
-            ]);
+            ->maxWidth('xl')
+            ->columnSpan(2);
     }
 
     protected function optionLabel(PrevDog $d): string
