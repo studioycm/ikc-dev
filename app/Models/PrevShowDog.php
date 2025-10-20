@@ -74,17 +74,17 @@ class PrevShowDog extends Model
 
     public function showClass(): BelongsTo
     {
-        return $this->belongsTo(PrevShowClass::class, 'ClassID', 'id');
+        return $this->belongsTo(PrevShowClass::class, 'ClassID', 'DataID');
     }
 
     public function registration(): BelongsTo
     {
-        return $this->belongsTo(PrevShowRegistration::class, 'ShowRegistrationID', '');
+        return $this->belongsTo(PrevShowRegistration::class, 'ShowRegistrationID', 'id');
     }
 
     public function newRegistration(): BelongsTo
     {
-        return $this->belongsTo(PrevShowRegistration::class, 'new_show_registration_id');
+        return $this->belongsTo(PrevShowRegistration::class, 'new_show_registration_id', 'id');
     }
 
     public function dog(): BelongsTo
@@ -98,16 +98,13 @@ class PrevShowDog extends Model
     }
 
     // revers relation with PrevShowResult
-    public function result(): HasOne
+    public function prevShowResult(): HasOne
     {
+        // Bind by literals so eager loading does not inject nulls or try to reference parent table
         return $this->hasOne(PrevShowResult::class, 'SagirID', 'SagirID')
-            ->whereExists(function ($query) {
-                $query->selectRaw('1')
-                    ->from('Shows_Dogs_DB as sd')
-                    ->whereColumn('sd.SagirID', 'shows_results.SagirID')
-                    ->whereColumn('sd.ShowID', 'shows_results.ShowID')
-                    ->whereColumn('sd.ArenaID', 'shows_results.MainArenaID')
-                    ->whereColumn('sd.ClassID', 'shows_results.ClassID');
-            });
+            ->where('shows_results.ShowID', $this->ShowID)
+            // If arena must match too, keep this line; otherwise remove it:
+            ->when($this->ArenaID !== null, fn($q) => $q->where('shows_results.MainArenaID', $this->ArenaID))
+            ->orderBy('shows_results.DataID', 'asc');
     }
 }

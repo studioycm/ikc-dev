@@ -482,30 +482,45 @@ class PrevShowResultResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function (Builder $query) {
-                return $query->with(['show', 'showDog', 'resultDog']);
+                return $query->with(['show', 'class', 'arena', 'showDog', 'resultDog']);
             })
             ->columns([
                 TextColumn::make('DataID')
                     ->label(__('Data ID'))
                     ->searchable(isIndividual: true, isGlobal: false)
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('show.TitleName')
                     ->label(__('Show Title'))
                     ->searchable(['ShowsDB.TitleName', 'ShowsDB.id'], isIndividual: true, isGlobal: false)
-                    ->description(fn(PrevShowResult $record): int => (int)$record->ShowID),
+                    ->description(fn(PrevShowResult $record): int => (int)$record->ShowID)
+                    ->toggleable(),
+                TextColumn::make('arena.GroupName')
+                    ->label(__('Arena'))
+                    ->searchable(['Shows_Structure.id'], isIndividual: true, isGlobal: false)
+                    ->description(fn(PrevShowResult $record): ?string => $record->MainArenaID ?? '-')
+                    ->toggleable(),
+                TextColumn::make('class.ClassName')
+                    ->label(__('Class'))
+                    ->description(fn(PrevShowResult $record): ?string => $record->ClassID ?? '-')
+                    ->toggleable(),
                 TextColumn::make('resultDog.fullName')
                     ->label(__('Dog'))
-                    ->searchable(['SagirID'], isIndividual: true, isGlobal: false)
-                    ->description(fn(PrevShowResult $record) => $record->SagirID),
+                    ->searchable(['SagirID'], isIndividual: true, isGlobal: true)
+                    ->description(fn(PrevShowResult $record) => $record->SagirID)
+                    ->toggleable(),
                 TextColumn::make('GenderID')
                     ->label(__('Gender'))
-                    ->badge(),
+                    ->badge()
+                    ->toggleable(),
                 TextColumn::make('resultsLabels')
                     ->label(__('Results'))
-                    ->badge(),
+                    ->badge()
+                    ->toggleable(),
                 TextColumn::make('titlesLabels')
                     ->label(__('Titles'))
-                    ->badge(),
+                    ->badge()
+                    ->toggleable(),
             ])
             ->filters([
             ])

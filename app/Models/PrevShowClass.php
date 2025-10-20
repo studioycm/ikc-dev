@@ -61,6 +61,6 @@ class PrevShowClass extends Model
 
     public function showDogs(): HasMany
     {
-        return $this->hasMany(PrevShowDog::class, 'ClassID', 'id');
+        return $this->hasMany(PrevShowDog::class, 'ClassID', 'DataID');
     }
 }

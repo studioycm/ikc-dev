@@ -84,6 +84,11 @@ class PrevShowBreed extends Model
         return $this->belongsTo(PrevShowArena::class, 'ArenaID', 'id');
     }
 
+    public function showClass(): BelongsTo
+    {
+        return $this->belongsTo(PrevShowClass::class, 'ClassID', 'DataID');
+    }
+
     public function breed(): BelongsTo
     {
         return $this->belongsTo(PrevBreed::class, 'RaceID', 'BreedCode');

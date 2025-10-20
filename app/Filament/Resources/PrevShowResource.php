@@ -29,7 +29,6 @@ use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -201,7 +200,8 @@ class PrevShowResource extends Resource
         return $table
             ->modifyQueryUsing(function (Builder $query) {
                 return $query
-                    ->with(['judges', 'club']);
+                    ->with(['judges', 'club'])
+                    ->scopes(['withCountsForResource']);
             })
             ->columns([
                 TextColumn::make('id')
@@ -329,8 +329,6 @@ class PrevShowResource extends Resource
                     ->sortable()
                     ->toggleable(),
 
-                ImageColumn::make('banner_image')
-                    ->toggleable(),
             ])
             ->filters([
                 TrashedFilter::make('trashed'),
