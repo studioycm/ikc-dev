@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\PrevDogResource\RelationManagers;
 
 use App\Filament\Resources\PrevShowResource;
-use App\Models\PrevShow;
 use App\Models\PrevTitle;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -43,7 +42,6 @@ class TitlesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('awarding.ShowID')
                     ->label(__('Show ID'))
                     ->url(fn($state) => $state ? PrevShowResource::getUrl('view', ['record' => $state]) : null)
-                    ->description(fn($state) => $state ? PrevShow::find($state, ['TitleName'])->TitleName : 'n/a')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('awarding.created_at')
                     ->dateTime()
