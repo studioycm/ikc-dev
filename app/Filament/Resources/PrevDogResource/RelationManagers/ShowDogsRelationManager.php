@@ -25,7 +25,7 @@ class ShowDogsRelationManager extends RelationManager
     {
         return $table
             ->modifyQueryUsing(function ($query) {
-                $query->with(['show', 'arena', 'showClass', 'result']);
+                $query->with(['show', 'arena', 'showClass', 'prevShowResult']);
             })
             ->columns([
                 TextColumn::make('ShowID')
@@ -53,7 +53,7 @@ class ShowDogsRelationManager extends RelationManager
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(),
-                TextColumn::make('result.DataID')
+                TextColumn::make('prevShowResult.DataID')
                     ->label(__('Result'))
                     ->url(function ($state) {
                         return $state ? PrevShowResultResource::getUrl('edit', ['record' => $state]) : null;
@@ -65,7 +65,7 @@ class ShowDogsRelationManager extends RelationManager
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false),
-//                TextColumn::make('result.updated_at')
+//                TextColumn::make('prevShowResult.updated_at')
 //                    ->label(__('Result'))
 //                    ->since()
 //                    ->dateTimeTooltip()

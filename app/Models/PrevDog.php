@@ -8,6 +8,7 @@ use App\Casts\Legacy\LegacyDogStatusCast;
 use App\Enums\Legacy\LegacyPedigreeColor;
 use App\Enums\Legacy\LegacySagirPrefix;
 use Filament\Models\Contracts\HasName;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -262,5 +263,35 @@ class PrevDog extends Model implements HasName
     public function showDogs(): HasMany
     {
         return $this->hasMany(PrevShowDog::class, 'SagirID', 'SagirID');
+    }
+
+    /**
+     * Scope a query to efficiently include the breed name via a join,
+     * using the custom BreedCode key.
+     */
+    public function scopeWithBreedName(Builder $query): void
+    {
+        $query->leftJoin('BreedsDB', 'DogsDB.RaceID', '=', 'BreedsDB.BreedCode') // <-- The join now uses BreedCode
+        ->select('DogsDB.*', 'BreedsDB.BreedName as breed_name');
+    }
+
+    /**
+     * Get the full formatted label for the dog.
+     * This accessor is optimized to use the pre-joined 'breed_name' attribute.
+     */
+    protected function formattedLabel(): Attribute
+    {
+        return Attribute::make(
+            get: function (): string {
+                $idPart = $this->sagir_prefix?->code() . "-" . $this->SagirID . " | " . ($this->ImportNumber ?: __('w/o Imp'));
+                $namePart = $this->full_name;
+
+                // This uses the 'breed_name' attribute from the join and does NOT trigger a new query.
+                $breed = $this->breed?->BreedName ?? null;
+                $breed = $breed ? " • {$breed}" : '';
+
+                return "{$idPart} <br> {$namePart}{$breed}";
+            }
+        );
     }
 }

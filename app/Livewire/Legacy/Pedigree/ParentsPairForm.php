@@ -23,6 +23,7 @@ use Filament\Forms\Get;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\HtmlString;
 use Livewire\Component;
 
 class ParentsPairForm extends Component implements HasForms
@@ -112,16 +113,37 @@ class ParentsPairForm extends Component implements HasForms
         return Select::make($field)
             ->label($label)
             ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
-            ->relationship($relation, 'SagirID', modifyQueryUsing: fn(Builder $query) => $query->where('GenderID', '=', $genderForCreate->value), ignoreRecord: true)
+            ->relationship($relation, 'SagirID', modifyQueryUsing: fn(Builder $query) => $query->with(['breed'])->where('GenderID', '=', $genderForCreate->value)->orderBy('ImportNumber', 'desc'), ignoreRecord: true)
             ->optionsLimit(50)
+            ->allowHtml()
             ->searchDebounce(2000)
-            ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->ImportNumber} | {$record->SagirID} \ {$record->full_name}")
-            ->createOptionForm([
+            ->getOptionLabelFromRecordUsing(fn(PrevDog $record) => $record->formatted_label)
+            ->manageOptionForm([
                 Grid::make(3)
                     ->schema([
                         TextInput::make('ImportNumber')
                             ->label(__('Import Number'))
-                            ->maxLength(200),
+                            ->unique(PrevDog::class, 'ImportNumber', ignoreRecord: true)
+                            ->maxLength(200)
+                            ->suffixAction(
+                                Action::make('search_import_number')
+                                    ->label(__('Search :model', ['model' => __('Import Number')]))
+                                    ->icon('fas-search')
+                                    ->color('warning')
+                                    ->modalHeading(__('Search :model', ['model' => __('Import Number')]))
+                                    ->modalContent(function ($state): HtmlString {
+                                        $dogs = PrevDog::with(['breed'])
+                                            ->whereLike('ImportNumber', "%$state%")
+                                            ->limit(50)
+                                            ->get();
+                                        $formattedData = $dogs->map(fn($dog) => '<li>' . $dog->formatted_label . '</li>')->implode('');
+                                        return new HtmlString(
+                                            '<ul style="list-style-type: disc; padding-left: 20px;">' .
+                                            $formattedData .
+                                            '</ul>'
+                                        );
+                                    })
+                            ),
                         TextInput::make('Eng_Name')
                             ->label(__('English Name'))
                             ->maxLength(200),
@@ -154,27 +176,28 @@ class ParentsPairForm extends Component implements HasForms
                         Select::make('RaceID')
                             ->label(__('Breed'))
                             ->relationship('breed', 'BreedName')
-                            ->searchable()
+                            ->searchable(['BreedName', 'BreedNameEN'])
                             ->preload()
                             ->default(fn() => $this->subject->RaceID),
                         Select::make('ColorID')
                             ->label(__('Color'))
                             ->relationship('color', 'ColorNameHE')
-                            ->searchable()
+                            ->searchable(['ColorNameHE', 'ColorNameEN'])
                             ->preload()
                             ->default(9000),
                         Select::make('HairID')
                             ->label(__('Hair'))
                             ->relationship('hair', 'HairNameHE')
-                            ->searchable()
+                            ->searchable(['HairNameHE', 'HairNameEN'])
                             ->preload()
                             ->default(4),
                         TextInput::make('Chip')
                             ->label(__('Chip'))
-                            ->unique()
+                            ->unique(PrevDog::class, 'Chip', ignoreRecord: true)
                             ->maxLength(200),
                         TextInput::make('DnaID')
                             ->label(__('DNA ID'))
+                            ->unique(PrevDog::class, 'DnaID', ignoreRecord: true)
                             ->maxLength(200),
                         TextInput::make('Breeder_Name')
                             ->label(__('Breeder Name'))
@@ -206,14 +229,26 @@ class ParentsPairForm extends Component implements HasForms
 
                 return $created->SagirID; // field stores SagirID
             })
-            ->createOptionAction(function (Action $action) use ($genderForCreate) {
+            ->createOptionAction(function (Action $action) use ($genderForCreate, $field) {
                 return $action
+                    ->visible(fn(Get $get) => blank($get($field)))
                     ->modalHeading($genderForCreate === LegacyDogGender::Male ? __('Create Father') : __('Create Mother'))
                     ->modalWidth('6xl')
                     ->label($genderForCreate === LegacyDogGender::Male ? __('Create new dog as Father') : __('Create new dog as Mother'))
                     ->color('warning')
                     ->icon('fas-circle-plus');
             })
+            ->updateOptionUsing(function (Model $record, array $data): void {
+                $record->fill($data);
+                $record->save();
+            })
+            ->editOptionAction(
+                fn(Action $action) => $action
+                    ->modalHeading(__('Edit dog'))
+                    ->modalWidth('6xl')
+                    ->color('warning')
+                    ->icon('fas-pen-to-square')
+            )
             ->live(onBlur: true)
             ->afterStateUpdated(function ($state) use ($field) {
                 // Persist immediate update to the subject dog
@@ -236,14 +271,12 @@ class ParentsPairForm extends Component implements HasForms
 
     protected function optionLabel(PrevDog $d): string
     {
-        $idPart = $d->SagirID ? ($d->sagir_prefix?->code() . $d->SagirID) : ($d->ImportNumber ?: '—');
-        $namePart = trim(($d->Eng_Name ?? '') . (($d->Eng_Name && $d->Heb_Name) ? ' / ' : '') . ($d->Heb_Name ?? '')) ?: '—';
-        $breed = method_exists($d->breed, 'name') ? (string)$d->breed->name : ($d->breed->BreedName ?? null);
+        $idPart = $d->sagir_prefix?->code() . "-" . $d->SagirID . " | " . ($d->ImportNumber ? $d->ImportNumber : __('w/o Imp'));
+        $namePart = $d->full_name;
+        $breed = $d->breed?->BreedName ?? null;
         $breed = $breed ? " • {$breed}" : '';
-        $color = method_exists($d->color, 'name') ? (string)$d->color->name : ($d->color->ColorNameHE ?? null);
-        $color = $color ? " • {$color}" : '';
 
-        return "{$idPart} • {$namePart}{$breed}{$color}";
+        return "{$idPart} • {$namePart}{$breed}";
     }
 
     protected function headingForDepth(PrevDog $subject_dog): string

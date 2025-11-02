@@ -127,7 +127,7 @@ class PrevShowDogResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function (Builder $query) {
-                return $query->with(['show', 'arena', 'showClass', 'breed', 'dog', 'result']);
+                return $query->with(['show', 'arena', 'showClass', 'breed', 'dog', 'prevShowResult']);
             })
             ->columns([
                 TextColumn::make('id')
@@ -145,7 +145,7 @@ class PrevShowDogResource extends Resource
                     ->description(fn(PrevShowDog $r) => ($r->SagirID ?? '—'))
                     ->url(fn(PrevShowDog $r) => $r->dog ? PrevDogResource::getUrl('view', ['record' => $r->dog->getKey()]) : null)
                     ->openUrlInNewTab()
-                    ->searchable(['DogsDB.Heb_Name', 'DogsDB.Eng_Name', 'Shows_Dogs_DB.SagirID'], isIndividual: true, isGlobal: false)
+                    ->searchable(['DogsDB.Heb_Name', 'DogsDB.Eng_Name', 'Shows_Dogs_DB.SagirID'], isIndividual: true, isGlobal: true)
                     ->sortable(['DogsDB.Heb_Name', 'DogsDB.Eng_Name']),
 
                 TextColumn::make('arena_summary')
@@ -172,9 +172,9 @@ class PrevShowDogResource extends Resource
                     ->openUrlInNewTab()
                     ->toggleable(),
 
-                TextColumn::make('result.DataID')
+                TextColumn::make('prevShowResult.DataID')
                     ->label(__('Result'))
-                    ->description(fn(PrevShowDog $record): int => (int)$record->result?->SagirID)
+                    ->description(fn(PrevShowDog $record): string => (string)$record->prevShowResult)
 //                    ->url(function ($state) {
 //                        return $state ? PrevShowResultResource::getUrl('edit', ['record' => $state]) : null;
 //                    })

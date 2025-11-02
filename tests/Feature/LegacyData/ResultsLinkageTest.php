@@ -2,12 +2,11 @@
 
 use Illuminate\Support\Facades\DB;
 
-it('has dog→result linkage within same show and arena (mysql_prev)', function () {
+it('has dog→prevShowResult linkage within same show and arena (mysql_prev)', function () {
     $sample = DB::connection('mysql_prev')
         ->table('shows_results as r')
         ->join('Shows_Dogs_DB as sd', function ($join) {
             $join->on('r.ShowID', '=', 'sd.ShowID')
-                ->on('r.MainArenaID', '=', 'sd.ArenaID')
                 ->on('r.SagirID', '=', 'sd.SagirID');
         })
         ->whereNull('sd.deleted_at')

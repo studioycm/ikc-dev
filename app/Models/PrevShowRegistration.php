@@ -50,7 +50,7 @@ class PrevShowRegistration extends Model
 
     public function class(): BelongsTo
     {
-        return $this->belongsTo(PrevShowClass::class, 'ClassID');
+        return $this->belongsTo(PrevShowClass::class, 'ClassID', 'DataID');
     }
 
     public function owner(): BelongsTo

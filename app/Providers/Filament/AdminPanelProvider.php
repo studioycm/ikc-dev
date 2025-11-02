@@ -182,6 +182,8 @@ class AdminPanelProvider extends PanelProvider
                     ->group(fn (): string => __('Reports Management'))
                     ->sort(130),
             ])
+            ->globalSearchKeyBindings(['ctrl+k', 'command+k'])
+            ->globalSearchDebounce('2000')
             ->theme(asset('css/filament/admin/theme.css'))
             ->LazyLoadedDatabaseNotifications();
     }

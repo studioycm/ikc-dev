@@ -319,7 +319,7 @@ class PrevShowResult extends Model
 
     public function class(): BelongsTo
     {
-        return $this->belongsTo(PrevShowClass::class, 'ClassID', 'id');
+        return $this->belongsTo(PrevShowClass::class, 'ClassID', 'DataID');
     }
 
     public function registration(): BelongsTo
@@ -330,15 +330,12 @@ class PrevShowResult extends Model
 
     public function showDog(): BelongsTo
     {
+        // Constrain the related row by this result’s ShowID (and optionally MainArenaID)
         return $this->belongsTo(PrevShowDog::class, 'SagirID', 'SagirID')
-            ->whereExists(function ($query) {
-                $query->selectRaw('1')
-                    ->from('shows_results as sr')
-                    ->whereColumn('sr.SagirID', 'Shows_Dogs_DB.SagirID')
-                    ->whereColumn('sr.ShowID', 'Shows_Dogs_DB.ShowID')
-                    ->whereColumn('sr.MainArenaID', 'Shows_Dogs_DB.ArenaID')
-                    ->whereColumn('sr.ClassID', 'Shows_Dogs_DB.ClassID');
-            });
+            ->where('Shows_Dogs_DB.ShowID', $this->ShowID)
+            // If arena must match too, keep this line; otherwise remove it:
+            ->when($this->MainArenaID !== null, fn($q) => $q->where('Shows_Dogs_DB.ArenaID', $this->MainArenaID))
+            ->orderBy('Shows_Dogs_DB.id', 'asc');
     }
 
     public function resultDog(): BelongsTo
