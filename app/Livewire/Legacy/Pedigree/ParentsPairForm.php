@@ -288,7 +288,7 @@ class ParentsPairForm extends Component implements HasForms
             default => __('Generation :n', ['n' => $this->depth]),
         };
         $parent_of = __('Parents of');
-        return "$depth_heading | $parent_of $subject_dog->SagirID";
+        return "{$depth_heading} • {$parent_of} {$subject_dog->SagirID} • {$subject_dog->full_name}";
     }
 
     public function render(): View
