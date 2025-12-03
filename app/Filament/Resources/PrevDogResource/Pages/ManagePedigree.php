@@ -52,8 +52,6 @@ class ManagePedigree extends Page implements HasForms
 
     protected static ?int $navigationSort = 99;
 
-    public string|int|null|Model $record;
-
     /** Selected root dog by SagirID (the select’s value) */
     public ?int $rootSagir = null;
 
@@ -63,7 +61,7 @@ class ManagePedigree extends Page implements HasForms
     /** Filament page form state */
     public ?array $data = [];
 
-    public function mount(int|string $record): void
+    public function mount(int|string|null $record): void
     {
         // Start clean to avoid stale state when navigating without a record.
         $this->subject = null;
@@ -385,56 +383,56 @@ class ManagePedigree extends Page implements HasForms
                                                 ->rule('before_or_equal:today'),
                                         ])->columnSpan(6),
 
-//                                        Fieldset::make(__('Relations'))
-//                                            ->schema([
-//                                                Select::make('RaceID')
-//                                                    ->label(__('Breed'))
-//                                                    ->relationship('breed', 'BreedName')
-//                                                    ->searchable(['BreedName', 'BreedNameEN'])
-//                                                    ->optionsLimit(50)
-//                                                    ->native(false)
-//                                                    ->required()
-//                                                    ->loadingMessage(__('Loading :model', ['model' => __('Breeds')]) . '...')
-//                                                    ->searchingMessage(__('Searching :model', ['model' => __('Breeds')]) . '...')
-//                                                    ->searchPrompt(__('Search :model', ['model' => __('Breeds')]))
-//                                                    ->noSearchResultsMessage(__('No :model found.', ['model' => __('Breeds')])),
-//
-//                                                Select::make('ColorID')
-//                                                    ->label(__('Color'))
-//                                                    ->relationship('color', 'ColorNameHE')
-//                                                    ->searchable(['ColorNameHE', 'ColorNameEN'])
-//                                                    ->optionsLimit(50)
-//                                                    ->native(false)
-//                                                    ->loadingMessage(__('Loading :model', ['model' => __('Colors')]) . '...')
-//                                                    ->searchingMessage(__('Searching :model', ['model' => __('Colors')]) . '...')
-//                                                    ->searchPrompt(__('Search :model', ['model' => __('Colors')]))
-//                                                    ->noSearchResultsMessage(__('No :model found.', ['model' => __('Colors')])),
-//
-//                                                Select::make('HairID')
-//                                                    ->label(__('Hair'))
-//                                                    ->relationship('hair', 'HairNameHE')
-//                                                    ->searchable(['HairNameHE', 'HairNameEN'])
-//                                                    ->optionsLimit(50)
-//                                                    ->native(false)
-//                                                    ->loadingMessage(__('Loading :model', ['model' => __('Hairs')]) . '...')
-//                                                    ->searchingMessage(__('Searching :model', ['model' => __('Hairs')]) . '...')
-//                                                    ->searchPrompt(__('Search :model', ['model' => __('Hairs')]))
-//                                                    ->noSearchResultsMessage(__('No :model found.', ['model' => __('Hairs')])),
-//
-//                                                Select::make('owners')
-//                                                    ->label(__('Owners'))
-//                                                    ->multiple()
-//                                                    ->relationship('owners', 'first_name')
-//                                                    ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en', 'mobile_phone'])
-//                                                    ->optionsLimit(50)
-//                                                    ->native(false)
-//                                                    ->loadingMessage(__('Loading :model', ['model' => __('Owners')]) . '...')
-//                                                    ->searchingMessage(__('Searching :model', ['model' => __('Owners')]) . '...')
-//                                                    ->searchPrompt(__('Search owners by name'))
-//                                                    ->noSearchResultsMessage(__('No :model found.', ['model' => __('Owners')])),
-//                                            ])
-//                                            ->columns(2)
-//                                            ->columnSpan(12),
+                                        Fieldset::make(__('Relations'))
+                                            ->schema([
+                                                Select::make('RaceID')
+                                                    ->label(__('Breed'))
+                                                    ->relationship('breed', 'BreedName')
+                                                    ->searchable(['BreedName', 'BreedNameEN'])
+                                                    ->optionsLimit(50)
+                                                    ->native(false)
+                                                    ->required()
+                                                    ->loadingMessage(__('Loading :model', ['model' => __('Breeds')]) . '...')
+                                                    ->searchingMessage(__('Searching :model', ['model' => __('Breeds')]) . '...')
+                                                    ->searchPrompt(__('Search :model', ['model' => __('Breeds')]))
+                                                    ->noSearchResultsMessage(__('No :model found.', ['model' => __('Breeds')])),
+
+                                                Select::make('ColorID')
+                                                    ->label(__('Color'))
+                                                    ->relationship('color', 'ColorNameHE')
+                                                    ->searchable(['ColorNameHE', 'ColorNameEN'])
+                                                    ->optionsLimit(50)
+                                                    ->native(false)
+                                                    ->loadingMessage(__('Loading :model', ['model' => __('Colors')]) . '...')
+                                                    ->searchingMessage(__('Searching :model', ['model' => __('Colors')]) . '...')
+                                                    ->searchPrompt(__('Search :model', ['model' => __('Colors')]))
+                                                    ->noSearchResultsMessage(__('No :model found.', ['model' => __('Colors')])),
+
+                                                Select::make('HairID')
+                                                    ->label(__('Hair'))
+                                                    ->relationship('hair', 'HairNameHE')
+                                                    ->searchable(['HairNameHE', 'HairNameEN'])
+                                                    ->optionsLimit(50)
+                                                    ->native(false)
+                                                    ->loadingMessage(__('Loading :model', ['model' => __('Hairs')]) . '...')
+                                                    ->searchingMessage(__('Searching :model', ['model' => __('Hairs')]) . '...')
+                                                    ->searchPrompt(__('Search :model', ['model' => __('Hairs')]))
+                                                    ->noSearchResultsMessage(__('No :model found.', ['model' => __('Hairs')])),
+
+                                                Select::make('owners')
+                                                    ->label(__('Owners'))
+                                                    ->multiple()
+                                                    ->relationship('owners', 'first_name')
+                                                    ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en', 'mobile_phone'])
+                                                    ->optionsLimit(50)
+                                                    ->native(false)
+                                                    ->loadingMessage(__('Loading :model', ['model' => __('Owners')]) . '...')
+                                                    ->searchingMessage(__('Searching :model', ['model' => __('Owners')]) . '...')
+                                                    ->searchPrompt(__('Search owners by name'))
+                                                    ->noSearchResultsMessage(__('No :model found.', ['model' => __('Owners')])),
+                                            ])
+                                            ->columns(2)
+                                            ->columnSpan(12),
                                     ]),
                                 ])
                                 ->updateOptionUsing(function (Model $record, array $data): void {
@@ -447,14 +445,14 @@ class ManagePedigree extends Page implements HasForms
                                         ->modalWidth('6xl')
                                         ->color('warning')
                                         ->icon('fas-pen-to-square')
-                                        ->mountUsing(function (Form $form, Get $get): void {
-                                            $record = PrevDog::query()
-                                                ->where('SagirID', (int)$get('rootSagir'))
-                                                ->first();
-
-                                            $form->model($record ?? PrevDog::make())
-                                                ->fill($record?->attributesToArray() ?? []);
-                                        })
+//                                        ->mountUsing(function (Form $form, Get $get): void {
+//                                            $record = PrevDog::query()
+//                                                ->where('SagirID', (int)$get('rootSagir'))
+//                                                ->first();
+//
+//                                            $form->model($record ?? PrevDog::make())
+//                                                ->fill($record?->attributesToArray() ?? []);
+//                                        })
                                 )
 
                                 // When user selects / clears value (including after create), hydrate page props.

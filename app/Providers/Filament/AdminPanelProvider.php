@@ -140,13 +140,6 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('fas-shield-dog'),
             ])
             ->navigationItems([
-                NavigationItem::make('Breedings')
-                    ->label(fn (): string => __('Breedings'))
-                    ->url(fn (): string => Pages\Dashboard::getUrl())
-                    ->icon('fas-seedling')
-                    ->group(fn (): string => __('Breedings Management'))
-                    ->sort(40),
-
                 NavigationItem::make('payments')
                     ->label(fn (): string => __('Payments'))
                     ->url(fn (): string => Pages\Dashboard::getUrl())

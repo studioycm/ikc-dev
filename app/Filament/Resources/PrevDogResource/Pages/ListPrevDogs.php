@@ -17,10 +17,10 @@ class ListPrevDogs extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
-            Actions\Action::make('pedigree')
-                ->label(__('Manage Pedigree'))
-                ->icon('heroicon-m-share')
-                ->url(PrevDogResource::getUrl('pedigree')),
+//            Actions\Action::make('pedigree')
+//                ->label(__('Manage Pedigree'))
+//                ->icon('heroicon-m-share')
+//                ->url(PrevDogResource::getUrl('pedigree')),
         ];
     }
 
