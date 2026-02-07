@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\Legacy\LegacyDogGender;
 use App\Filament\Resources\PrevBreedingResource\Pages;
 use App\Models\PrevBreeding;
 use Filament\Forms\Components\DatePicker;
@@ -25,6 +26,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PrevBreedingResource extends Resource
@@ -61,14 +63,19 @@ class PrevBreedingResource extends Resource
             ->schema([
                 Select::make('SagirId')
                     ->label(__('Female'))
-                    ->relationship('female', 'name')
-                    ->searchable(['SagirID', 'Heb_Name', 'Eng_Name']),
+                    ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
+                    ->relationship('female', 'SagirID', modifyQueryUsing: fn(Builder $query) => $query->where('GenderID', '=', LegacyDogGender::Female->value), ignoreRecord: true)
+                    ->optionsLimit(20)
+                    ->searchDebounce(1500)
+                    ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}"),
 
                 Select::make('MaleSagirId')
                     ->label(__('Male'))
-                    ->relationship('male', 'name')
-                    ->searchable(['SagirID', 'Heb_Name', 'Eng_Name']),
-
+                    ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
+                    ->relationship('male', 'SagirID', modifyQueryUsing: fn(Builder $query) => $query->where('GenderID', '=', LegacyDogGender::Male->value), ignoreRecord: true)
+                    ->optionsLimit(20)
+                    ->searchDebounce(1500)
+                    ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}"),
                 DatePicker::make('BreddingDate'),
 
                 Toggle::make('Rules_IsOwner')
@@ -207,11 +214,11 @@ class PrevBreedingResource extends Resource
                     ->integer(),
 
                 Select::make('created_by')
-                    ->relationship('createdBy', 'name')
+                    ->relationship('createdBy', 'first_name')
                     ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en']),
 
                 Select::make('breeding_house_id')
-                    ->relationship('breedinghouse', 'name')
+                    ->relationship('breedinghouse', 'HebName')
                     ->searchable(['HebName', 'EngName', 'GidulCode']),
 
                 Placeholder::make('created_at')
