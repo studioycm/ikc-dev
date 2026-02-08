@@ -64,9 +64,14 @@ class PrevBreedingResource extends Resource
         return $form
             ->schema([
                 Wizard::make([
-                    Step::make(__('Inquiry'))
-                        ->description(__('Inquiry information'))
+                    Step::make('inquiry')
+                        ->label(__('Inquiry'))
+                        ->description(__('Preliminary inquiry information'))
+                        ->extraAttributes([
+                            'class' => 'breeding-wizard-step-inquiry',
+                        ])
                         ->schema([
+                            // --- PARENTS ---
                             Select::make('SagirId')
                                 ->label(__('Female'))
                                 ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
@@ -82,20 +87,28 @@ class PrevBreedingResource extends Resource
                                 ->optionsLimit(20)
                                 ->searchDebounce(1500)
                                 ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}"),
-                            DatePicker::make('BreddingDate'),
+
+                            // --- ELIGIBILITY CHECKS ---
+                            ToggleButtons::make('less_than_8_years')
+                                ->label(__('Less than 8 years'))
+                                ->options([
+                                    'yes' => __('Yes'),
+                                    'no' => __('No'),
+                                ])
+                                ->grouped(),
+
+                            ToggleButtons::make('more_than_18_months')
+                                ->label(__('More than 18 months'))
+                                ->options([
+                                    'yes' => __('Yes'),
+                                    'no' => __('No'),
+                                ])
+                                ->grouped(),
 
                             Toggle::make('Rules_IsOwner')
                                 ->label(__('Rules Is Owner')),
 
-                            Toggle::make('BreedMismatch')
-                                ->label(__('Breed Mismatch')),
-
-                            Toggle::make('Male_More_Than_5')
-                                ->label(__('Male more than 5')),
-
-                            Toggle::make('Male_More_Than_2')
-                                ->label(__('Male more than 2')),
-
+                            // --- DNA & APPROVALS ---
                             Toggle::make('Male_DNA')
                                 ->label(__('Male DNA')),
 
@@ -110,55 +123,116 @@ class PrevBreedingResource extends Resource
 
                             Toggle::make('Foreign_Male_Records')
                                 ->label(__('Foreign Male Records')),
+                        ])
+                        ->columns(4),
 
-                            TextInput::make('female_rate'),
+                    Step::make('breeding')
+                        ->label(__('Breeding'))
+                        ->description(__('Breeding information'))
+                        ->extraAttributes([
+                            'class' => 'breeding-wizard-step-breeding',
+                        ])
+                        ->schema([
+                            // --- MATING DETAILS ---
+                            DatePicker::make('BreddingDate')
+                                ->label(__('Breeding Date')),
 
-                            TextInput::make('male_rebreed'),
+                            Toggle::make('BreedMismatch')
+                                ->label(__('Breed Mismatch')),
 
-                            TextInput::make('male_rebreed_5'),
+                            // --- MALE FREQUENCY/LIMITS ---
+                            Toggle::make('Male_More_Than_5')
+                                ->label(__('Male more than 5')),
+
+                            Toggle::make('Male_More_Than_2')
+                                ->label(__('Male more than 2')),
+
+                            TextInput::make('male_rebreed')
+                                ->label(__('Male rebreed')),
+
+                            TextInput::make('male_rebreed_5')
+                                ->label(__('Male rebreed 5')),
 
                             TextInput::make('male_rebreed_2')
-                                ->required(),
+                                ->label(__('Male rebreed 2')),
 
-                            TextInput::make('generations_note'),
+                            // --- NOTES/RATES ---
+                            TextInput::make('female_rate')
+                                ->label(__('Female rate')),
+
+                            TextInput::make('generations_note')
+                                ->label(__('Generations note')),
                         ])
-                        ->columns(2),
-                    Step::make(__('Breeding'))
-                        ->description(__('Breeding information'))
+                        ->columns(4),
+
+                    Step::make('litter')
+                        ->label(__('Litter'))
+                        ->description(__('Litter information'))
+                        ->extraAttributes([
+                            'class' => 'breeding-wizard-step-litter',
+                        ])
                         ->schema([
-                            TextInput::make('live_male_puppie')
-                                ->integer(),
+                            // --- DATES & SETTINGS ---
+                            DatePicker::make('birthing_date')
+                                ->label(__('Birthing date')),
 
-                            TextInput::make('live_female_puppie')
-                                ->integer(),
+                            Toggle::make('publish_data')
+                                ->label(__('Publish data')),
 
-                            TextInput::make('dead_male_puppie')
-                                ->integer(),
-
-                            TextInput::make('dead_female_puppie')
-                                ->integer(),
-
-                            TextInput::make('total_dead')
-                                ->integer(),
+                            Toggle::make('share_data')
+                                ->label(__('Share data')),
 
                             Select::make('review_type')
+                                ->label(__('Review type'))
                                 ->options([
                                     'breeding_promoter' => __('Breed promoter'),
                                     'breeding_group' => __('Breeding group'),
                                 ])
                                 ->nullable(),
+
+                            // --- PUPPY COUNTS ---
+                            TextInput::make('live_male_puppie')
+                                ->label(__('Live male puppie'))
+                                ->integer(),
+
+                            TextInput::make('live_female_puppie')
+                                ->label(__('Live female puppie'))
+                                ->integer(),
+
+                            TextInput::make('dead_male_puppie')
+                                ->label(__('Dead male puppie'))
+                                ->integer(),
+
+                            TextInput::make('dead_female_puppie')
+                                ->label(__('Dead female puppie'))
+                                ->integer(),
+
+                            TextInput::make('total_dead')
+                                ->label(__('Total dead'))
+                                ->integer(),
                         ])
-                        ->columns(2),
-                    Step::make(__('Litter'))
-                        ->description(__('Litter information'))
+                        ->columns(4),
+
+                    Step::make('inspection')
+                        ->label(__('Inspection'))
+                        ->description(__('Scheduling a litter inspection'))
+                        ->extraAttributes([
+                            'class' => 'breeding-wizard-step-inspection',
+                        ])
                         ->schema([
-                            Toggle::make('publish_data'),
-
-                            Toggle::make('share_data'),
-
-                            DatePicker::make('birthing_date'),
+                            // --- STATUS & ADMIN ---
+                            ToggleButtons::make('status')
+                                ->label(__('Status'))
+                                ->options([
+                                    '0' => '0',
+                                    '1' => '1',
+                                    '2' => '2',
+                                    '3' => '3',
+                                ])
+                                ->grouped(),
 
                             ToggleButtons::make('filled_step')
+                                ->label(__('Filled step'))
                                 ->options([
                                     '1' => '1',
                                     '2' => '2',
@@ -167,7 +241,23 @@ class PrevBreedingResource extends Resource
                                 ])
                                 ->grouped(),
 
+                            TextInput::make('responsiable_owner')
+                                ->label(__('Responsiable owner'))
+                                ->integer(),
+
+                            Select::make('created_by')
+                                ->label(__('Created By'))
+                                ->relationship('createdBy', 'first_name')
+                                ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en']),
+
+                            Select::make('breeding_house_id')
+                                ->label(__('Beit Gidul'))
+                                ->relationship('breedinghouse', 'HebName')
+                                ->searchable(['HebName', 'EngName', 'GidulCode']),
+
+                            // --- FINANCIALS ---
                             ToggleButtons::make('payment_type')
+                                ->label(__('Payment Type'))
                                 ->options([
                                     'phone_payment' => __('Phone Payment'),
                                     'credit_card' => __('Credit Card'),
@@ -178,6 +268,7 @@ class PrevBreedingResource extends Resource
                                 ->nullable(),
 
                             ToggleButtons::make('payment_status')
+                                ->label(__('Payment Status'))
                                 ->options([
                                     'paid' => __('Paid'),
                                     'waiting for payment' => __('Waiting for payment'),
@@ -187,69 +278,38 @@ class PrevBreedingResource extends Resource
                                 ->nullable(),
 
                             TextInput::make('price_per_dog')
+                                ->label(__('Price per dog'))
                                 ->numeric(),
 
                             TextInput::make('review_price')
+                                ->label(__('Review price'))
                                 ->numeric(),
 
                             TextInput::make('certificate_price')
+                                ->label(__('Certificate price'))
                                 ->numeric(),
 
                             TextInput::make('total_payment')
+                                ->label(__('Total payment'))
                                 ->numeric(),
 
                             TextInput::make('total_refund')
+                                ->label(__('Total refund'))
                                 ->numeric(),
-                        ])
-                        ->columns(2),
-                    Step::make(__('Inspection'))
-                        ->description(__('Scheduling a litter inspection'))
-                        ->schema([
-                            ToggleButtons::make('less_than_8_years')
-                                ->options([
-                                    'yes' => __('Yes'),
-                                    'no' => __('No'),
-                                ])
-                                ->grouped(),
 
-                            ToggleButtons::make('more_than_18_months')
-                                ->options([
-                                    'yes' => __('Yes'),
-                                    'no' => __('No'),
-                                ])
-                                ->grouped(),
-
-                            ToggleButtons::make('status')
-                                ->options([
-                                    '0' => '0',
-                                    '1' => '1',
-                                    '2' => '2',
-                                    '3' => '3',
-                                ])
-                                ->grouped(),
-
-                            TextInput::make('responsiable_owner')
-                                ->integer(),
-
-                            Select::make('created_by')
-                                ->relationship('createdBy', 'first_name')
-                                ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en']),
-
-                            Select::make('breeding_house_id')
-                                ->relationship('breedinghouse', 'HebName')
-                                ->searchable(['HebName', 'EngName', 'GidulCode']),
-
+                            // --- TIMESTAMPS ---
                             Placeholder::make('created_at')
-                                ->label('Created Date')
+                                ->label(__('Created Date'))
                                 ->content(fn(?PrevBreeding $record): string => $record?->created_at?->diffForHumans() ?? '-'),
 
                             Placeholder::make('updated_at')
-                                ->label('Last Modified Date')
+                                ->label(__('Last Modified Date'))
                                 ->content(fn(?PrevBreeding $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
                         ])
-                        ->columns(2),
+                        ->columns(4),
                 ])
-                    ->columnSpanFull(),
+                    ->extraAttributes(['class' => 'breeding-wizard'])
+                    ->columnSpan('2xl'),
             ]);
     }
 
@@ -368,7 +428,8 @@ class PrevBreedingResource extends Resource
 
                 TextColumn::make('filled_step')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('status')
                     ->badge()
@@ -377,7 +438,9 @@ class PrevBreedingResource extends Resource
                         'pending' => 'warning',
                         'rejected' => 'danger',
                         default => 'gray',
-                    }),
+                    })
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 // Financials (Assuming ILS based on 'Asia/Jerusalem' timezone in context)
                 TextColumn::make('payment_type')
@@ -457,7 +520,8 @@ class PrevBreedingResource extends Resource
                     RestoreBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getPages(): array
