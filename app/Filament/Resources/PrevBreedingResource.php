@@ -109,7 +109,7 @@ class PrevBreedingResource extends Resource
                                         ])
                                         ->grouped(),
                             ])
-                                ->columns(5),
+                                ->columns(8),
                             Group::make([
                                     Select::make('MaleSagirId')
                                         ->label(__('Male'))
@@ -135,9 +135,9 @@ class PrevBreedingResource extends Resource
                                         ->onColor('success')
                                         ->offColor('danger'),
                             ])
-                                ->columns(5),
+                                ->columns(8),
                         ])
-                        ->columns(2),
+                        ->columns(1),
 
                     Step::make('breeding')
                         ->label(__('Breeding'))
@@ -271,7 +271,6 @@ class PrevBreedingResource extends Resource
                                     'credit_card' => __('Credit Card'),
                                     'cash' => __('Cash'),
                                 ])
-                                ->grouped()
                                 ->nullable(),
 
                         ])
