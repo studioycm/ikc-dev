@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use App\Enums\Legacy\LegacyDogGender;
 use App\Filament\Resources\PrevBreedingResource\Pages;
 use App\Models\PrevBreeding;
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Repeater;
@@ -75,6 +77,12 @@ class PrevBreedingResource extends Resource
                         ])
                         ->schema([
                             Group::make([
+                                TextInput::make('litter_report_name')
+                                    ->label(__('Litter Report Name')),
+
+                            ])
+                                ->columns(5),
+                            Group::make([
                                     Select::make('SagirId')
                                         ->label(__('Female'))
                                         ->hint(__('Search dogs by import number, sagir, chip or name'))
@@ -86,12 +94,14 @@ class PrevBreedingResource extends Resource
                                         ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}")
                                         ->columnSpan(2),
 
-                                    Toggle::make('Female_DNA')
+                                ToggleButtons::make('Female_DNA')
                                         ->label(__('Female DNA'))
-                                        ->inline(false)
-                                        ->default(false)
-                                        ->onColor('success')
-                                        ->offColor('danger'),
+                                    ->options([
+                                        'yes' => __('Yes'),
+                                        'no' => __('No'),
+                                        ''
+                                    ])
+                                    ->grouped(),
 
                                     ToggleButtons::make('less_than_8_years')
                                         ->label(__('Less than 8 years'))
@@ -136,6 +146,31 @@ class PrevBreedingResource extends Resource
                                         ->offColor('danger'),
                             ])
                                 ->columns(5),
+                            Section::make('preliminary_checks')
+                                ->heading(__('Preliminary Checks'))
+                                ->columns(5)
+                                ->schema([
+                                    // populate info components with data from selected female dog and male dog:
+
+                                    // toggle buttons: "קרבה משפחתית, כשירות לגידול, בדיקת גיל, מספר הרבעות, המלטה אחרונה"
+                                    // options: "כן מוחלט / לא מוחלט /  נדרש מידע משלים / נדרשת בדיקה"
+
+                                ]),
+                            Actions::make([
+                                Action::make('save_litter_report')
+                                    ->label(__('Save Litter Report'))
+                                    ->color('success')
+                                    ->action(function () {
+                                        // Your custom logic here
+                                    }),
+                                Action::make('delete_litter_report')
+                                    ->label(__('Delete Litter Report'))
+                                    ->color('danger')
+                                    ->action(function () {
+
+                                    }),
+                            ])
+                                ->alignCenter(),
                         ])
                         ->columns(1),
 
