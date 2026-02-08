@@ -109,7 +109,7 @@ class PrevBreedingResource extends Resource
                                         ])
                                         ->grouped(),
                             ])
-                                ->columns(8),
+                                ->columns(5),
                             Group::make([
                                     Select::make('MaleSagirId')
                                         ->label(__('Male'))
@@ -135,7 +135,7 @@ class PrevBreedingResource extends Resource
                                         ->onColor('success')
                                         ->offColor('danger'),
                             ])
-                                ->columns(8),
+                                ->columns(5),
                         ])
                         ->columns(1),
 
@@ -162,7 +162,7 @@ class PrevBreedingResource extends Resource
 
 
                         ])
-                        ->columns(4),
+                        ->columns(3),
 
                     Step::make('litter')
                         ->label(__('Litter'))
@@ -200,8 +200,8 @@ class PrevBreedingResource extends Resource
                                         ->label(__('Total dead'))
                                         ->integer(),
                                 ])
-                                ->columns(2)
-                                ->columnSpan(1),
+                                ->columns(7)
+                                ->columnSpan(4),
                             Section::make('puppies_list')
                                 ->heading(__('Puppies list'))
                                 ->schema([
@@ -242,7 +242,7 @@ class PrevBreedingResource extends Resource
                                         ])
                                         ->columns(6)
                                 ])
-                                ->columnSpan(3),
+                                ->columnSpan(4),
                         ])
                         ->columns(4),
 
@@ -274,11 +274,11 @@ class PrevBreedingResource extends Resource
                                 ->nullable(),
 
                         ])
-                        ->columns(4),
+                        ->columns(3),
                 ])
                     ->persistStepInQueryString('step')
                     ->extraAttributes(['class' => 'breeding-wizard'])
-                    ->columnSpan('full'),
+                    ->columnSpan('2xl'),
             ]);
     }
 
