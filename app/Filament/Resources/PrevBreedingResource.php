@@ -13,7 +13,6 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
@@ -94,30 +93,30 @@ class PrevBreedingResource extends Resource
                                         ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}")
                                         ->columnSpan(2),
 
-                                ToggleButtons::make('Female_DNA')
-                                        ->label(__('Female DNA'))
-                                    ->options([
-                                        'yes' => __('Yes'),
-                                        'no' => __('No'),
-                                        ''
-                                    ])
-                                    ->grouped(),
-
-                                    ToggleButtons::make('less_than_8_years')
-                                        ->label(__('Less than 8 years'))
-                                        ->options([
-                                            'yes' => __('Yes'),
-                                            'no' => __('No'),
-                                        ])
-                                        ->grouped(),
-
-                                    ToggleButtons::make('more_than_18_months')
-                                        ->label(__('More than 18 months'))
-                                        ->options([
-                                            'yes' => __('Yes'),
-                                            'no' => __('No'),
-                                        ])
-                                        ->grouped(),
+//                                ToggleButtons::make('Female_DNA')
+//                                        ->label(__('Female DNA'))
+//                                    ->options([
+//                                        'yes' => __('Yes'),
+//                                        'no' => __('No'),
+//                                        ''
+//                                    ])
+//                                    ->grouped(),
+//
+//                                    ToggleButtons::make('less_than_8_years')
+//                                        ->label(__('Less than 8 years'))
+//                                        ->options([
+//                                            'yes' => __('Yes'),
+//                                            'no' => __('No'),
+//                                        ])
+//                                        ->grouped(),
+//
+//                                    ToggleButtons::make('more_than_18_months')
+//                                        ->label(__('More than 18 months'))
+//                                        ->options([
+//                                            'yes' => __('Yes'),
+//                                            'no' => __('No'),
+//                                        ])
+//                                        ->grouped(),
                             ])
                                 ->columns(5),
                             Group::make([
@@ -131,19 +130,19 @@ class PrevBreedingResource extends Resource
                                         ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}")
                                         ->columnSpan(2),
 
-                                    Toggle::make('Male_DNA')
-                                        ->label(__('Male DNA'))
-                                        ->inline(false)
-                                        ->default(false)
-                                        ->onColor('success')
-                                        ->offColor('danger'),
-
-                                    Toggle::make('Foreign_Male_Records')
-                                        ->label(__('Foreign Male Records'))
-                                        ->inline(false)
-                                        ->default(false)
-                                        ->onColor('success')
-                                        ->offColor('danger'),
+//                                    Toggle::make('Male_DNA')
+//                                        ->label(__('Male DNA'))
+//                                        ->inline(false)
+//                                        ->default(false)
+//                                        ->onColor('success')
+//                                        ->offColor('danger'),
+//
+//                                    Toggle::make('Foreign_Male_Records')
+//                                        ->label(__('Foreign Male Records'))
+//                                        ->inline(false)
+//                                        ->default(false)
+//                                        ->onColor('success')
+//                                        ->offColor('danger'),
                             ])
                                 ->columns(5),
                             Section::make('preliminary_checks')
