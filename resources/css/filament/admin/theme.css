@@ -1,11 +1,12 @@
 @import '../../../../vendor/filament/filament/resources/css/base.css';
 
-@config 'tailwind.config.js';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 @tailwind variants;
+
+@config 'tailwind.config.js';
 
 .fi-sidebar-nav-groups {
     @apply gap-y-2;
