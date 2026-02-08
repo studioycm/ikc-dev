@@ -11,6 +11,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -61,173 +63,193 @@ class PrevBreedingResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('SagirId')
-                    ->label(__('Female'))
-                    ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
-                    ->relationship('female', 'SagirID', modifyQueryUsing: fn(Builder $query) => $query->where('GenderID', '=', LegacyDogGender::Female->value), ignoreRecord: true)
-                    ->optionsLimit(20)
-                    ->searchDebounce(1500)
-                    ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}"),
+                Wizard::make([
+                    Step::make(__('Inquiry'))
+                        ->description(__('Inquiry information'))
+                        ->schema([
+                            Select::make('SagirId')
+                                ->label(__('Female'))
+                                ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
+                                ->relationship('female', 'SagirID', modifyQueryUsing: fn(Builder $query) => $query->where('GenderID', '=', LegacyDogGender::Female->value), ignoreRecord: true)
+                                ->optionsLimit(20)
+                                ->searchDebounce(1500)
+                                ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}"),
 
-                Select::make('MaleSagirId')
-                    ->label(__('Male'))
-                    ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
-                    ->relationship('male', 'SagirID', modifyQueryUsing: fn(Builder $query) => $query->where('GenderID', '=', LegacyDogGender::Male->value), ignoreRecord: true)
-                    ->optionsLimit(20)
-                    ->searchDebounce(1500)
-                    ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}"),
-                DatePicker::make('BreddingDate'),
+                            Select::make('MaleSagirId')
+                                ->label(__('Male'))
+                                ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
+                                ->relationship('male', 'SagirID', modifyQueryUsing: fn(Builder $query) => $query->where('GenderID', '=', LegacyDogGender::Male->value), ignoreRecord: true)
+                                ->optionsLimit(20)
+                                ->searchDebounce(1500)
+                                ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}"),
+                            DatePicker::make('BreddingDate'),
 
-                Toggle::make('Rules_IsOwner')
-                    ->label(__('Rules Is Owner')),
+                            Toggle::make('Rules_IsOwner')
+                                ->label(__('Rules Is Owner')),
 
-                Toggle::make('BreedMismatch')
-                    ->label(__('Breed Mismatch')),
+                            Toggle::make('BreedMismatch')
+                                ->label(__('Breed Mismatch')),
 
-                Toggle::make('Male_More_Than_5')
-                    ->label(__('Male more than 5')),
+                            Toggle::make('Male_More_Than_5')
+                                ->label(__('Male more than 5')),
 
-                Toggle::make('Male_More_Than_2')
-                    ->label(__('Male more than 2')),
+                            Toggle::make('Male_More_Than_2')
+                                ->label(__('Male more than 2')),
 
-                Toggle::make('Male_DNA')
-                    ->label(__('Male DNA')),
+                            Toggle::make('Male_DNA')
+                                ->label(__('Male DNA')),
 
-                Toggle::make('Female_DNA')
-                    ->label(__('Female DNA')),
+                            Toggle::make('Female_DNA')
+                                ->label(__('Female DNA')),
 
-                Toggle::make('Male_Breeding_Not_Approved')
-                    ->label(__('Male Breeding Not Approved')),
+                            Toggle::make('Male_Breeding_Not_Approved')
+                                ->label(__('Male Breeding Not Approved')),
 
-                Toggle::make('Female_Breeding_Not_Approved')
-                    ->label(__('Female Breeding Not Approved')),
+                            Toggle::make('Female_Breeding_Not_Approved')
+                                ->label(__('Female Breeding Not Approved')),
 
-                Toggle::make('Foreign_Male_Records')
-                    ->label(__('Foreign Male Records')),
+                            Toggle::make('Foreign_Male_Records')
+                                ->label(__('Foreign Male Records')),
 
-                TextInput::make('female_rate'),
+                            TextInput::make('female_rate'),
 
-                TextInput::make('male_rebreed'),
+                            TextInput::make('male_rebreed'),
 
-                TextInput::make('male_rebreed_5'),
+                            TextInput::make('male_rebreed_5'),
 
-                TextInput::make('male_rebreed_2')
-                    ->required(),
+                            TextInput::make('male_rebreed_2')
+                                ->required(),
 
-                TextInput::make('generations_note'),
+                            TextInput::make('generations_note'),
+                        ])
+                        ->columns(2),
+                    Step::make(__('Breeding'))
+                        ->description(__('Breeding information'))
+                        ->schema([
+                            TextInput::make('live_male_puppie')
+                                ->integer(),
 
-                TextInput::make('live_male_puppie')
-                    ->integer(),
+                            TextInput::make('live_female_puppie')
+                                ->integer(),
 
-                TextInput::make('live_female_puppie')
-                    ->integer(),
+                            TextInput::make('dead_male_puppie')
+                                ->integer(),
 
-                TextInput::make('dead_male_puppie')
-                    ->integer(),
+                            TextInput::make('dead_female_puppie')
+                                ->integer(),
 
-                TextInput::make('dead_female_puppie')
-                    ->integer(),
+                            TextInput::make('total_dead')
+                                ->integer(),
 
-                TextInput::make('total_dead')
-                    ->integer(),
+                            Select::make('review_type')
+                                ->options([
+                                    'breeding_promoter' => __('Breed promoter'),
+                                    'breeding_group' => __('Breeding group'),
+                                ])
+                                ->nullable(),
+                        ])
+                        ->columns(2),
+                    Step::make(__('Litter'))
+                        ->description(__('Litter information'))
+                        ->schema([
+                            Toggle::make('publish_data'),
 
-                Select::make('review_type')
-                    ->options([
-                        'breeding_promoter' => __('Breed promoter'),
-                        'breeding_group' => __('Breeding group'),
-                    ])
-                    ->nullable(),
+                            Toggle::make('share_data'),
 
-                Toggle::make('publish_data'),
+                            DatePicker::make('birthing_date'),
 
-                Toggle::make('share_data'),
+                            ToggleButtons::make('filled_step')
+                                ->options([
+                                    '1' => '1',
+                                    '2' => '2',
+                                    '3' => '3',
+                                    '4' => '4',
+                                ])
+                                ->grouped(),
 
-                DatePicker::make('birthing_date'),
+                            ToggleButtons::make('payment_type')
+                                ->options([
+                                    'phone_payment' => __('Phone Payment'),
+                                    'credit_card' => __('Credit Card'),
+                                    'cash' => __('Cash'),
+                                    null => __('Missing'),
+                                ])
+                                ->grouped()
+                                ->nullable(),
 
-                ToggleButtons::make('filled_step')
-                    ->options([
-                        '1' => '1',
-                        '2' => '2',
-                        '3' => '3',
-                        '4' => '4',
-                    ])
-                    ->grouped(),
+                            ToggleButtons::make('payment_status')
+                                ->options([
+                                    'paid' => __('Paid'),
+                                    'waiting for payment' => __('Waiting for payment'),
+                                    null => __('Missing'),
+                                ])
+                                ->grouped()
+                                ->nullable(),
 
-                ToggleButtons::make('payment_type')
-                    ->options([
-                        'phone_payment' => __('Phone Payment'),
-                        'credit_card' => __('Credit Card'),
-                        'cash' => __('Cash'),
-                        null => __('Missing'),
-                    ])
-                    ->grouped()
-                    ->nullable(),
+                            TextInput::make('price_per_dog')
+                                ->numeric(),
 
-                ToggleButtons::make('payment_status')
-                    ->options([
-                        'paid' => __('Paid'),
-                        'waiting for payment' => __('Waiting for payment'),
-                        null => __('Missing'),
-                    ])
-                    ->grouped()
-                    ->nullable(),
+                            TextInput::make('review_price')
+                                ->numeric(),
 
-                TextInput::make('price_per_dog')
-                    ->numeric(),
+                            TextInput::make('certificate_price')
+                                ->numeric(),
 
-                TextInput::make('review_price')
-                    ->numeric(),
+                            TextInput::make('total_payment')
+                                ->numeric(),
 
-                TextInput::make('certificate_price')
-                    ->numeric(),
+                            TextInput::make('total_refund')
+                                ->numeric(),
+                        ])
+                        ->columns(2),
+                    Step::make(__('Inspection'))
+                        ->description(__('Scheduling a litter inspection'))
+                        ->schema([
+                            ToggleButtons::make('less_than_8_years')
+                                ->options([
+                                    'yes' => __('Yes'),
+                                    'no' => __('No'),
+                                ])
+                                ->grouped(),
 
-                TextInput::make('total_payment')
-                    ->numeric(),
+                            ToggleButtons::make('more_than_18_months')
+                                ->options([
+                                    'yes' => __('Yes'),
+                                    'no' => __('No'),
+                                ])
+                                ->grouped(),
 
-                TextInput::make('total_refund')
-                    ->numeric(),
+                            ToggleButtons::make('status')
+                                ->options([
+                                    '0' => '0',
+                                    '1' => '1',
+                                    '2' => '2',
+                                    '3' => '3',
+                                ])
+                                ->grouped(),
 
-                ToggleButtons::make('less_than_8_years')
-                    ->options([
-                        'yes' => __('Yes'),
-                        'no' => __('No'),
-                    ])
-                    ->grouped(),
+                            TextInput::make('responsiable_owner')
+                                ->integer(),
 
-                ToggleButtons::make('more_than_18_months')
-                    ->options([
-                        'yes' => __('Yes'),
-                        'no' => __('No'),
-                    ])
-                    ->grouped(),
+                            Select::make('created_by')
+                                ->relationship('createdBy', 'first_name')
+                                ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en']),
 
-                ToggleButtons::make('status')
-                    ->options([
-                        '0' => '0',
-                        '1' => '1',
-                        '2' => '2',
-                        '3' => '3',
-                    ])
-                    ->grouped(),
+                            Select::make('breeding_house_id')
+                                ->relationship('breedinghouse', 'HebName')
+                                ->searchable(['HebName', 'EngName', 'GidulCode']),
 
-                TextInput::make('responsiable_owner')
-                    ->integer(),
+                            Placeholder::make('created_at')
+                                ->label('Created Date')
+                                ->content(fn(?PrevBreeding $record): string => $record?->created_at?->diffForHumans() ?? '-'),
 
-                Select::make('created_by')
-                    ->relationship('createdBy', 'first_name')
-                    ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en']),
-
-                Select::make('breeding_house_id')
-                    ->relationship('breedinghouse', 'HebName')
-                    ->searchable(['HebName', 'EngName', 'GidulCode']),
-
-                Placeholder::make('created_at')
-                    ->label('Created Date')
-                    ->content(fn(?PrevBreeding $record): string => $record?->created_at?->diffForHumans() ?? '-'),
-
-                Placeholder::make('updated_at')
-                    ->label('Last Modified Date')
-                    ->content(fn(?PrevBreeding $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
+                            Placeholder::make('updated_at')
+                                ->label('Last Modified Date')
+                                ->content(fn(?PrevBreeding $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
+                        ])
+                        ->columns(2),
+                ])
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -235,6 +257,7 @@ class PrevBreedingResource extends Resource
     {
         return $table
             ->columns([
+
                 // Relationships (Using 'female' and 'male' relations from Breeding model)
                 TextColumn::make('female.Eng_Name')
                     ->label('Mother (Dam)')
@@ -408,8 +431,18 @@ class PrevBreedingResource extends Resource
                 TextColumn::make('breedinghouse.name')
                     ->searchable(['HebName', 'EngName', 'GidulCode'])
                     ->sortable(['HebName']),
+
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+
                 TrashedFilter::make(),
             ])
             ->actions([
