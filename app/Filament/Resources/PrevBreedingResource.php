@@ -6,7 +6,7 @@ use App\Enums\Legacy\LegacyDogGender;
 use App\Filament\Resources\PrevBreedingResource\Pages;
 use App\Models\PrevBreeding;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -74,10 +74,7 @@ class PrevBreedingResource extends Resource
                             'class' => 'breeding-wizard-step-inquiry',
                         ])
                         ->schema([
-                            Fieldset::make('female')
-                                ->label(__('Female details'))
-                                ->columns(5)
-                                ->schema([
+                            Group::make([
                                     Select::make('SagirId')
                                         ->label(__('Female'))
                                         ->hint(__('Search dogs by import number, sagir, chip or name'))
@@ -111,11 +108,9 @@ class PrevBreedingResource extends Resource
                                             'no' => __('No'),
                                         ])
                                         ->grouped(),
-                                ]),
-                            Fieldset::make('male')
-                                ->label(__('Male details'))
-                                ->columns(5)
-                                ->schema([
+                            ])
+                                ->columns(5),
+                            Group::make([
                                     Select::make('MaleSagirId')
                                         ->label(__('Male'))
                                         ->hint(__('Search dogs by import number, sagir, chip or name'))
@@ -139,7 +134,8 @@ class PrevBreedingResource extends Resource
                                         ->default(false)
                                         ->onColor('success')
                                         ->offColor('danger'),
-                                ]),
+                            ])
+                                ->columns(5),
                         ])
                         ->columns(2),
 
