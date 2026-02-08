@@ -51,7 +51,6 @@ expert with them all. Ensure you abide by these specific packages & versions.
   tests are more important.
 
 ## Application Structure & Architecture
-
 - Stick to existing directory structure; don't create new base folders without approval.
 - Do not change the application's dependencies without approval.
 
@@ -121,7 +120,7 @@ expert with them all. Ensure you abide by these specific packages & versions.
 
 ### Constructors
 - Use PHP 8 constructor property promotion in `__construct()`.
-  - <code-snippet>public function __construct(public GitHub $github) { }</code-snippet>
+    - <code-snippet>public function __construct(public GitHub $github) { }</code-snippet>
 - Do not allow empty `__construct()` methods with zero parameters unless the constructor is private.
 
 ### Type Declarations
@@ -235,7 +234,6 @@ protected function isAccessible(User $user, ?string $path = null): bool
 - Since Laravel 11, Laravel has a new streamlined file structure which this project uses.
 
 ### Laravel 12 Structure
-
 - In Laravel 12, middleware are no longer registered in `app/Http/Kernel.php`.
 - Middleware are configured declaratively in `bootstrap/app.php` using `Application::configure()->withMiddleware()`.
 - `bootstrap/app.php` is the file to register middleware, exceptions, and routing files.
@@ -309,10 +307,10 @@ protected function isAccessible(User $user, ?string $path = null): bool
 
 - These things changed in Livewire 3, but may not have been updated in this application. Verify this application's setup
   to ensure you conform with application conventions.
-  - Use `wire:model.live` for real-time updates, `wire:model` is now deferred by default.
-  - Components now use the `App\Livewire` namespace (not `App\Http\Livewire`).
-  - Use `$this->dispatch()` to dispatch events (not `emit` or `dispatchBrowserEvent`).
-  - Use the `components.layouts.app` view as the typical layout path (not `layouts.app`).
+    - Use `wire:model.live` for real-time updates, `wire:model` is now deferred by default.
+    - Components now use the `App\Livewire` namespace (not `App\Http\Livewire`).
+    - Use `$this->dispatch()` to dispatch events (not `emit` or `dispatchBrowserEvent`).
+    - Use the `components.layouts.app` view as the typical layout path (not `layouts.app`).
 
 ### New Directives
 
@@ -320,7 +318,6 @@ protected function isAccessible(User $user, ?string $path = null): bool
   documentation to find usage examples.
 
 ### Alpine
-
 - Alpine is now included with Livewire; don't manually include Alpine.js.
 - Plugins included with Alpine: persist, intersect, collapse, and focus.
 
@@ -423,7 +420,6 @@ it('has emails', function (string $email) {
 - You can use the `search-docs` tool to get exact examples from the official documentation when needed.
 
 ### Spacing
-
 - When listing items, use gap utilities for spacing; don't use margins.
 
 <code-snippet name="Valid Flex Gap Spacing Example" lang="html">
@@ -465,7 +461,6 @@ it('has emails', function (string $email) {
 </code-snippet>
 
 ### Replaced Utilities
-
 - Tailwind v4 removed deprecated utilities. Do not use the deprecated option; use the replacement.
 - Opacity values are still numeric.
 

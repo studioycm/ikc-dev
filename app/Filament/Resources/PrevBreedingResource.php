@@ -309,7 +309,7 @@ class PrevBreedingResource extends Resource
                         ->columns(4),
                 ])
                     ->extraAttributes(['class' => 'breeding-wizard'])
-                    ->columnSpan('2xl'),
+                    ->columnSpan('full'),
             ]);
     }
 
