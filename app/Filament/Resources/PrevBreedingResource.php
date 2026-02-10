@@ -2,16 +2,23 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\Legacy\LegacyDogGender;
 use App\Filament\Resources\PrevBreedingResource\Pages;
 use App\Models\PrevBreeding;
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Alignment;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -25,6 +32,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PrevBreedingResource extends Resource
@@ -37,7 +45,7 @@ class PrevBreedingResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('Breeding');
+        return __('Litter');
     }
 
     public static function getPluralModelLabel(): string
@@ -59,168 +67,252 @@ class PrevBreedingResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('SagirId')
-                    ->label(__('Female'))
-                    ->relationship('female', 'name')
-                    ->searchable(['SagirID', 'Heb_Name', 'Eng_Name']),
+                Wizard::make([
+                    Step::make('inquiry')
+                        ->label(__('Inquiry'))
+                        ->description(__('Preliminary inquiry information'))
+                        ->extraAttributes([
+                            'class' => 'breeding-wizard-step-inquiry',
+                        ])
+                        ->schema([
+                            Group::make([
+                                TextInput::make('litter_report_name')
+                                    ->label(__('Litter Report Name')),
 
-                Select::make('MaleSagirId')
-                    ->label(__('Male'))
-                    ->relationship('male', 'name')
-                    ->searchable(['SagirID', 'Heb_Name', 'Eng_Name']),
+                            ])
+                                ->columns(5),
+                            Group::make([
+                                    Select::make('SagirId')
+                                        ->label(__('Female'))
+                                        ->hint(__('Search dogs by import number, sagir, chip or name'))
+                                        ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
+                                        ->relationship('female', 'SagirID', modifyQueryUsing: fn(Builder $query) => $query->where('GenderID', '=', LegacyDogGender::Female->value), ignoreRecord: true)
+                                        ->optionsLimit(20)
+                                        ->default('504740')
+                                        ->searchDebounce(1500)
+                                        ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}")
+                                        ->columnSpan(2),
 
-                DatePicker::make('BreddingDate'),
+//                                ToggleButtons::make('Female_DNA')
+//                                        ->label(__('Female DNA'))
+//                                    ->options([
+//                                        'yes' => __('Yes'),
+//                                        'no' => __('No'),
+//                                        ''
+//                                    ])
+//                                    ->grouped(),
+//
+//                                    ToggleButtons::make('less_than_8_years')
+//                                        ->label(__('Less than 8 years'))
+//                                        ->options([
+//                                            'yes' => __('Yes'),
+//                                            'no' => __('No'),
+//                                        ])
+//                                        ->grouped(),
+//
+//                                    ToggleButtons::make('more_than_18_months')
+//                                        ->label(__('More than 18 months'))
+//                                        ->options([
+//                                            'yes' => __('Yes'),
+//                                            'no' => __('No'),
+//                                        ])
+//                                        ->grouped(),
+                            ])
+                                ->columns(5),
+                            Group::make([
+                                    Select::make('MaleSagirId')
+                                        ->label(__('Male'))
+                                        ->hint(__('Search dogs by import number, sagir, chip or name'))
+                                        ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
+                                        ->relationship('male', 'SagirID', modifyQueryUsing: fn(Builder $query) => $query->where('GenderID', '=', LegacyDogGender::Male->value), ignoreRecord: true)
+                                        ->optionsLimit(20)
+                                        ->searchDebounce(1500)
+                                        ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}")
+                                        ->columnSpan(2),
 
-                Toggle::make('Rules_IsOwner')
-                    ->label(__('Rules Is Owner')),
+//                                    Toggle::make('Male_DNA')
+//                                        ->label(__('Male DNA'))
+//                                        ->inline(false)
+//                                        ->default(false)
+//                                        ->onColor('success')
+//                                        ->offColor('danger'),
+//
+//                                    Toggle::make('Foreign_Male_Records')
+//                                        ->label(__('Foreign Male Records'))
+//                                        ->inline(false)
+//                                        ->default(false)
+//                                        ->onColor('success')
+//                                        ->offColor('danger'),
+                            ])
+                                ->columns(5),
+                            Section::make('preliminary_checks')
+                                ->heading(__('Preliminary Checks'))
+                                ->columns(5)
+                                ->schema([
+                                    // populate info components with data from selected female dog and male dog:
 
-                Toggle::make('BreedMismatch')
-                    ->label(__('Breed Mismatch')),
+                                    // toggle buttons: "קרבה משפחתית, כשירות לגידול, בדיקת גיל, מספר הרבעות, המלטה אחרונה"
+                                    // options: "כן מוחלט / לא מוחלט /  נדרש מידע משלים / נדרשת בדיקה"
 
-                Toggle::make('Male_More_Than_5')
-                    ->label(__('Male more than 5')),
+                                ]),
+                            Actions::make([
+                                Action::make('save_litter_report')
+                                    ->label(__('Save Litter Report'))
+                                    ->color('success')
+                                    ->action(function () {
+                                        // Your custom logic here
+                                    }),
+                                Action::make('delete_litter_report')
+                                    ->label(__('Delete Litter Report'))
+                                    ->color('danger')
+                                    ->action(function () {
 
-                Toggle::make('Male_More_Than_2')
-                    ->label(__('Male more than 2')),
+                                    }),
+                            ])
+                                ->alignCenter(),
+                        ])
+                        ->columns(1),
 
-                Toggle::make('Male_DNA')
-                    ->label(__('Male DNA')),
+                    Step::make('breeding')
+                        ->label(__('Breeding'))
+                        ->description(__('Breeding information'))
+                        ->extraAttributes([
+                            'class' => 'breeding-wizard-step-breeding',
+                        ])
+                        ->schema([
+                            // --- MATING DETAILS ---
+                            DatePicker::make('BreddingDate')
+                                ->label(__('Breeding Date')),
 
-                Toggle::make('Female_DNA')
-                    ->label(__('Female DNA')),
+                            Select::make('breeding_house_id')
+                                ->label(__('Beit Gidul'))
+                                ->relationship('breedinghouse', 'HebName')
+                                ->searchable(['HebName', 'EngName', 'GidulCode']),
 
-                Toggle::make('Male_Breeding_Not_Approved')
-                    ->label(__('Male Breeding Not Approved')),
+                            Select::make('created_by')
+                                ->label(__('Breeder'))
+                                ->relationship('createdBy', 'first_name')
+                                ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en']),
 
-                Toggle::make('Female_Breeding_Not_Approved')
-                    ->label(__('Female Breeding Not Approved')),
 
-                Toggle::make('Foreign_Male_Records')
-                    ->label(__('Foreign Male Records')),
+                        ])
+                        ->columns(3),
 
-                TextInput::make('female_rate'),
+                    Step::make('litter')
+                        ->label(__('Litter'))
+                        ->description(__('Litter information'))
+                        ->extraAttributes([
+                            'class' => 'breeding-wizard-step-litter',
+                        ])
+                        ->schema([
+                            Section::make('general')
+                                ->heading(__('General'))
+                                ->schema([
+                                    // --- DATES & SETTINGS ---
+                                    DatePicker::make('birthing_date')
+                                        ->label(__('Birthing date'))
+                                        ->columnSpan(2),
 
-                TextInput::make('male_rebreed'),
+                                    // --- PUPPY COUNTS ---
+                                    TextInput::make('live_male_puppie')
+                                        ->label(__('Live male puppie'))
+                                        ->integer(),
 
-                TextInput::make('male_rebreed_5'),
+                                    TextInput::make('live_female_puppie')
+                                        ->label(__('Live female puppie'))
+                                        ->integer(),
 
-                TextInput::make('male_rebreed_2')
-                    ->required(),
+                                    TextInput::make('dead_male_puppie')
+                                        ->label(__('Dead male puppie'))
+                                        ->integer(),
 
-                TextInput::make('generations_note'),
+                                    TextInput::make('dead_female_puppie')
+                                        ->label(__('Dead female puppie'))
+                                        ->integer(),
 
-                TextInput::make('live_male_puppie')
-                    ->integer(),
+                                    TextInput::make('total_dead')
+                                        ->label(__('Total dead'))
+                                        ->integer(),
+                                ])
+                                ->columns(7)
+                                ->columnSpan(4),
+                            Section::make('puppies_list')
+                                ->heading(__('Puppies list'))
+                                ->schema([
+                                    Repeater::make('puppies')
+                                        ->label(false)
+                                        ->addActionLabel(__('Add puppy'))
+                                        ->addActionAlignment(Alignment::Start)
+                                        ->schema([
+                                            TextInput::make('name')
+                                                ->label(__('Name')),
+                                            ToggleButtons::make('gender')
+                                                ->label(__('Gender'))
+                                                ->options([
+                                                    'male' => __('Male'),
+                                                    'female' => __('Female'),
+                                                ])
+                                                ->grouped(),
+                                            TextInput::make('chip')
+                                                ->label(__('Chip')),
+                                            ToggleButtons::make('vaccinated')
+                                                ->label(__('Vaccinated'))
+                                                ->options([
+                                                    'yes' => __('Yes'),
+                                                    'no' => __('No'),
+                                                ])
+                                                ->grouped(),
+                                            DatePicker::make('vaccinated_date')
+                                                ->label(__('Vaccination date'))
+                                                ->nullable(),
+                                            ToggleButtons::make('alive')
+                                                ->label(__('Alive'))
+                                                ->options([
+                                                    'yes' => __('Yes'),
+                                                    'no' => __('No'),
+                                                ])
+                                                ->default('yes')
+                                                ->grouped(),
+                                        ])
+                                        ->columns(6)
+                                ])
+                                ->columnSpan(4),
+                        ])
+                        ->columns(4),
 
-                TextInput::make('live_female_puppie')
-                    ->integer(),
+                    Step::make('inspection')
+                        ->label(__('Inspection'))
+                        ->description(__('Scheduling a litter inspection'))
+                        ->extraAttributes([
+                            'class' => 'breeding-wizard-step-inspection',
+                        ])
+                        ->schema(components: [
+                            Select::make('review_type')
+                                ->label(__('Review type'))
+                                ->options([
+                                    'breeding_promoter' => __('Breed promoter'),
+                                    'breeding_group' => __('Breeding group'),
+                                    'not_matter' => __('Does not matter'),
+                                    'office_choice' => __('Office choice'),
+                                ])
+                                ->nullable(),
 
-                TextInput::make('dead_male_puppie')
-                    ->integer(),
+                            // --- FINANCIALS ---
+                            ToggleButtons::make('payment_type')
+                                ->label(__('Payment Type'))
+                                ->options([
+                                    'phone_payment' => __('Phone Payment'),
+                                    'credit_card' => __('Credit Card'),
+                                    'cash' => __('Cash'),
+                                ])
+                                ->nullable(),
 
-                TextInput::make('dead_female_puppie')
-                    ->integer(),
-
-                TextInput::make('total_dead')
-                    ->integer(),
-
-                Select::make('review_type')
-                    ->options([
-                        'breeding_promoter' => __('Breed promoter'),
-                        'breeding_group' => __('Breeding group'),
-                    ])
-                    ->nullable(),
-
-                Toggle::make('publish_data'),
-
-                Toggle::make('share_data'),
-
-                DatePicker::make('birthing_date'),
-
-                ToggleButtons::make('filled_step')
-                    ->options([
-                        '1' => '1',
-                        '2' => '2',
-                        '3' => '3',
-                        '4' => '4',
-                    ])
-                    ->grouped(),
-
-                ToggleButtons::make('payment_type')
-                    ->options([
-                        'phone_payment' => __('Phone Payment'),
-                        'credit_card' => __('Credit Card'),
-                        'cash' => __('Cash'),
-                        null => __('Missing'),
-                    ])
-                    ->grouped()
-                    ->nullable(),
-
-                ToggleButtons::make('payment_status')
-                    ->options([
-                        'paid' => __('Paid'),
-                        'waiting for payment' => __('Waiting for payment'),
-                        null => __('Missing'),
-                    ])
-                    ->grouped()
-                    ->nullable(),
-
-                TextInput::make('price_per_dog')
-                    ->numeric(),
-
-                TextInput::make('review_price')
-                    ->numeric(),
-
-                TextInput::make('certificate_price')
-                    ->numeric(),
-
-                TextInput::make('total_payment')
-                    ->numeric(),
-
-                TextInput::make('total_refund')
-                    ->numeric(),
-
-                ToggleButtons::make('less_than_8_years')
-                    ->options([
-                        'yes' => __('Yes'),
-                        'no' => __('No'),
-                    ])
-                    ->grouped(),
-
-                ToggleButtons::make('more_than_18_months')
-                    ->options([
-                        'yes' => __('Yes'),
-                        'no' => __('No'),
-                    ])
-                    ->grouped(),
-
-                ToggleButtons::make('status')
-                    ->options([
-                        '0' => '0',
-                        '1' => '1',
-                        '2' => '2',
-                        '3' => '3',
-                    ])
-                    ->grouped(),
-
-                TextInput::make('responsiable_owner')
-                    ->integer(),
-
-                Select::make('created_by')
-                    ->relationship('createdBy', 'name')
-                    ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en']),
-
-                Select::make('breeding_house_id')
-                    ->relationship('breedinghouse', 'name')
-                    ->searchable(['HebName', 'EngName', 'GidulCode']),
-
-                Placeholder::make('created_at')
-                    ->label('Created Date')
-                    ->content(fn(?PrevBreeding $record): string => $record?->created_at?->diffForHumans() ?? '-'),
-
-                Placeholder::make('updated_at')
-                    ->label('Last Modified Date')
-                    ->content(fn(?PrevBreeding $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
+                        ])
+                        ->columns(3),
+                ])
+                    ->persistStepInQueryString('step')
+                    ->extraAttributes(['class' => 'breeding-wizard'])
+                    ->columnSpan('2xl'),
             ]);
     }
 
@@ -228,6 +320,7 @@ class PrevBreedingResource extends Resource
     {
         return $table
             ->columns([
+
                 // Relationships (Using 'female' and 'male' relations from Breeding model)
                 TextColumn::make('female.Eng_Name')
                     ->label('Mother (Dam)')
@@ -338,7 +431,8 @@ class PrevBreedingResource extends Resource
 
                 TextColumn::make('filled_step')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('status')
                     ->badge()
@@ -347,7 +441,9 @@ class PrevBreedingResource extends Resource
                         'pending' => 'warning',
                         'rejected' => 'danger',
                         default => 'gray',
-                    }),
+                    })
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 // Financials (Assuming ILS based on 'Asia/Jerusalem' timezone in context)
                 TextColumn::make('payment_type')
@@ -401,8 +497,18 @@ class PrevBreedingResource extends Resource
                 TextColumn::make('breedinghouse.name')
                     ->searchable(['HebName', 'EngName', 'GidulCode'])
                     ->sortable(['HebName']),
+
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+
                 TrashedFilter::make(),
             ])
             ->actions([
@@ -417,7 +523,8 @@ class PrevBreedingResource extends Resource
                     RestoreBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getPages(): array

@@ -25,7 +25,7 @@ should be followed closely to enhance the user's satisfaction building Laravel a
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an
 expert with them all. Ensure you abide by these specific packages & versions.
 
-- php - 8.4.15
+- php - 8.4.16
 - filament/filament (FILAMENT) - v3
 - laravel/framework (LARAVEL) - v12
 - laravel/horizon (HORIZON) - v5
@@ -41,7 +41,7 @@ expert with them all. Ensure you abide by these specific packages & versions.
 ## Conventions
 
 - You must follow all existing code conventions used in this application. When creating or editing a file, check sibling
-  files for the correct structure, approach, naming.
+  files for the correct structure, approach, and naming.
 - Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
 - Check for existing components to reuse before writing a new one.
 
@@ -51,7 +51,7 @@ expert with them all. Ensure you abide by these specific packages & versions.
   tests are more important.
 
 ## Application Structure & Architecture
-- Stick to existing directory structure - don't create new base folders without approval.
+- Stick to existing directory structure; don't create new base folders without approval.
 - Do not change the application's dependencies without approval.
 
 ## Frontend Bundling
@@ -65,7 +65,6 @@ expert with them all. Ensure you abide by these specific packages & versions.
 ## Documentation Files
 - You must only create documentation files if explicitly requested by the user.
 
-
 === boost rules ===
 
 ## Laravel Boost
@@ -73,13 +72,13 @@ expert with them all. Ensure you abide by these specific packages & versions.
 
 ## Artisan
 
-- Use the `list-artisan-commands` tool when you need to call an Artisan command to double check the available
+- Use the `list-artisan-commands` tool when you need to call an Artisan command to double-check the available
   parameters.
 
 ## URLs
 
-- Whenever you share a project URL with the user you should use the `get-absolute-url` tool to ensure you're using the
-  correct scheme, domain / IP, and port.
+- Whenever you share a project URL with the user, you should use the `get-absolute-url` tool to ensure you're using the
+  correct scheme, domain/IP, and port.
 
 ## Tinker / Debugging
 - You should use the `tinker` tool when you need to execute PHP to debug code or query Eloquent models directly.
@@ -91,28 +90,27 @@ expert with them all. Ensure you abide by these specific packages & versions.
 
 ## Searching Documentation (Critically Important)
 
-- Boost comes with a powerful `search-docs` tool you should use before any other approaches. This tool automatically
-  passes a list of installed packages and their versions to the remote Boost API, so it returns only version-specific
-  documentation specific for the user's circumstance. You should pass an array of packages to filter on if you know you
-  need docs for particular packages.
-- The 'search-docs' tool is perfect for all Laravel related packages, including Laravel, Inertia, Livewire, Filament,
+- Boost comes with a powerful `search-docs` tool you should use before any other approaches when dealing with Laravel or
+  Laravel ecosystem packages. This tool automatically passes a list of installed packages and their versions to the
+  remote Boost API, so it returns only version-specific documentation for the user's circumstance. You should pass an
+  array of packages to filter on if you know you need docs for particular packages.
+- The `search-docs` tool is perfect for all Laravel-related packages, including Laravel, Inertia, Livewire, Filament,
   Tailwind, Pest, Nova, Nightwatch, etc.
-- You must use this tool to search for Laravel-ecosystem documentation before falling back to other approaches.
+- You must use this tool to search for Laravel ecosystem documentation before falling back to other approaches.
 - Search the documentation before making code changes to ensure we are taking the correct approach.
-- Use multiple, broad, simple, topic based queries to start. For example:
+- Use multiple, broad, simple, topic-based queries to start. For example:
   `['rate limiting', 'routing rate limiting', 'routing']`.
-- Do not add package names to queries - package information is already shared. For example, use `test resource table`,
+- Do not add package names to queries; package information is already shared. For example, use `test resource table`,
   not `filament 4 test resource table`.
 
 ### Available Search Syntax
 - You can and should pass multiple queries at once. The most relevant results will be returned first.
 
-1. Simple Word Searches with auto-stemming - query=authentication - finds 'authenticate' and 'auth'
-2. Multiple Words (AND Logic) - query=rate limit - finds knowledge containing both "rate" AND "limit"
-3. Quoted Phrases (Exact Position) - query="infinite scroll" - Words must be adjacent and in that order
-4. Mixed Queries - query=middleware "rate limit" - "middleware" AND exact phrase "rate limit"
-5. Multiple Queries - queries=["authentication", "middleware"] - ANY of these terms
-
+1. Simple Word Searches with auto-stemming - query=authentication - finds 'authenticate' and 'auth'.
+2. Multiple Words (AND Logic) - query=rate limit - finds knowledge containing both "rate" AND "limit".
+3. Quoted Phrases (Exact Position) - query="infinite scroll" - words must be adjacent and in that order.
+4. Mixed Queries - query=middleware "rate limit" - "middleware" AND exact phrase "rate limit".
+5. Multiple Queries - queries=["authentication", "middleware"] - ANY of these terms.
 
 === php rules ===
 
@@ -122,8 +120,8 @@ expert with them all. Ensure you abide by these specific packages & versions.
 
 ### Constructors
 - Use PHP 8 constructor property promotion in `__construct()`.
-  - <code-snippet>public function __construct(public GitHub $github) { }</code-snippet>
-- Do not allow empty `__construct()` methods with zero parameters.
+    - <code-snippet>public function __construct(public GitHub $github) { }</code-snippet>
+- Do not allow empty `__construct()` methods with zero parameters unless the constructor is private.
 
 ### Type Declarations
 - Always use explicit return type declarations for methods and functions.
@@ -138,8 +136,8 @@ protected function isAccessible(User $user, ?string $path = null): bool
 
 ## Comments
 
-- Prefer PHPDoc blocks over comments. Never use comments within the code itself unless there is something _very_ complex
-  going on.
+- Prefer PHPDoc blocks over inline comments. Never use comments within the code itself unless there is something very
+  complex going on.
 
 ## PHPDoc Blocks
 - Add useful array shape type definitions for arrays when appropriate.
@@ -147,14 +145,13 @@ protected function isAccessible(User $user, ?string $path = null): bool
 ## Enums
 - Typically, keys in an Enum should be TitleCase. For example: `FavoritePerson`, `BestLake`, `Monthly`.
 
-
 === herd rules ===
 
 ## Laravel Herd
 
-- The application is served by Laravel Herd and will be available at: https?://[kebab-case-project-dir].test. Use the
+- The application is served by Laravel Herd and will be available at: `https?://[kebab-case-project-dir].test`. Use the
   `get-absolute-url` tool to generate URLs for the user to ensure valid URLs.
-- You must not run any commands to make the site available via HTTP(s). It is _always_ available through Laravel Herd.
+- You must not run any commands to make the site available via HTTP(S). It is always available through Laravel Herd.
 
 === tests rules ===
 
@@ -162,9 +159,8 @@ protected function isAccessible(User $user, ?string $path = null): bool
 
 - Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests
   to make sure they pass.
-- Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test` with a specific
-  filename or filter.
-
+- Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test --compact` with a
+  specific filename or filter.
 
 === laravel/core rules ===
 
@@ -180,7 +176,7 @@ protected function isAccessible(User $user, ?string $path = null): bool
 
 - Always use proper Eloquent relationship methods with return type hints. Prefer relationship methods over raw queries
   or manual joins.
-- Use Eloquent models and relationships before suggesting raw database queries
+- Use Eloquent models and relationships before suggesting raw database queries.
 - Avoid `DB::`; prefer `Model::query()`. Generate code that leverages Laravel's ORM capabilities rather than bypassing
   them.
 - Generate code that prevents N+1 query problems by using eager loading.
@@ -230,41 +226,41 @@ protected function isAccessible(User $user, ?string $path = null): bool
 - If you receive an "Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest" error, you can run
   `npm run build` or ask the user to run `npm run dev` or `composer run dev`.
 
-
 === laravel/v12 rules ===
 
 ## Laravel 12
 
-- Use the `search-docs` tool to get version specific documentation.
+- Use the `search-docs` tool to get version-specific documentation.
 - Since Laravel 11, Laravel has a new streamlined file structure which this project uses.
 
 ### Laravel 12 Structure
-- No middleware files in `app/Http/Middleware/`.
+- In Laravel 12, middleware are no longer registered in `app/Http/Kernel.php`.
+- Middleware are configured declaratively in `bootstrap/app.php` using `Application::configure()->withMiddleware()`.
 - `bootstrap/app.php` is the file to register middleware, exceptions, and routing files.
 - `bootstrap/providers.php` contains application specific service providers.
-- **No app\Console\Kernel.php** - use `bootstrap/app.php` or `routes/console.php` for console configuration.
-- **Commands auto-register** - files in `app/Console/Commands/` are automatically available and do not require manual
-  registration.
+- The `app\Console\Kernel.php` file no longer exists; use `bootstrap/app.php` or `routes/console.php` for console
+  configuration.
+- Console commands in `app/Console/Commands/` are automatically available and do not require manual registration.
 
 ### Database
 
 - When modifying a column, the migration must include all of the attributes that were previously defined on the column.
   Otherwise, they will be dropped and lost.
-- Laravel 11 allows limiting eagerly loaded records natively, without external packages: `$query->latest()->limit(10);`.
+- Laravel 12 allows limiting eagerly loaded records natively, without external packages: `$query->latest()->limit(10);`.
 
 ### Models
 
 - Casts can and likely should be set in a `casts()` method on a model rather than the `$casts` property. Follow existing
   conventions from other models.
 
-
 === livewire/core rules ===
 
-## Livewire Core
-- Use the `search-docs` tool to find exact version specific documentation for how to write Livewire & Livewire tests.
-- Use the `php artisan make:livewire [Posts\CreatePost]` artisan command to create new components
+## Livewire
+
+- Use the `search-docs` tool to find exact version-specific documentation for how to write Livewire and Livewire tests.
+- Use the `php artisan make:livewire [Posts\CreatePost]` Artisan command to create new components.
 - State should live on the server, with the UI reflecting it.
-- All Livewire requests hit the Laravel backend, they're like regular HTTP requests. Always validate form data, and run
+- All Livewire requests hit the Laravel backend; they're like regular HTTP requests. Always validate form data and run
   authorization checks in Livewire actions.
 
 ## Livewire Best Practices
@@ -282,14 +278,14 @@ protected function isAccessible(User $user, ?string $path = null): bool
 
 - Prefer lifecycle hooks like `mount()`, `updatedFoo()` for initialization and reactive side effects:
 
-<code-snippet name="Lifecycle hook examples" lang="php">
+<code-snippet name="Lifecycle Hook Examples" lang="php">
     public function mount(User $user) { $this->user = $user; }
     public function updatedSearch() { $this->resetPage(); }
 </code-snippet>
 
 ## Testing Livewire
 
-<code-snippet name="Example Livewire component test" lang="php">
+<code-snippet name="Example Livewire Component Test" lang="php">
     Livewire::test(Counter::class)
         ->assertSet('count', 0)
         ->call('increment')
@@ -298,10 +294,10 @@ protected function isAccessible(User $user, ?string $path = null): bool
         ->assertStatus(200);
 </code-snippet>
 
-    <code-snippet name="Testing a Livewire component exists within a page" lang="php">
-        $this->get('/posts/create')
-        ->assertSeeLivewire(CreatePost::class);
-    </code-snippet>
+<code-snippet name="Testing Livewire Component Exists on Page" lang="php">
+    $this->get('/posts/create')
+    ->assertSeeLivewire(CreatePost::class);
+</code-snippet>
 
 === livewire/v3 rules ===
 
@@ -309,12 +305,12 @@ protected function isAccessible(User $user, ?string $path = null): bool
 
 ### Key Changes From Livewire 2
 
-- These things changed in Livewire 2, but may not have been updated in this application. Verify this application's setup
+- These things changed in Livewire 3, but may not have been updated in this application. Verify this application's setup
   to ensure you conform with application conventions.
-  - Use `wire:model.live` for real-time updates, `wire:model` is now deferred by default.
-  - Components now use the `App\Livewire` namespace (not `App\Http\Livewire`).
-  - Use `$this->dispatch()` to dispatch events (not `emit` or `dispatchBrowserEvent`).
-  - Use the `components.layouts.app` view as the typical layout path (not `layouts.app`).
+    - Use `wire:model.live` for real-time updates, `wire:model` is now deferred by default.
+    - Components now use the `App\Livewire` namespace (not `App\Http\Livewire`).
+    - Use `$this->dispatch()` to dispatch events (not `emit` or `dispatchBrowserEvent`).
+    - Use the `components.layouts.app` view as the typical layout path (not `layouts.app`).
 
 ### New Directives
 
@@ -322,7 +318,7 @@ protected function isAccessible(User $user, ?string $path = null): bool
   documentation to find usage examples.
 
 ### Alpine
-- Alpine is now included with Livewire, don't manually include Alpine.js.
+- Alpine is now included with Livewire; don't manually include Alpine.js.
 - Plugins included with Alpine: persist, intersect, collapse, and focus.
 
 ### Lifecycle Hooks
@@ -330,7 +326,7 @@ protected function isAccessible(User $user, ?string $path = null): bool
 - You can listen for `livewire:init` to hook into Livewire initialization, and `fail.status === 419` for the page
   expiring:
 
-<code-snippet name="livewire:load example" lang="js">
+<code-snippet name="Livewire Init Hook Example" lang="js">
 document.addEventListener('livewire:init', function () {
     Livewire.hook('request', ({ fail }) => {
         if (fail && fail.status === 419) {
@@ -359,7 +355,6 @@ document.addEventListener('livewire:init', function () {
 - If you need to verify a feature is working, write or update a Unit / Feature test.
 
 ### Pest Tests
-
 - All tests must be written using Pest. Use `php artisan make:test --pest {name}`.
 - You must not remove any tests or test files from the tests directory without approval. These are not temporary or
   helper files - these are core to the application.
@@ -374,10 +369,10 @@ document.addEventListener('livewire:init', function () {
 
 ### Running Tests
 - Run the minimal number of tests using an appropriate filter before finalizing code edits.
-- To run all tests: `php artisan test`.
-- To run all tests in a file: `php artisan test tests/Feature/ExampleTest.php`.
-- To filter on a particular test name: `php artisan test --filter=testName` (recommended after making a change to a
-  related file).
+- To run all tests: `php artisan test --compact`.
+- To run all tests in a file: `php artisan test --compact tests/Feature/ExampleTest.php`.
+- To filter on a particular test name: `php artisan test --compact --filter=testName` (recommended after making a change
+  to a related file).
 - When the tests relating to your changes are passing, ask the user if they would like to run the entire test suite to
   ensure everything is still passing.
 
@@ -401,8 +396,8 @@ document.addEventListener('livewire:init', function () {
 
 ### Datasets
 
-- Use datasets in Pest to simplify tests which have a lot of duplicated data. This is often the case when testing
-  validation rules, so consider going with this solution when writing tests for validation rules.
+- Use datasets in Pest to simplify tests that have a lot of duplicated data. This is often the case when testing
+  validation rules, so consider this solution when writing tests for validation rules.
 
 <code-snippet name="Pest Dataset Example" lang="php">
 it('has emails', function (string $email) {
@@ -413,28 +408,27 @@ it('has emails', function (string $email) {
 ]);
 </code-snippet>
 
-
 === tailwindcss/core rules ===
 
-## Tailwind Core
+## Tailwind CSS
 
-- Use Tailwind CSS classes to style HTML, check and use existing tailwind conventions within the project before writing
+- Use Tailwind CSS classes to style HTML; check and use existing Tailwind conventions within the project before writing
   your own.
-- Offer to extract repeated patterns into components that match the project's conventions (i.e. Blade, JSX, Vue, etc..)
-- Think through class placement, order, priority, and defaults - remove redundant classes, add classes to parent or
-  child carefully to limit repetition, group elements logically
+- Offer to extract repeated patterns into components that match the project's conventions (i.e. Blade, JSX, Vue, etc.).
+- Think through class placement, order, priority, and defaults. Remove redundant classes, add classes to parent or child
+  carefully to limit repetition, and group elements logically.
 - You can use the `search-docs` tool to get exact examples from the official documentation when needed.
 
 ### Spacing
-- When listing items, use gap utilities for spacing, don't use margins.
+- When listing items, use gap utilities for spacing; don't use margins.
 
-    <code-snippet name="Valid Flex Gap Spacing Example" lang="html">
-        <div class="flex gap-8">
-            <div>Superior</div>
-            <div>Michigan</div>
-            <div>Erie</div>
-        </div>
-    </code-snippet>
+<code-snippet name="Valid Flex Gap Spacing Example" lang="html">
+    <div class="flex gap-8">
+        <div>Superior</div>
+        <div>Michigan</div>
+        <div>Erie</div>
+    </div>
+</code-snippet>
 
 ### Dark Mode
 
@@ -443,17 +437,18 @@ it('has emails', function (string $email) {
 
 === tailwindcss/v4 rules ===
 
-## Tailwind 4
+## Tailwind CSS 4
 
-- Always use Tailwind CSS v4 - do not use the deprecated utilities.
+- Always use Tailwind CSS v4; do not use the deprecated utilities.
 - `corePlugins` is not supported in Tailwind v4.
 - In Tailwind v4, configuration is CSS-first using the `@theme` directive — no separate `tailwind.config.js` file is
   needed.
-  <code-snippet name="Extending Theme in CSS" lang="css">
-  @theme {
+
+<code-snippet name="Extending Theme in CSS" lang="css">
+@theme {
   --color-brand: oklch(0.72 0.11 178);
-  }
-  </code-snippet>
+}
+</code-snippet>
 
 - In Tailwind v4, you import Tailwind using a regular CSS `@import` statement, not using the `@tailwind` directives used
   in v3:
@@ -466,7 +461,7 @@ it('has emails', function (string $email) {
 </code-snippet>
 
 ### Replaced Utilities
-- Tailwind v4 removed deprecated utilities. Do not use the deprecated option - use the replacement.
+- Tailwind v4 removed deprecated utilities. Do not use the deprecated option; use the replacement.
 - Opacity values are still numeric.
 
 | Deprecated | Replacement |
@@ -486,7 +481,6 @@ it('has emails', function (string $email) {
 === filament/filament rules ===
 
 ## Filament
-
 - Filament is used by this application, check how and where to follow existing application conventions.
 - Filament is a Server-Driven UI (SDUI) framework for Laravel. It allows developers to define user interfaces in PHP
   using structured configuration objects. It is built on top of Livewire, Alpine.js, and Tailwind CSS.
@@ -531,7 +525,6 @@ Forms\Components\Select::make('user_id')
 </code-snippet>
 
 ## Testing
-
 - It's important to test Filament functionality for user satisfaction.
 - Ensure that you are authenticated to access the application within the test.
 - Filament uses Livewire, so start assertions with `livewire()` or `Livewire::test()`.
@@ -563,14 +556,12 @@ Forms\Components\Select::make('user_id')
         'name' => 'Howdy',
         'email' => 'howdy@example.com',
     ]);
-
 </code-snippet>
 
 <code-snippet name="Testing Multiple Panels (setup())" lang="php">
     use Filament\Facades\Filament;
 
     Filament::setCurrentPanel('app');
-
 </code-snippet>
 
 <code-snippet name="Calling an Action in a Test" lang="php">
@@ -579,11 +570,9 @@ Forms\Components\Select::make('user_id')
     ])->callAction('send');
 
     expect($invoice->refresh())->isSent()->toBeTrue();
-
 </code-snippet>
 
 ## Version 3 Changes To Focus On
-
 - Resources are located in `app/Filament/Resources/` directory.
 - Resource pages (List, Create, Edit) are auto-generated within the resource's directory - e.g.,
   `app/Filament/Resources/PostResource/Pages/`.

@@ -157,6 +157,21 @@ class PrevDog extends Model implements HasName
             ->orderBy('EventDate', 'desc');
     }
 
+    // relationship to female breedings (PrevBreeding) by breedings.SagirId = DogsDB.SagirID
+    public function femaleBreedings(): HasMany
+    {
+        return $this->hasMany(PrevBreeding::class, 'SagirId', 'SagirID')
+            ->where('GenderID', 2);
+    }
+
+    // relationship to male breedings (PrevBreeding) by breedings.MaleSagirId = DogsDB.SagirID
+    public function maleBreedings(): HasMany
+    {
+        return $this->hasMany(PrevBreeding::class, 'MaleSagirId', 'SagirID')
+            ->where('GenderID', 1);
+    }
+
+
     // breedingManager using PrevUser model
     public function breedingManager(): BelongsTo
     {
