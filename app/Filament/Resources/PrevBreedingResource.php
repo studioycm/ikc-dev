@@ -5,10 +5,13 @@ namespace App\Filament\Resources;
 use App\Enums\Legacy\LegacyDogGender;
 use App\Filament\Resources\PrevBreedingResource\Pages;
 use App\Models\PrevBreeding;
+use App\Models\PrevDog;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -17,6 +20,8 @@ use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\Alignment;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -82,74 +87,130 @@ class PrevBreedingResource extends Resource
                             ])
                                 ->columns(5),
                             Group::make([
-                                    Select::make('SagirId')
-                                        ->label(__('Female'))
-                                        ->hint(__('Search dogs by import number, sagir, chip or name'))
-                                        ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
-                                        ->relationship('female', 'SagirID', modifyQueryUsing: fn(Builder $query) => $query->where('GenderID', '=', LegacyDogGender::Female->value), ignoreRecord: true)
-                                        ->optionsLimit(20)
-                                        ->default('504740')
-                                        ->searchDebounce(1500)
-                                        ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}")
-                                        ->columnSpan(2),
+                                Select::make('SagirId')
+                                    ->label(__('Female'))
+                                    ->hint(__('Search dogs by import number, sagir, chip or name'))
+                                    ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
+                                    ->relationship('female', 'SagirID', modifyQueryUsing: fn(Builder $query) => $query
+                                        ->where('GenderID', '=', LegacyDogGender::Female->value)
+                                        ->withCount('femaleBreedings'), ignoreRecord: true)
+                                    ->optionsLimit(20)
+                                    ->searchDebounce(1500)
+                                    ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}")
+                                    ->live()
+                                    ->afterStateHydrated(function (Set $set, Get $get, ?string $state, Select $component): void {
+                                        self::updateFemaleDetails($get, $set, $component);
+                                    })
+                                    ->afterStateUpdated(function (Set $set, Get $get, ?string $state, Select $component): void {
+                                        self::updateFemaleDetails($get, $set, $component);
+                                    }),
 
-//                                ToggleButtons::make('Female_DNA')
-//                                        ->label(__('Female DNA'))
-//                                    ->options([
-//                                        'yes' => __('Yes'),
-//                                        'no' => __('No'),
-//                                        ''
-//                                    ])
-//                                    ->grouped(),
-//
-//                                    ToggleButtons::make('less_than_8_years')
-//                                        ->label(__('Less than 8 years'))
-//                                        ->options([
-//                                            'yes' => __('Yes'),
-//                                            'no' => __('No'),
-//                                        ])
-//                                        ->grouped(),
-//
-//                                    ToggleButtons::make('more_than_18_months')
-//                                        ->label(__('More than 18 months'))
-//                                        ->options([
-//                                            'yes' => __('Yes'),
-//                                            'no' => __('No'),
-//                                        ])
-//                                        ->grouped(),
-                            ])
-                                ->columns(5),
-                            Group::make([
-                                    Select::make('MaleSagirId')
-                                        ->label(__('Male'))
-                                        ->hint(__('Search dogs by import number, sagir, chip or name'))
-                                        ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
-                                        ->relationship('male', 'SagirID', modifyQueryUsing: fn(Builder $query) => $query->where('GenderID', '=', LegacyDogGender::Male->value), ignoreRecord: true)
-                                        ->optionsLimit(20)
-                                        ->searchDebounce(1500)
-                                        ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}")
-                                        ->columnSpan(2),
+                                Select::make('MaleSagirId')
+                                    ->label(__('Male'))
+                                    ->hint(__('Search dogs by import number, sagir, chip or name'))
+                                    ->searchable(['SagirID', 'Heb_Name', 'Eng_Name', 'Chip', 'ImportNumber'])
+                                    ->relationship('male', 'SagirID', modifyQueryUsing: fn(Builder $query) => $query
+                                        ->where('GenderID', '=', LegacyDogGender::Male->value)
+                                        ->withCount('maleBreedings'), ignoreRecord: true)
+                                    ->optionsLimit(20)
+                                    ->searchDebounce(1500)
+                                    ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->SagirID} - {$record->full_name}")
+                                    ->live()
+                                    ->afterStateHydrated(function (Set $set, Get $get, ?string $state, Select $component): void {
+                                        self::updateMaleDetails($get, $set, $component);
+                                    })
+                                    ->afterStateUpdated(function (Set $set, Get $get, ?string $state, Select $component): void {
+                                        self::updateMaleDetails($get, $set, $component);
+                                    }),
 
-//                                    Toggle::make('Male_DNA')
-//                                        ->label(__('Male DNA'))
-//                                        ->inline(false)
-//                                        ->default(false)
-//                                        ->onColor('success')
-//                                        ->offColor('danger'),
-//
-//                                    Toggle::make('Foreign_Male_Records')
-//                                        ->label(__('Foreign Male Records'))
-//                                        ->inline(false)
-//                                        ->default(false)
-//                                        ->onColor('success')
-//                                        ->offColor('danger'),
                             ])
-                                ->columns(5),
-                            Section::make('preliminary_checks')
-                                ->heading(__('Preliminary Checks'))
+                                ->columns(2),
+                            Section::make('female_preliminary_checks')
+                                ->heading(__('Female Preliminary Checks'))
                                 ->columns(5)
                                 ->schema([
-                                    // populate info components with data from selected female dog and male dog:
+                                    // populate info components with data from the selected female dog:
+                                    Hidden::make('female_breedings_count_state')
+                                        ->afterStateHydrated(function (Set $set, Get $get): void {
+                                            self::updateFemaleDetails($get, $set, null);
+                                        })
+                                        ->dehydrated(false),
+                                    Hidden::make('female_age_state')
+                                        ->afterStateHydrated(function (Set $set, Get $get): void {
+                                            self::updateFemaleDetails($get, $set, null);
+                                        })
+                                        ->dehydrated(false),
+                                    Hidden::make('female_dna_state')
+                                        ->afterStateHydrated(function (Set $set, Get $get): void {
+                                            self::updateFemaleDetails($get, $set, null);
+                                        })
+                                        ->dehydrated(false),
+
+                                    Placeholder::make('female_age')
+                                        ->label(__('Age'))
+                                        ->content(function (Get $get): string {
+                                            $age = $get('female_age_state');
+
+                                            return filled($age) ? (string)$age : '---';
+                                        }),
+                                    Placeholder::make('female_breedings_count')
+                                        ->label(__('Breeding Count'))
+                                        ->content(function (Get $get): string {
+                                            $count = $get('female_breedings_count_state');
+
+                                            return filled($count) ? (string)$count : '---';
+                                        }),
+                                    Placeholder::make('female_dna')
+                                        ->label(__('DNA Test'))
+                                        ->content(function (Get $get): string {
+                                            $dna = $get('female_dna_state');
+                                            return filled($dna) ? (string)$dna : '---';
+                                        }),
+
+                                    // toggle buttons: "קרבה משפחתית, כשירות לגידול, בדיקת גיל, מספר הרבעות, המלטה אחרונה"
+                                    // options: "כן מוחלט / לא מוחלט /  נדרש מידע משלים / נדרשת בדיקה"
+
+                                ]),
+                            Section::make('male_preliminary_checks')
+                                ->heading(__('Male Preliminary Checks'))
+                                ->columns(5)
+                                ->visible(fn(Get $get): bool => filled($get('MaleSagirId')))
+                                ->schema([
+                                    // populate info components with data from selected male dog:
+                                    Hidden::make('male_breedings_count_state')
+                                        ->afterStateHydrated(function (Set $set, Get $get): void {
+                                            self::updateMaleDetails($get, $set, null);
+                                        })
+                                        ->dehydrated(false),
+                                    Hidden::make('male_age_state')
+                                        ->afterStateHydrated(function (Set $set, Get $get): void {
+                                            self::updateMaleDetails($get, $set, null);
+                                        })
+                                        ->dehydrated(false),
+                                    Hidden::make('male_dna_state')
+                                        ->afterStateHydrated(function (Set $set, Get $get): void {
+                                            self::updateMaleDetails($get, $set, null);
+                                        })
+                                        ->dehydrated(false),
+
+                                    Placeholder::make('male_age')
+                                        ->label(__('Age'))
+                                        ->content(function (Get $get): string {
+                                            $age = $get('male_age_state');
+                                            return filled($age) ? (string)$age : '---';
+                                        }),
+                                    Placeholder::make('male_breedings_count')
+                                        ->label(__('Breeding Count'))
+                                        ->content(function (Get $get): string {
+                                            $count = $get('male_breedings_count_state');
+                                            return filled($count) ? (string)$count : '---';
+                                        }),
+                                    Placeholder::make('male_dna')
+                                        ->label(__('DNA Test'))
+                                        ->content(function (Get $get): string {
+                                            $dna = $get('male_dna_state');
+                                            return filled($dna) ? (string)$dna : '---';
+                                        }),
 
                                     // toggle buttons: "קרבה משפחתית, כשירות לגידול, בדיקת גיל, מספר הרבעות, המלטה אחרונה"
                                     // options: "כן מוחלט / לא מוחלט /  נדרש מידע משלים / נדרשת בדיקה"
@@ -164,9 +225,9 @@ class PrevBreedingResource extends Resource
                                     }),
                                 Action::make('delete_litter_report')
                                     ->label(__('Delete Litter Report'))
+                                    ->disabled()
                                     ->color('danger')
                                     ->action(function () {
-
                                     }),
                             ])
                                 ->alignCenter(),
@@ -194,7 +255,6 @@ class PrevBreedingResource extends Resource
                                 ->relationship('createdBy', 'first_name')
                                 ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en']),
 
-
                         ])
                         ->columns(3),
 
@@ -210,7 +270,7 @@ class PrevBreedingResource extends Resource
                                 ->schema([
                                     // --- DATES & SETTINGS ---
                                     DatePicker::make('birthing_date')
-                                        ->label(__('Birthing date'))
+                                        ->label(__('Whelping Date'))
                                         ->columnSpan(2),
 
                                     // --- PUPPY COUNTS ---
@@ -274,7 +334,7 @@ class PrevBreedingResource extends Resource
                                                 ->default('yes')
                                                 ->grouped(),
                                         ])
-                                        ->columns(6)
+                                        ->columns(6),
                                 ])
                                 ->columnSpan(4),
                         ])
@@ -542,5 +602,55 @@ class PrevBreedingResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function updateFemaleDetails(Get $get, Set $set, ?Select $component): void
+    {
+        if ($get('SagirId') === null) {
+            $set('female_breedings_count_state', null);
+            $set('female_age_state', null);
+            $set('female_dna_state', null);
+
+            return;
+        }
+
+        if ($component === null) {
+            $record = PrevDog::query()->where('SagirID', $get('SagirId'))
+                ->with('femaleBreedings');
+        } else {
+            $record = $component->getSelectedRecord();
+        }
+        if ($record) {
+            $set('female_breedings_count_state', $record?->female_breedings_count ?? __("Missing"));
+            $set('female_age_state', $record?->age_years ?? __("Missing"));
+            $set('female_dna_state', $record?->DnaID ?? __("Missing"));
+        } else {
+            $set('female_breedings_count_state', $get('SagirId'));
+            $set('female_age_state', null);
+            $set('female_dna_state', null);
+        }
+    }
+
+    public static function updateMaleDetails(Get $get, Set $set, ?Select $component): void
+    {
+        if ($get('MaleSagirId') === null) {
+            $set('male_breedings_count_state', null);
+            $set('male_age_state', null);
+            $set('male_dna_state', null);
+            return;
+        }
+        if ($component === null) {
+            $record = PrevDog::query()->where('SagirID', $get('MaleSagirId'))
+                ->with('maleBreedings');
+        } else {
+            $record = $component->getSelectedRecord();
+        }
+        if ($record) {
+            $set('male_breedings_count_state', $record?->male_breedings_count ?? __("Missing"));
+            $set('male_age_state', $record?->age_years ?? __("Missing"));
+            $set('male_dna_state', $record?->DnaID ?? __("Missing"));
+        } else {
+            $set('male_breedings_count_state', $get('MaleSagirId'));
+        }
     }
 }
