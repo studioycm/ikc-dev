@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PrevBreeding extends Model
@@ -115,6 +116,11 @@ class PrevBreeding extends Model
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(PrevUser::class, 'created_by', 'id');
+    }
+
+    public function puppies(): HasMany
+    {
+        return $this->hasMany(PrevBreedingRelatedDog::class, 'breeding_id', 'id');
     }
 
 }

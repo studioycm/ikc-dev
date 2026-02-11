@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Casts\Legacy\LegacyDogGenderCast;
 use App\Casts\Legacy\LegacyDogSizeCast;
 use App\Casts\Legacy\LegacyDogStatusCast;
+use App\Enums\Legacy\LegacyDogGender;
 use App\Enums\Legacy\LegacyPedigreeColor;
 use App\Enums\Legacy\LegacySagirPrefix;
 use Filament\Models\Contracts\HasName;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 class PrevDog extends Model implements HasName
 {
@@ -160,17 +162,14 @@ class PrevDog extends Model implements HasName
     // relationship to female breedings (PrevBreeding) by breedings.SagirId = DogsDB.SagirID
     public function femaleBreedings(): HasMany
     {
-        return $this->hasMany(PrevBreeding::class, 'SagirId', 'SagirID')
-            ->where('GenderID', 2);
+        return $this->hasMany(PrevBreeding::class, 'SagirId', 'SagirID');
     }
 
     // relationship to male breedings (PrevBreeding) by breedings.MaleSagirId = DogsDB.SagirID
     public function maleBreedings(): HasMany
     {
-        return $this->hasMany(PrevBreeding::class, 'MaleSagirId', 'SagirID')
-            ->where('GenderID', 1);
+        return $this->hasMany(PrevBreeding::class, 'MaleSagirId', 'SagirID');
     }
-
 
     // breedingManager using PrevUser model
     public function breedingManager(): BelongsTo
@@ -272,6 +271,119 @@ class PrevDog extends Model implements HasName
         );
     }
 
+    protected function ageYears(): Attribute
+    {
+        return Attribute::make(
+            get: function (): ?string {
+                $birthDate = $this->BirthDate;
+                if ($birthDate === null) {
+                    return null;
+                }
+
+                $birth = $birthDate instanceof Carbon ? $birthDate : Carbon::parse($birthDate);
+                $now = Carbon::now();
+                if ($birth->greaterThan($now)) {
+                    return null;
+                }
+
+                $totalMonths = (int)$birth->diffInMonths($now);
+                $years = intdiv($totalMonths, 12);
+                $months = $totalMonths % 12;
+
+                return "{$years}y {$months}m ({$totalMonths}m)";
+            }
+        );
+    }
+
+    protected function femaleBreedingsCount(): Attribute
+    {
+        return Attribute::make(
+            get: function (): int {
+                if (array_key_exists('female_breedings_count', $this->attributes)) {
+                    return (int)$this->attributes['female_breedings_count'];
+                }
+
+                if ($this->relationLoaded('femaleBreedings')) {
+                    $relation = $this->getRelation('femaleBreedings');
+
+                    return $relation?->count() ?? 0;
+                }
+
+                return $this->femaleBreedings()->count();
+            }
+        );
+    }
+
+    protected function maleBreedingsCount(): Attribute
+    {
+        return Attribute::make(
+            get: function (): int {
+                if (array_key_exists('male_breedings_count', $this->attributes)) {
+                    return (int)$this->attributes['male_breedings_count'];
+                }
+
+                if ($this->relationLoaded('maleBreedings')) {
+                    $relation = $this->getRelation('maleBreedings');
+
+                    return $relation?->count() ?? 0;
+                }
+
+                return $this->maleBreedings()->count();
+            }
+        );
+    }
+
+    protected function lastBreedingDate(): Attribute
+    {
+        return Attribute::make(
+            get: function (): ?string {
+                $latest = $this->resolveLatestLitterDate();
+
+                return $latest?->format('d/m/Y');
+            }
+        );
+    }
+
+    private function resolveLatestLitterDate(): ?Carbon
+    {
+        $gender = $this->GenderID;
+        if ($gender === LegacyDogGender::Female) {
+            return $this->latestLitterDateForRelation('femaleBreedings');
+        }
+
+        if ($gender === LegacyDogGender::Male) {
+            return $this->latestLitterDateForRelation('maleBreedings');
+        }
+
+        $femaleDate = $this->latestLitterDateForRelation('femaleBreedings');
+        $maleDate = $this->latestLitterDateForRelation('maleBreedings');
+
+        if ($femaleDate !== null && $maleDate !== null) {
+            return $femaleDate->greaterThan($maleDate) ? $femaleDate : $maleDate;
+        }
+
+        return $femaleDate ?? $maleDate;
+    }
+
+    private function latestLitterDateForRelation(string $relation): ?Carbon
+    {
+        $date = null;
+        if ($this->relationLoaded($relation)) {
+            $relationData = $this->getRelation($relation);
+            if ($relationData !== null) {
+                $date = $relationData->max('birthing_date');
+            }
+        } else {
+            $date = $this->{$relation}()->max('birthing_date');
+        }
+
+        if ($date === null) {
+            return null;
+        }
+
+        return $date instanceof Carbon ? $date : Carbon::parse($date);
+    }
+
     /**
      * All show entries for this dog.
      */
@@ -298,7 +410,7 @@ class PrevDog extends Model implements HasName
     {
         return Attribute::make(
             get: function (): string {
-                $idPart = $this->sagir_prefix?->code() . "-" . $this->SagirID . " | " . ($this->ImportNumber ?: __('w/o Imp'));
+                $idPart = $this->sagir_prefix?->code() . '-' . $this->SagirID . ' | ' . ($this->ImportNumber ?: __('w/o Imp'));
                 $namePart = $this->full_name;
 
                 // This uses the 'breed_name' attribute from the join and does NOT trigger a new query.
