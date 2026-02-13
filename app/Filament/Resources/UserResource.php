@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
+use App\Models\PrevUser;
 use App\Models\User;
 use App\Notifications\UserMessageNotification;
 use Filament\Facades\Filament;
@@ -14,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Notification as LaravelNotification;
 use Illuminate\Support\Str;
@@ -21,6 +23,12 @@ use Illuminate\Support\Str;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with('prevUser');
+    }
 
     public static function getModelLabel(): string
     {
@@ -60,6 +68,22 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required(),
+                Forms\Components\Select::make('prev_user_id')
+                    ->label(__('Legacy User'))
+                    ->nullable()
+                    ->placeholder(__('—'))
+                    ->searchable()
+                    ->getSearchResultsUsing(fn(string $search): array => PrevUser::selectOptions($search, 50))
+                    ->getOptionLabelUsing(function ($value) {
+                        if (!$value) return null;
+
+                        // Optimisation: Select only columns needed for the 'search_label' accessor
+                        return PrevUser::query()
+                            ->select(['id', 'first_name', 'last_name', 'first_name_en', 'last_name_en', 'mobile_phone', 'phone', 'email'])
+                            ->find($value)
+                            ?->search_label;
+                    })
+                    ->unique(ignoreRecord: true),
                 Forms\Components\DateTimePicker::make('email_verified_at')
                     ->native(false)
                     ->displayFormat('d/m/Y H:i'),
@@ -78,6 +102,16 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                return $query
+                    ->with([
+                        'prevUser' => function ($q) {
+                            // This runs entirely on the Legacy DB, so it works perfectly.
+                            // It adds a 'dogs_count' attribute to the prevUser model.
+                            $q->withCount('dogs');
+                        }
+                    ]);
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->sortable()
@@ -93,6 +127,41 @@ class UserResource extends Resource
                     ->copyable()
                     ->copyMessage('Email address copied')
                     ->copyMessageDuration(1500),
+                Tables\Columns\TextColumn::make('prevUser.name')
+                    ->label(__('Legacy User'))
+                    ->placeholder('-')
+                    ->sortable(false)
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        // Step A: Search the Legacy DB first
+                        // We reuse the 'searchName' scope you already have in PrevUser model!
+                        $matchingLegacyIds = PrevUser::searchName($search)
+                            ->pluck('id')
+                            ->toArray(); // Important: convert to array for whereIn
+
+                        // Step B: Filter the System DB using those IDs
+                        // If no matches found in legacy, passing empty array returns no results (correct)
+                        return $query->whereIn('prev_user_id', $matchingLegacyIds);
+                    })
+                    ->description(function (User $record) {
+                        $legacy = $record->prevUser;
+
+                        if (!$legacy) {
+                            return null;
+                        }
+
+                        // Combine Phone and Email, filtering out empty values
+                        return collect([$legacy->mobile_phone, $legacy->email])
+                            ->filter()
+                            ->join(' • '); // Separator dot
+                    })
+                    ->sortable(false)
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('prevUser.dogs_count')
+                    ->label('Dogs')
+                    ->badge()
+                    ->color(fn($state) => $state > 0 ? 'success' : 'gray')
+                    ->default(0)
+                    ->toggleable(),
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label('Verified')
                     ->boolean()

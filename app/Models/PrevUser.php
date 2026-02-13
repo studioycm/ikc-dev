@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 
@@ -29,6 +30,7 @@ class PrevUser extends Model implements HasName
      * @var string
      */
     protected $table = 'users';
+
     protected $primaryKey = 'id';
 
     public $timestamps = true;
@@ -65,6 +67,11 @@ class PrevUser extends Model implements HasName
             ->withPivot('status', 'created_at', 'updated_at', 'deleted_at')
             ->wherePivot('deleted_at', null)
             ->wherePivot('status', 'current');
+    }
+
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class, 'prev_user_id', 'id');
     }
 
     public function history_dogs(): HasMany

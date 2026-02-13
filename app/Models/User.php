@@ -2,22 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
-use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
-
-
-class User extends Authenticatable implements FilamentUser, MustVerifyEmail, HasName
+class User extends Authenticatable implements FilamentUser, HasName, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasPanelShield, HasRoles;
+    use HasFactory, HasPanelShield, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -29,6 +29,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
         'email',
         'email_verified_at',
         'password',
+        'prev_user_id',
     ];
 
     /**
@@ -51,10 +52,10 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'prev_user_id' => 'integer',
         ];
     }
 
-    
     /**
      * Checks if the user has access to the panel.
      *
@@ -67,19 +68,14 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
     public function canAccessPanel(Panel $panel): bool
     {
         // return str_ends_with($this->email, '+admin@gmail.com'); // @todo Change this to check for access level
-        // is super admin by shild plugin 
-        
+        // is super admin by shild plugin
+
         return $this->isSuperAdmin() ? true : $this->isPanelUser();
 
-
-        
     }
 
     /**
-     * check if user is shild super admin 
-     * 
-     * 
-     * @return bool
+     * check if user is shild super admin
      */
     public function isSuperAdmin(): bool
     {
@@ -87,19 +83,31 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
     }
 
     /**
-     * check if user is shild panel user 
-     * 
-     * 
-     * @return bool
+     * check if user is shild panel user
      */
     public function isPanelUser(): bool
     {
         return $this->hasRole('panel_user');
     }
 
+    public function prevUser(): BelongsTo
+    {
+        return $this->belongsTo(PrevUser::class, 'prev_user_id', 'id');
+    }
+
+    public function prevDogs(): BelongsToMany
+    {
+        return $this->belongsToMany(PrevDog::class, 'dogs2users', 'user_id', 'sagir_id', 'prev_user_id', 'SagirID')
+            ->withTimestamps()
+            ->using(PrevUserDog::class)
+            ->as('ownership')
+            ->withPivot('status', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivot('deleted_at', null)
+            ->wherePivot('status', 'current');
+    }
+
     public function getFilamentName(): string
     {
         return "{$this->name}";
     }
-
 }
