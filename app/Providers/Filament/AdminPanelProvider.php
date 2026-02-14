@@ -22,6 +22,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Spatie\Permission\Middleware\RoleMiddleware;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -79,6 +80,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                RoleMiddleware::class . ':super_admin',
             ])
             ->plugins([
                 FilamentShieldPlugin::make()
