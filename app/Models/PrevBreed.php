@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -33,6 +34,12 @@ class PrevBreed extends Model
     protected $casts = [
         'BreedCode' => 'integer',
     ];
+
+    // reverse pivot relationship with PrevClub model
+    public function clubs(): BelongsToMany
+    {
+        return $this->belongsToMany(PrevClub::class, 'breed_club', 'breed_id', 'club_id');
+    }
 
     // relationships with PrevUser model for UserManagerID and ClubManagerID
     public function userManager(): BelongsTo

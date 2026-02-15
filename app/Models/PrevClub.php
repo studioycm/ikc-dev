@@ -63,6 +63,23 @@ class PrevClub extends Model
         return $this->belongsToMany(PrevUser::class, 'user_club_manager', 'club_id', 'user_id');
     }
 
+    public function members(): BelongsToMany
+    {
+        return $this->belongsToMany(PrevUser::class, 'club2user', 'club_id', 'user_id', 'id', 'id')
+            ->withTimestamps()
+            ->using(PrevClubUser::class)
+            ->as('membership')
+            ->withPivot('id', 'expire_date', 'type', 'status', 'payment_status', 'forbidden', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivotNull('deleted_at')
+            ->wherePivot('status', '=', 'active')
+            ->wherePivot('expire_date', '>=', now()->format('Y-m-d'))
+            ->where(function ($query) {
+                $query->whereNull('club2user.payment_status') // Where 'payment_status' is NULL
+                ->orWhere('club2user.payment_status', 1); // Or 'payment_status' is 1
+            })
+            ->orderByPivot('expire_date', 'asc');
+    }
+
     protected function fullAddress(): Attribute
     {
         return Attribute::make(
