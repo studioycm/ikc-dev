@@ -67,12 +67,15 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        // can access panel by isSuperAdmin or by isPanelUser, and using Filament Shield plugin.
-        // match by $panel->getId(), 'admin' only by isSuperAdmin, 'user' by isPanelUser. isSuperAdmin can access all panels.
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
 
-
-        return $this->isSuperAdmin() ? true : $this->isPanelUser();
-
+        return match ($panel->getId()) {
+            'admin' => $this->isAdmin(),
+            'user' => $this->isAdmin() || $this->isPanelUser(),
+            default => false,
+        };
     }
 
     /**
@@ -81,6 +84,11 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
     public function isSuperAdmin(): bool
     {
         return $this->hasRole('super_admin');
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
     }
 
     /**

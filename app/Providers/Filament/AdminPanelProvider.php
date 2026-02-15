@@ -49,7 +49,7 @@ class AdminPanelProvider extends PanelProvider
             // ->databaseNotificationsPolling('60s')
             ->maxContentWidth(MaxWidth::Full)
             ->colors([
-                //'primary' => Color::hex('#5566aa'),
+                // 'primary' => Color::hex('#5566aa'),
                 'pink' => Color::Pink,
                 'purple' => Color::Purple,
                 'indigo' => Color::Indigo,
@@ -80,7 +80,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-                RoleMiddleware::class . ':super_admin',
+                RoleMiddleware::class . ':super_admin|admin',
             ])
             ->plugins([
                 FilamentShieldPlugin::make()
