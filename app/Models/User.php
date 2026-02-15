@@ -67,8 +67,9 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        // return str_ends_with($this->email, '+admin@gmail.com'); // @todo Change this to check for access level
-        // is super admin by shild plugin
+        // can access panel by isSuperAdmin or by isPanelUser, and using Filament Shield plugin.
+        // match by $panel->getId(), 'admin' only by isSuperAdmin, 'user' by isPanelUser. isSuperAdmin can access all panels.
+
 
         return $this->isSuperAdmin() ? true : $this->isPanelUser();
 
