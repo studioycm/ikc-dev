@@ -1110,13 +1110,12 @@ class PrevDogResource extends Resource
                         Forms\Components\ToggleButtons::make('GenderID')
                             ->label(__('Gender'))
                             ->options(LegacyDogGender::class)
-                            ->multiple()
                             ->grouped()
                             ->nullable(),
                     ])
                     ->query(fn(Builder $query, array $data): Builder => $query->when(
                         filled($data['GenderID'] ?? null),
-                        fn(Builder $q): Builder => $q->whereIn('GenderID', $data['GenderID'])
+                        fn(Builder $q): Builder => $q->where('GenderID', $data['GenderID'])
                     )),
                 Filter::make('sagir_prefix')
                     ->form([

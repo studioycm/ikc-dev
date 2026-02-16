@@ -36,6 +36,13 @@ class UserPanelProvider extends PanelProvider
             ->topNavigation()
             ->colors([
                 'primary' => Color::Amber,
+                'pink' => Color::Pink,
+                'purple' => Color::Purple,
+                'indigo' => Color::Indigo,
+                'blue' => Color::Blue,
+                'green' => Color::Green,
+                'yellow' => Color::Yellow,
+                'orange' => Color::Orange,
             ])
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')

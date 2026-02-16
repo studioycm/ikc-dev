@@ -127,13 +127,12 @@ class UserDogsTableWidget extends BaseWidget
                         \Filament\Forms\Components\ToggleButtons::make('GenderID')
                             ->label(__('Gender'))
                             ->options(LegacyDogGender::class)
-                            ->multiple()
                             ->grouped()
                             ->nullable(),
                     ])
                     ->query(fn(Builder $query, array $data): Builder => $query->when(
                         filled($data['GenderID'] ?? null),
-                        fn(Builder $q): Builder => $q->whereIn('GenderID', $data['GenderID'])
+                        fn(Builder $q): Builder => $q->where('GenderID', $data['GenderID'])
                     )),
                 Tables\Filters\SelectFilter::make('breed')
                     ->label(__('Breed'))
@@ -176,14 +175,14 @@ class UserDogsTableWidget extends BaseWidget
                             ->options([
                                 'all' => __('All'),
                                 'below_9m' => __('Below 9m'),
-                                '9m_18m' => __('9-18m'),
-                                '18m_36m' => __('18-36m'),
-                                '3y_7y' => __('3-7y'),
+                                '9m_18m' => __('9-18 month'),
+                                '18m_36m' => __('18-36 month'),
+                                '3y_7y' => __('3-7 years'),
                                 'above_7y' => __('Above 7y'),
                             ])
                             ->multiple()
                             ->columns(3)
-                            ->gridDirection('column')
+                            ->gridDirection('row')
                             ->nullable(),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -279,7 +278,7 @@ class UserDogsTableWidget extends BaseWidget
                                 Tab::make(__('Titles'))
                                     ->schema([
                                         RepeatableEntry::make('titles')
-                                            ->label(__('Titles & Awards'))
+                                            ->label(__('Titles'))
                                             ->schema([
                                                 TextEntry::make('name')
                                                     ->label(__('Title'))
