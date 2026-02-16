@@ -1,12 +1,5 @@
 {
   "mcpServers": {
-    "laravel-boost": {
-      "command": "C:\\Users\\user-pc\\.config\\herd\\bin\\php84\\php.exe",
-      "args": [
-        "D:\\0-Dev\\Herd\\ikc-dev\\artisan",
-        "boost:mcp"
-      ]
-    },
     "herd": {
       "command": "C:\\Users\\user-pc\\.config\\herd\\bin\\php84\\php.exe",
       "args": [
@@ -15,6 +8,13 @@
       "env": {
         "SITE_PATH": "D:\\0-Dev\\Herd\\ikc-dev"
       }
+    },
+      "laravel-boost": {
+          "command": "C:\\Users\\user-pc\\.config\\herd\\bin\\php84\\php.exe",
+          "args": [
+              "D:\\0-Dev\\Herd\\ikc-dev\\artisan",
+              "boost:mcp"
+          ]
     }
   }
 }
