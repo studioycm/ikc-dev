@@ -244,10 +244,15 @@ class UserDogsTableWidget extends BaseWidget
                                                 ->label(__('Color')),
                                             TextEntry::make('Chip')
                                                 ->label(__('Chip')),
+                                            TextEntry::make('breedinghouse.name')
+                                                ->label(__('Breeding House')),
                                         ]),
                                     ]),
                                 Tab::make(__('Pedigree'))
                                     ->schema([
+                                        TextEntry::make('no_pedigree')
+                                            ->label(__('No Pedigree'))
+                                            ->visible(fn(PrevDog $record): bool => empty($record->father) && empty($record->mother)),
                                         InfolistSection::make(__('Parents'))->schema([
                                             TextEntry::make('father.full_name')
                                                 ->label(__('Father')),
@@ -273,8 +278,6 @@ class UserDogsTableWidget extends BaseWidget
                                                     ->label(__('Email')),
                                             ])
                                             ->grid(3),
-                                        TextEntry::make('breedinghouse.name')
-                                            ->label(__('Breeding House')),
                                     ]),
                                 Tab::make(__('Titles'))
                                     ->schema([

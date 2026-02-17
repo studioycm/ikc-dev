@@ -133,6 +133,7 @@ class ClubMembershipsWidget extends BaseWidget
                     ->tooltip(__('Renew'))
                     ->icon('heroicon-o-arrow-path')
                     ->color('success')
+                    ->visible(fn(PrevClubUser $record) => $record->isActive)
                     ->form([
                         Select::make('membership_type')
                             ->label('Membership Type')
