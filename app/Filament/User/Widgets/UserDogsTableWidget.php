@@ -257,9 +257,10 @@ class UserDogsTableWidget extends BaseWidget
                                                 ->label(__('Mother')),
                                             TextEntry::make('mother.SagirID')
                                                 ->label(__('Mother ID')),
-                                        ])->columns(2),
+                                        ])->columns(2)
+                                            ->hidden(fn(PrevDog $record): bool => empty($record->father) && empty($record->mother)),
                                     ]),
-                                Tab::make(__('Ownership'))
+                                Tab::make(__('Ownerships'))
                                     ->schema([
                                         RepeatableEntry::make('owners')
                                             ->label(__('All Owners'))
