@@ -120,9 +120,9 @@ class PrevClubUser extends Pivot
             get: function ($value, $attributes): string {
                 $type = $attributes['type'] ?? '';
                 return match (strtolower($type)) {
-                    'main' => 'Main',
-                    'sub' => 'Sub',
-                    default => 'Unknown',
+                    'main' => __('Main'),
+                    'sub' => __('Sub'),
+                    default => __('Unknown'),
                 };
             }
         );
@@ -195,23 +195,23 @@ class PrevClubUser extends Pivot
         return Attribute::make(
             get: function (): string {
                 if (!$this->expire_date) {
-                    return 'No expiration date';
+                    return __('No expiration date');
                 }
 
                 $days = $this->daysUntilExpiration();
 
                 if ($days === null) {
-                    return 'No expiration date';
+                    return __('No expiration date');
                 }
 
                 if ($days > 0) {
                     // Future date - will expire
                     return $this->expire_date->diffForHumans(['parts' => 1, 'short' => false]);
                 } elseif ($days === 0) {
-                    return 'Expires today';
+                    return __('Expires today');
                 } else {
                     // Past date - expired
-                    return 'Expired ' . $this->expire_date->diffForHumans(['parts' => 1, 'short' => false]);
+                    return __('Expired') . ' ' . $this->expire_date->diffForHumans(['parts' => 1, 'short' => false]);
                 }
             }
         );

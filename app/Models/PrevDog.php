@@ -146,6 +146,17 @@ class PrevDog extends Model implements HasName
             ->wherePivot('status', 'current');
     }
 
+    public function oldOwners(): BelongsToMany
+    {
+        return $this->belongsToMany(PrevUser::class, 'dogs2users', 'sagir_id', 'user_id', 'SagirID', 'id')
+            ->withTimestamps()
+            ->using(PrevUserDog::class)
+            ->as('ownership')
+            ->withPivot('status', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivot('deleted_at', null)
+            ->wherePivot('status', "!=", 'current');
+    }
+
     // get dog titles by a relationship of many 2 many with PrevDogTitle model
     public function titles(): BelongsToMany
     {

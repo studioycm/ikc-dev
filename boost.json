@@ -1,11 +1,13 @@
 {
     "agents": [
+        "claude_code",
         "codex",
         "copilot",
         "gemini",
         "phpstorm"
     ],
     "editors": [
+        "claude_code",
         "codex",
         "gemini",
         "phpstorm",

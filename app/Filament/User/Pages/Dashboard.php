@@ -2,10 +2,14 @@
 
 namespace App\Filament\User\Pages;
 
+use App\Filament\User\Widgets;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
 {
+
+    protected static ?int $navigationSort = 1;
+
     protected static ?string $navigationIcon = 'heroicon-o-home';
 
     protected static string $routePath = '/';
@@ -18,9 +22,9 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
-            \App\Filament\User\Widgets\UserDogsTableWidget::class,
-            \App\Filament\User\Widgets\ClubMembershipsWidget::class,
-            \App\Filament\User\Widgets\ClubManagersWidget::class,
+            Widgets\UserDogsTableWidget::class,
+            Widgets\ClubMembershipsWidget::class,
+            Widgets\ClubManagersWidget::class,
         ];
     }
 }

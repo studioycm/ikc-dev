@@ -57,11 +57,15 @@ class ClubManagersWidget extends Widget
             $managers = $club->managers;
 
             // Group managers by role (placeholder logic)
-            $managersByClub[$club->Name] = [
-                'chairman' => $managers->take(1),
-                'secretary' => $managers->slice(1, 1),
-                'accountant' => $managers->slice(2, 1),
-                'promoters' => $managers->slice(3),
+            $managersByClub[$club->id] = [
+                "managers" => [
+                    'chairman' => $managers->take(1),
+                    'secretary' => $managers->slice(1, 1),
+                    'accountant' => $managers->slice(2, 1),
+                    'promoters' => $managers->slice(3),
+                ],
+                "name" => $club->Name,
+                "breeds" => $club->breeds->pluck('BreedName')->toArray(),
             ];
         }
 

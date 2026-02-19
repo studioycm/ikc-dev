@@ -58,6 +58,7 @@ class UserDogsTableWidget extends BaseWidget
                         'mother:id,SagirID,Heb_Name,Eng_Name',
                         'breedinghouse:GidulCode,HebName,EngName',
                         'owners:id,first_name,last_name,first_name_en,last_name_en,mobile_phone,email',
+                        'oldOwners:id,first_name,last_name,first_name_en,last_name_en,mobile_phone,email',
                         'titles:TitleCode,TitleName',
                     ])
                     ->orderBy('SagirID', 'desc')
@@ -136,9 +137,20 @@ class UserDogsTableWidget extends BaseWidget
                     )),
                 Tables\Filters\SelectFilter::make('breed')
                     ->label(__('Breed'))
-                    ->relationship('breed', 'BreedName')
+                    ->relationship('breed', 'BreedName', modifyQueryUsing: function (Builder $query): Builder {
+                        $userBreedIds = auth()->user()?->prevUser?->dogs()
+                            ->with('breed:id,BreedCode')
+                            ->get()
+                            ->pluck('breed.id')
+                            ->unique()
+                            ->filter()
+                            ->toArray() ?? [];
+                        return $query->whereIn('id', $userBreedIds);
+                    })
+                    ->placeholder(__('All'))
+                    ->preload()
                     ->multiple()
-                    ->searchable(),
+                    ->searchable(['BreedName', 'BreedNameEN']),
                 Filter::make('BirthDate')
                     ->form([
                         Section::make(__('Birth Date Range'))
@@ -245,13 +257,14 @@ class UserDogsTableWidget extends BaseWidget
                                             TextEntry::make('Chip')
                                                 ->label(__('Chip')),
                                             TextEntry::make('breedinghouse.name')
-                                                ->label(__('Breeding House')),
+                                                ->label(__('Breeding Rights'))
+                                                ->hidden(fn(PrevDog $record): bool => empty($record->breedinghouse)),
                                         ]),
                                     ]),
                                 Tab::make(__('Pedigree'))
                                     ->schema([
                                         TextEntry::make('no_pedigree')
-                                            ->label(__('No Pedigree'))
+                                            ->label(__('Pedigree Missing'))
                                             ->visible(fn(PrevDog $record): bool => empty($record->father) && empty($record->mother)),
                                         InfolistSection::make(__('Parents'))->schema([
                                             TextEntry::make('father.full_name')
@@ -262,13 +275,26 @@ class UserDogsTableWidget extends BaseWidget
                                                 ->label(__('Mother')),
                                             TextEntry::make('mother.SagirID')
                                                 ->label(__('Mother ID')),
-                                        ])->columns(2)
+                                        ])
+                                            ->columns(2)
                                             ->hidden(fn(PrevDog $record): bool => empty($record->father) && empty($record->mother)),
+
                                     ]),
                                 Tab::make(__('Ownerships'))
                                     ->schema([
                                         RepeatableEntry::make('owners')
-                                            ->label(__('All Owners'))
+                                            ->label(__('Current Owners'))
+                                            ->schema([
+                                                TextEntry::make('full_name')
+                                                    ->label(__('Name')),
+                                                TextEntry::make('mobile_phone')
+                                                    ->label(__('Phone')),
+                                                TextEntry::make('email')
+                                                    ->label(__('Email')),
+                                            ])
+                                            ->grid(3),
+                                        RepeatableEntry::make('oldOwners')
+                                            ->label(__('Previous Owners'))
                                             ->schema([
                                                 TextEntry::make('full_name')
                                                     ->label(__('Name')),
@@ -307,24 +333,24 @@ class UserDogsTableWidget extends BaseWidget
                     ->modalContent(fn() => view('filament.user.modals.placeholder', ['message' => 'Breeding info coming soon']))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel(__('Close')),
-                Tables\Actions\Action::make('medical')
-                    ->hiddenLabel()
-                    ->tooltip(__('Medical'))
-                    ->icon('heroicon-o-document')
-                    ->color('danger')
-                    ->modalHeading(__('Medical Records'))
-                    ->modalContent(fn() => view('filament.user.modals.placeholder', ['message' => 'Medical records coming soon']))
-                    ->modalSubmitAction(false)
-                    ->modalCancelActionLabel(__('Close')),
-                Tables\Actions\Action::make('shows')
-                    ->hiddenLabel()
-                    ->tooltip(__('Shows'))
-                    ->icon('heroicon-o-trophy')
-                    ->color('warning')
-                    ->modalHeading(__('Show History'))
-                    ->modalContent(fn() => view('filament.user.modals.placeholder', ['message' => 'Show history coming soon']))
-                    ->modalSubmitAction(false)
-                    ->modalCancelActionLabel(__('Close')),
+//                Tables\Actions\Action::make('medical')
+//                    ->hiddenLabel()
+//                    ->tooltip(__('Medical'))
+//                    ->icon('heroicon-o-document')
+//                    ->color('danger')
+//                    ->modalHeading(__('Medical Records'))
+//                    ->modalContent(fn() => view('filament.user.modals.placeholder', ['message' => 'Medical records coming soon']))
+//                    ->modalSubmitAction(false)
+//                    ->modalCancelActionLabel(__('Close')),
+//                Tables\Actions\Action::make('shows')
+//                    ->hiddenLabel()
+//                    ->tooltip(__('Shows'))
+//                    ->icon('heroicon-o-trophy')
+//                    ->color('warning')
+//                    ->modalHeading(__('Show History'))
+//                    ->modalContent(fn() => view('filament.user.modals.placeholder', ['message' => 'Show history coming soon']))
+//                    ->modalSubmitAction(false)
+//                    ->modalCancelActionLabel(__('Close')),
             ])
             ->paginated([5, 10, 15, 20, 'all'])
             ->defaultPaginationPageOption(10)

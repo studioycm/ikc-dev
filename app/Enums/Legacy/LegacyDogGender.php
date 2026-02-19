@@ -10,11 +10,11 @@ enum LegacyDogGender: int implements HasColor, HasIcon, HasLabel
 {
     case Male = 1;
     case Female = 2;
-    case Unknown = 0;
+    case Missing = 0;
 
     public function getLabel(): string
     {
-        return $this->name;
+        return __($this->name);
     }
 
     public function getColor(): string|array|null
@@ -22,7 +22,7 @@ enum LegacyDogGender: int implements HasColor, HasIcon, HasLabel
         return match ($this) {
             self::Male => 'blue',
             self::Female => 'pink',
-            self::Unknown => 'gray',
+            self::Missing => 'gray',
         };
     }
 
@@ -31,7 +31,7 @@ enum LegacyDogGender: int implements HasColor, HasIcon, HasLabel
         return match ($this) {
             self::Male => 'fas-mars',
             self::Female => 'fas-venus',
-            self::Unknown => 'fas-question',
+            self::Missing => 'fas-question',
         };
     }
 

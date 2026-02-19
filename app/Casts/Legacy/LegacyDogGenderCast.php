@@ -17,7 +17,7 @@ class LegacyDogGenderCast implements CastsAttributes
         return match ($int) {
             1 => LegacyDogGender::Male,
             2 => LegacyDogGender::Female,
-            default => LegacyDogGender::Unknown,
+            default => LegacyDogGender::Missing,
         };
 
     }

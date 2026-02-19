@@ -3,9 +3,11 @@
 namespace App\Filament\User\Widgets;
 
 use App\Models\PrevClubUser;
+use Carbon\CarbonImmutable;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Tables;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
@@ -20,7 +22,7 @@ class ClubMembershipsWidget extends BaseWidget
 
     public function table(Table $table): Table
     {
-        $prevUserId = auth()->user()?->prevUser?->id;
+        $prevUserId = auth()->user()?->prev_user_id;
 
         if (!$prevUserId) {
             return $table->query(PrevClubUser::query()->whereRaw('1 = 0'));
@@ -59,7 +61,7 @@ class ClubMembershipsWidget extends BaseWidget
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('club.Name')
-                    ->label('Club')
+                    ->label(__('Club'))
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
@@ -77,13 +79,13 @@ class ClubMembershipsWidget extends BaseWidget
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('computed_status')
-                    ->label('Status')
+                    ->label(__('Status'))
                     ->formatStateUsing(fn($state): string => match ($state) {
-                        1 => 'Active',
-                        0 => 'Inactive',
-                        2 => 'Pending Payment',
-                        3 => 'Expired',
-                        default => 'Unknown',
+                        1 => __('Active'),
+                        0 => __('Inactive'),
+                        2 => __('Pending Payment'),
+                        3 => __('Expired'),
+                        default => __('Unknown'),
                     })
                     ->badge()
                     ->color(fn($state): string => match ($state) {
@@ -94,22 +96,22 @@ class ClubMembershipsWidget extends BaseWidget
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Valid From')
+                    ->label(__('Valid From'))
                     ->date('Y-m-d')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('expire_date')
-                    ->label('Valid Until')
+                    ->label(__('Valid Until'))
                     ->date('Y-m-d')
                     ->description(fn(PrevClubUser $record): string => $record->expiration_human)
                     ->color(fn(PrevClubUser $record): string => $record->getExpirationColor())
                     ->sortable(),
                 Tables\Columns\TextColumn::make('payment_status_code')
-                    ->label('Payment')
+                    ->label(__('Payment'))
                     ->formatStateUsing(fn(?int $state): string => match ($state) {
-                        1 => 'Paid',
-                        0 => 'Pending',
-                        null => 'N/A',
-                        default => 'Unknown',
+                        1 => __('Paid'),
+                        0 => __('Pending'),
+                        null => __('N/A'),
+                        default => __('Unknown'),
                     })
                     ->badge()
                     ->color(fn(?int $state): string => match ($state) {
@@ -117,6 +119,62 @@ class ClubMembershipsWidget extends BaseWidget
                         0 => 'warning',
                         null => 'gray',
                         default => 'gray',
+                    }),
+                Tables\Columns\TextColumn::make('deleted_at')
+                    ->label(__('Deleted'))
+                    ->formatStateUsing(fn(?CarbonImmutable $state): string => $state ? $state->format('Y-m-d') : '')
+                    ->color(fn(?CarbonImmutable $state): string => $state ? 'danger' : 'gray')
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filtersFormColumns(2)
+            ->filtersLayout(Tables\Enums\FiltersLayout::AboveContent)
+            ->filters([
+                Tables\Filters\Filter::make('status_filter')
+                    ->form([
+                        ToggleButtons::make('status')
+                            ->label(__('Status'))
+                            ->options([
+                                'active' => __('Active'),
+                                'expired' => __('Expired'),
+                                'all' => __('All'),
+                            ])
+                            ->default('active')
+                            ->inline(),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $status = $data['status'] ?? 'active';
+
+                        if ($status === 'active') {
+                            return $query
+                                ->whereNull('deleted_at')
+                                ->where('expire_date', '>=', now())
+                                ->where(function (Builder $q) {
+                                    $q->whereNull('payment_status')
+                                        ->orWhere('payment_status', '1');
+                                })
+                                ->where(function (Builder $q) {
+                                    $q->whereNull('forbidden')
+                                        ->orWhere('forbidden', false);
+                                });
+                        }
+
+                        if ($status === 'expired') {
+                            $prevUserId = auth()->user()?->prevUser?->id;
+
+                            return $query
+                                ->whereNull('deleted_at')
+                                ->where('expire_date', '<', now())
+                                ->whereIn('id', function ($subquery) use ($prevUserId) {
+                                    $subquery->selectRaw('MAX(id)')
+                                        ->from('club2user')
+                                        ->where('user_id', $prevUserId)
+                                        ->whereNull('deleted_at')
+                                        ->where('expire_date', '<', now())
+                                        ->groupBy('club_id');
+                                });
+                        }
+
+                        return $query->withTrashed();
                     }),
             ])
             ->groups([
@@ -196,10 +254,10 @@ class ClubMembershipsWidget extends BaseWidget
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Close'),
             ])
-            ->heading('Club Memberships')
-            ->description('Your active club memberships by breed associations')
-            ->emptyStateHeading('No Memberships Found')
-            ->emptyStateDescription('You don\'t have any active club memberships yet.')
+            ->heading(__('Club Memberships'))
+            ->description(__('Your active club memberships by breed associations'))
+            ->emptyStateHeading(__('No Memberships Found'))
+            ->emptyStateDescription(__("You don't have any active club memberships yet."))
             ->emptyStateIcon('heroicon-o-user-group');
     }
 }
