@@ -35,13 +35,13 @@ class PrevClub extends Model
         'DataID' => 'integer',
         'ClubCode' => 'integer',
         'ManagerID' => 'integer',
-        'RegistrationPrice' => 'float',
-        'GeneralReviewFee' => 'float',
-        'DogReviewFee' => 'float',
-        'Breed_NonReg_Price' => 'float',
-        'PerDog_NonReg_Price' => 'float',
-        'TestPrice' => 'float',
-        'status' => 'integer',
+        'RegistrationPrice' => 'integer',
+        'GeneralReviewFee' => 'integer',
+        'DogReviewFee' => 'integer',
+        'Breed_NonReg_Price' => 'integer',
+        'PerDog_NonReg_Price' => 'integer',
+        'TestPrice' => 'integer',
+        'status' => 'string',
     ];
 
     //    protected $appends = ['full_address'];

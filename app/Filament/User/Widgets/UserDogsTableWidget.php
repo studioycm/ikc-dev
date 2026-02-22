@@ -3,6 +3,7 @@
 namespace App\Filament\User\Widgets;
 
 use App\Enums\Legacy\LegacyDogGender;
+use App\Filament\User\Resources\BreedingInquiryResource;
 use App\Models\PrevDog;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
@@ -329,10 +330,9 @@ class UserDogsTableWidget extends BaseWidget
                     ->tooltip('פתיחת תיק המלטה')
                     ->icon('heroicon-o-heart')
                     ->color('success')
-                    ->modalHeading(__('Open Litter Report'))
-                    ->modalContent(fn() => view('filament.user.modals.placeholder', ['message' => 'Breeding info coming soon']))
-                    ->modalSubmitAction(false)
-                    ->modalCancelActionLabel(__('Close')),
+                    ->visible(fn(PrevDog $record): bool => $record->GenderID === LegacyDogGender::Female)
+                    ->url(fn(PrevDog $record): string => BreedingInquiryResource::getUrl('create', ['female_sagir_id' => $record->SagirID])),
+
 //                Tables\Actions\Action::make('medical')
 //                    ->hiddenLabel()
 //                    ->tooltip(__('Medical'))

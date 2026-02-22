@@ -79,6 +79,15 @@ class PrevUser extends Model implements HasName
             ->wherePivotNull('deleted_at');
     }
 
+    public function activeMemberships(): BelongsToMany
+    {
+        return $this->clubs()
+            ->wherePivot('expire_date', '>=', now()->format('Y-m-d'))
+            ->wherePivot('forbidden', false)
+            ->WherePivot('payment_status', 1);
+    }
+
+
     public function user(): HasOne
     {
         return $this->hasOne(User::class, 'prev_user_id', 'id');

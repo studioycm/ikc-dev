@@ -117,6 +117,26 @@ class PrevDog extends Model implements HasName
         return $this->belongsTo(self::class, 'MotherSAGIR', 'SagirID');
     }
 
+    /**
+     * Eager load the pedigree tree recursively up to a specified depth.
+     */
+    public function scopeWithPedigree($query, int $depth, $columns = ['id', 'SagirID', 'Heb_Name', 'Eng_Name', 'FatherSAGIR', 'MotherSAGIR'])
+    {
+        if ($depth > 0) {
+            return $query->with([
+                'father' => function ($q) use ($depth, $columns) {
+                    $q->select(...$columns)
+                        ->withPedigree($depth - 1, $columns);
+                },
+                'mother' => function ($q) use ($depth, $columns) {
+                    $q->select(...$columns)
+                        ->withPedigree($depth - 1, $columns);
+                }
+            ]);
+        }
+        return $query;
+    }
+
     public function childrenAsFather(): HasMany
     {
         // All pups that list this dog as FatherSAGIR
@@ -221,7 +241,7 @@ class PrevDog extends Model implements HasName
     }
 
     // appends full_name and prefixed_sagir, removed the "sagir_prefix" and "gender" attributes
-    protected $appends = ['full_name', 'breeding_house_name'];
+    protected $appends = ['full_name'];
 
     public function fullName(): Attribute
     {

@@ -39,6 +39,7 @@ class PrevClubUser extends Pivot
         'club_id' => 'integer',
         'forbidden' => 'boolean',
         'expire_date' => 'datetime',
+        'payment_status' => 'integer',
     ];
 
     protected $appends = ['is_active', 'computed_status', 'type_label', 'payment_status_code', 'expiration_human'];
