@@ -14,6 +14,8 @@ class ClubManagersWidget extends Widget
 
     protected static ?int $sort = 3;
 
+    protected int $grid_columns = 4;
+
     public function getClubsWithManagers(): Collection
     {
         $prevUserId = auth()->user()?->prevUser?->id;

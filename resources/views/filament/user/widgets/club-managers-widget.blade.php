@@ -35,7 +35,7 @@
                     </div>
 
                     {{-- Manager Cards Grid --}}
-                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-{{ $this->grid_columns }} gap-4">
                         {{-- Chairman --}}
                         @foreach($clubData['managers']['chairman'] as $manager)
                             <div
