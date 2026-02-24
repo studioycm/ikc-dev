@@ -44,6 +44,7 @@ class UserPanelProvider extends PanelProvider
                 'yellow' => Color::Yellow,
                 'orange' => Color::Orange,
             ])
+            ->theme(asset('css/filament/admin/theme.css'))
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
             ->pages([

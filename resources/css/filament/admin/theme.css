@@ -70,10 +70,10 @@
 
 /* Force Text/Icon Colors to White for better contrast on colored backgrounds */
 /* (Except for the Yellow step, handled below) */
-.breeding-wizard .fi-fo-wizard-header-step-label,
-.breeding-wizard .fi-fo-wizard-header-step-description,
-.breeding-wizard .fi-fo-wizard-header-step-indicator, /* The "01", "02" numbers */
-.breeding-wizard .fi-fo-wizard-header-step-icon {
+.breeding-wizard .fi-fo-wizard-header-step.fi-active .fi-fo-wizard-header-step-label,
+.breeding-wizard .fi-fo-wizard-header-step.fi-active .fi-fo-wizard-header-step-description,
+.breeding-wizard .fi-fo-wizard-header-step.fi-active .fi-fo-wizard-header-step-indicator, /* The "01", "02" numbers */
+.breeding-wizard .fi-fo-wizard-header-step.fi-active .fi-fo-wizard-header-step-icon {
     color: #ffffff !important;
     --c-400: #ffffff !important; /* Forces Tailwind icon colors override */
     --c-500: #ffffff !important;
@@ -81,13 +81,13 @@
 }
 
 /* Remove the default borders on the number circle so it looks cleaner on colored bg */
-.breeding-wizard .fi-fo-wizard-header-step-icon-ctn {
+.breeding-wizard .fi-fo-wizard-header-step.fi-active .fi-fo-wizard-header-step-icon-ctn {
     border-color: rgba(255, 255, 255, 0.5) !important;
 }
 
 /* --- Step 1: Inquiry (Blue) --- */
 /* Note: Targeting the BUTTON ensures the whole clickable area is colored */
-.breeding-wizard .fi-fo-wizard-header-step:nth-child(1) {
+.breeding-wizard .fi-fo-wizard-header-step:nth-child(1).fi-active {
     background-color: #5b9bd5 !important;
 }
 
@@ -98,33 +98,33 @@
 
 
 /* --- Step 2: Breeding (Green) --- */
-.breeding-wizard .fi-fo-wizard-header-step:nth-child(2) {
+.breeding-wizard .fi-fo-wizard-header-step:nth-child(2).fi-active {
     background-color: #00b050 !important;
 }
 
 
 /* --- Step 3: Litter (Yellow) - Special Text Handling --- */
-.breeding-wizard .fi-fo-wizard-header-step:nth-child(3) {
+.breeding-wizard .fi-fo-wizard-header-step:nth-child(3).fi-active {
     background-color: #ffc000 !important;
 }
 
 /* Force BLACK text/icons for the Yellow step only */
-.breeding-wizard .fi-fo-wizard-header-step:nth-child(3) .fi-fo-wizard-header-step-label,
-.breeding-wizard .fi-fo-wizard-header-step:nth-child(3) .fi-fo-wizard-header-step-description,
-.breeding-wizard .fi-fo-wizard-header-step:nth-child(3) .fi-fo-wizard-header-step-indicator,
-.breeding-wizard .fi-fo-wizard-header-step:nth-child(3) .fi-fo-wizard-header-step-icon {
+.breeding-wizard .fi-fo-wizard-header-step:nth-child(3).fi-active .fi-fo-wizard-header-step-label,
+.breeding-wizard .fi-fo-wizard-header-step:nth-child(3).fi-active .fi-fo-wizard-header-step-description,
+.breeding-wizard .fi-fo-wizard-header-step:nth-child(3).fi-active .fi-fo-wizard-header-step-indicator,
+.breeding-wizard .fi-fo-wizard-header-step:nth-child(3).fi-active .fi-fo-wizard-header-step-icon {
     color: #000000 !important;
     --c-400: #000000 !important;
     --c-500: #000000 !important;
     --c-600: #000000 !important;
 }
 
-.breeding-wizard .fi-fo-wizard-header-step:nth-child(3) .fi-fo-wizard-header-step-icon-ctn {
+.breeding-wizard .fi-fo-wizard-header-step:nth-child(3).fi-active .fi-fo-wizard-header-step-icon-ctn {
     border-color: rgba(0, 0, 0, 0.2) !important;
 }
 
 
 /* --- Step 4: Inspection (Orange) --- */
-.breeding-wizard .fi-fo-wizard-header-step:nth-child(4) {
+.breeding-wizard .fi-fo-wizard-header-step:nth-child(4).fi-active {
     background-color: #c55a11 !important;
 }

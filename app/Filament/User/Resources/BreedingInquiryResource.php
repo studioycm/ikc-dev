@@ -63,11 +63,13 @@ class BreedingInquiryResource extends Resource
                 Wizard::make([
                     Step::make('inquiry')
                         ->label(__('Inquiry'))
+                        ->columns(2)
                         ->schema([
 
                             TextInput::make('litter_report_name')
                                 ->label(__('Litter Report Name'))
-                                ->required(),
+                                ->required()
+                                ->columnSpan(1),
 
                             Group::make([
                                 Section::make('female_section')
@@ -108,7 +110,9 @@ class BreedingInquiryResource extends Resource
                                             ),
                                         Placeholder::make('suitability')
                                             ->label(__('DNA Test'))
-                                            ->content(fn(Get $get) => $get('female_suitable_state.has_dna')),
+                                            ->inlineLabel(true)
+                                            ->content(fn(Get $get) => $get('female_dna_state') ? __('Yes') : __('No'))
+                                            ->visible(fn(Get $get) => filled($get('female_sagir_id'))),
 
                                     ])
                                     ->columnSpan(1),
@@ -150,9 +154,15 @@ class BreedingInquiryResource extends Resource
                                             ->afterStateUpdated(
                                                 fn(Set $set, Get $get, ?string $state, Select $component) => self::hydrateMale($get, $set, $component)
                                             ),
+                                        Placeholder::make('suitability')
+                                            ->label(__('DNA Test'))
+                                            ->content(fn(Get $get) => $get('male_dna_state') ? __('Yes') : __('No'))
+                                            ->visible(fn(Get $get) => filled($get('male_sagir_id'))),
+
                                     ])
                                     ->columnSpan(1),
-                            ])->columns(2),
+                            ])->columns(2)
+                                ->columnSpanFull(),
 
                             /*
                             |--------------------------------------------------------------------------
@@ -185,8 +195,8 @@ class BreedingInquiryResource extends Resource
                                                 return '---';
                                             }
                                             return $status_key === 'active'
-                                                ? $prices->get('member') . 'ש"ח לאחר הנחה'
-                                                : $prices->get('non_member') . 'ש"ח';
+                                                ? $prices->get('member', "0") . 'ש"ח לאחר הנחה'
+                                                : $prices->get('non_member', "0") . 'ש"ח';
                                         }),
 
                                     Placeholder::make('club_conditions')
@@ -304,20 +314,19 @@ class BreedingInquiryResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                $query->with(['femaleDog', 'maleDog'])->orderBy('created_at', 'asc');
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('litter_report_name')
                     ->label(__('Litter Report Name'))
                     ->searchable(),
-                Tables\Columns\TextColumn::make('female_sagir_id')
-                    ->label(__('Female'))
-                    ->searchable()
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('male_sagir_id')
-                    ->label(__('Male'))
-                    ->searchable()
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('femaleDog.SagirID')
+                    ->label(__('Dam'))
+                    ->description(fn(BreedingInquiry $record) => $record->femaleDog->full_name),
+                Tables\Columns\TextColumn::make('maleDog.SagirID')
+                    ->label(__('Sire'))
+                    ->description(fn(BreedingInquiry $record) => $record->maleDog->full_name),
                 Tables\Columns\TextColumn::make('breeding_date')
                     ->label(__('Breeding Date'))
                     ->date()

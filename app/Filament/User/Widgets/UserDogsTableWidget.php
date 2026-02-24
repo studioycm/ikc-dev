@@ -6,6 +6,7 @@ use App\Enums\Legacy\LegacyDogGender;
 use App\Filament\User\Resources\BreedingInquiryResource;
 use App\Models\PrevDog;
 use Carbon\Carbon;
+use Filament\Actions\StaticAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
 use Filament\Infolists\Components\Grid as InfolistGrid;
@@ -16,10 +17,12 @@ use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Support\Enums\FontWeight;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 
 class UserDogsTableWidget extends BaseWidget
@@ -118,7 +121,7 @@ class UserDogsTableWidget extends BaseWidget
                     })
                     ->toggleable(),
             ])
-            ->filtersLayout(Tables\Enums\FiltersLayout::BelowContent)
+            ->filtersLayout(Tables\Enums\FiltersLayout::AboveContentCollapsible)
             ->persistFiltersInSession(true)
             ->filtersFormColumns(4)
             ->deselectAllRecordsWhenFiltered(true)
@@ -325,6 +328,15 @@ class UserDogsTableWidget extends BaseWidget
                             ])->columnSpanFull(),
                         ])
                     ),
+                Tables\Actions\Action::make('pedigree_tree_modal')
+                    ->label(__('Pedigree'))
+                    ->icon('fas-sitemap')
+                    ->color('primary')
+                    ->modalWidth(MaxWidth::Full)
+                    ->modalSubmitAction(false)
+                    ->modalCancelAction(fn(StaticAction $action) => $action->label(__('Close')))
+                    ->modalContent(fn(PrevDog $record): View => view('legacy.pedigree.pedigree-tree-modal', ['dogId' => $record->id])),
+
                 Tables\Actions\Action::make('breeding')
                     ->label(__('Litter'))
                     ->tooltip('פתיחת תיק המלטה')

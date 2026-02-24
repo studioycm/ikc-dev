@@ -23,7 +23,9 @@ class CreateBreedingInquiry extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['user_id'] = auth()->id();
+        $user = auth()->user();
+        $data['user_id'] = $user->id;
+        $data['prev_user_id'] = $user->prev_user_id;
 
         $data['puppies'] = collect($data['puppies'] ?? [])
             ->map(function ($puppy) {

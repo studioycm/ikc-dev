@@ -21,6 +21,7 @@ class BreedingInquiry extends Model
             'breeding_date' => 'date',
             'birthing_date' => 'date',
             'submitted_at' => 'datetime',
+            'breeding_rights' => 'array',
         ];
     }
 

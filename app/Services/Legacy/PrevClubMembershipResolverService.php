@@ -106,8 +106,8 @@ class PrevClubMembershipResolverService
 //            return null;
 //        }
 
-        $nonMember = $club->Breed_NonReg_Price ?? 0;
-        $member = $club->GeneralReviewFee ?? 0;
+        $nonMember = $club->Breed_NonReg_Price;
+        $member = $club->GeneralReviewFee;
 
 //        if ($nonMember <= 0 || $member >= $nonMember) {
 //            return null;
