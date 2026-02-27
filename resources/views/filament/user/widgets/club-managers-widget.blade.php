@@ -44,7 +44,7 @@
                                     {{-- Info --}}
                                     <div class="flex-1 min-w-0">
                                         <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                            {{ $manager->full_name ?? __('Unknown') }}
+                                            {{ $manager->name ?? __('Unknown') }}
                                         </p>
                                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                             <span
@@ -83,7 +83,7 @@
                                 <div class="flex items-start space-x-3">
                                     <div class="flex-1 min-w-0">
                                         <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                            {{ $manager->full_name ?? 'Unknown' }}
+                                            {{ $manager->name ?? 'Unknown' }}
                                         </p>
                                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                             <span
@@ -121,7 +121,7 @@
                                 <div class="flex items-start space-x-3">
                                     <div class="flex-1 min-w-0">
                                         <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                            {{ $manager->full_name ?? 'Unknown' }}
+                                            {{ $manager->name ?? 'Unknown' }}
                                         </p>
                                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                             <span
@@ -159,7 +159,7 @@
                                 <div class="flex items-start space-x-3">
                                     <div class="flex-1 min-w-0">
                                         <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                            {{ $manager->full_name ?? 'Unknown' }}
+                                            {{ $manager->name ?? 'Unknown' }}
                                         </p>
                                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                             <span
