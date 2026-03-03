@@ -47,7 +47,7 @@ class PrevClubMembershipResolverService
         );
     }
 
-    protected function buildResponse(PrevClub $club, PrevClubUser $membership): array
+    protected function buildResponse(PrevClub $club, ?PrevClubUser $membership): array
     {
         if (!$membership) {
             return $this->statusResponse(

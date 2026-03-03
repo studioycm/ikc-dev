@@ -6,6 +6,7 @@ use App\Enums\Legacy\LegacyDogGender;
 use App\Filament\User\Resources\BreedingInquiryResource\Pages;
 use App\Models\BreedingInquiry;
 use App\Models\PrevDog;
+use App\Models\PrevUser;
 use App\Services\Legacy\PrevClubMembershipResolverService;
 use Filament\Forms\Components\{DatePicker,
     Group,
@@ -219,6 +220,70 @@ class BreedingInquiryResource extends Resource
                             DatePicker::make('breeding_date')
                                 ->label(__('Breeding Date'))
                                 ->required(),
+                            Section::make('breeder_rights_section')
+                                ->heading(__('Breeder Rights'))
+                                ->schema([
+                                    Placeholder::make('breeder_rights_explanation')
+                                        ->label(false)
+                                        ->columnSpanFull()
+                                        ->content(fn() => __('Breeder rights explanation will be displayed here.')),
+                                    ToggleButtons::make('type')
+                                        ->label(__('Transfer Breeder / Kennel'))
+                                        ->options(function (Get $get) {
+                                            $options = [
+                                                'owner' => __('Without'),
+                                                'female_co_owner' => __('Co-owner'),
+                                                'male_owner' => __("Male's Owner"),
+                                                'kennel' => __('Kennel'),
+                                            ];
+                                            // Hide 'archived' if 'other_field' is filled
+                                            if (!filled($get('female_sagir_id'))) {
+                                                unset($options['female_co_owner']);
+                                            }
+
+                                            // Hide 'published' if 'other_field' equals 'hide_pub'
+                                            if (!filled($get('male_sagir_id'))) {
+                                                unset($options['male_owner']);
+                                            }
+                                            return $options;
+                                        })
+                                        ->live()
+                                        ->grouped()
+                                        ->columnSpan(1)
+                                        ->default('owner')
+                                        ->dehydrated(false),
+                                    // PrevUser Select (“Breeder”)
+                                    Select::make('prev_breeder_id')
+                                        ->label(__('Breeder'))
+                                        ->required(fn($get) => $get('type') !== 'kennel')
+                                        ->getSearchResultsUsing(fn($search, $get) => PrevUser::query()
+                                            ->when($get('type') == 'owner', fn($q) => $q->where('id', auth()->user()->prev_user_id))
+                                            ->when($get('type') == 'female_co_owner', fn($q) => $q->whereHas('dogs', fn($q2) => $q2->where('SagirID', $get('female_sagir_id')))
+                                                ->where('id', '!=', auth()->user()->prev_user_id))
+                                            ->when($get('type') == 'male_owner', fn($q) => $q->whereHas('dogs', fn($q2) => $q2->where('SagirID', $get('male_sagir_id'))))->limit(50)->get()->pluck('name', 'id')->toArray()
+                                        )
+                                        ->getOptionLabelUsing(fn($value): ?string => PrevUser::find($value)->name)
+                                        ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en', 'mobile_phone', 'email'])
+                                        ->preload()
+                                        ->columnSpan(1)
+                                        ->visible(fn($get) => $get('type') !== 'kennel'),
+
+                                    // PrevBreedingHouse Select (“Kennel”)
+                                    Select::make('prev_breeding_house_id')
+                                        ->label(__('Breeding House'))
+                                        ->relationship('breedingHouse', 'HebName')
+                                        ->searchable(['HebName', 'EngName'])
+                                        ->columnSpan(1)
+                                        ->visible(fn($get) => $get('type') === 'kennel'),
+
+                                    // SMS Request Approval Action
+//                                            Action::make('sms')
+//                                                ->label(__('SMS Request Approval'))
+//                                                ->icon('heroicon-o-chat')
+//                                                ->size('sm')
+//                                                ->button(),
+
+                                ]),
                         ])
                         ->columns(2),
 
@@ -263,7 +328,8 @@ class BreedingInquiryResource extends Resource
                                         ->grouped(),
 
                                     DatePicker::make('vaccinated_date')
-                                        ->nullable(),
+                                        ->nullable()
+                                        ->visible(fn(Get $get) => $get('vaccinated') === 'yes'),
 
                                     ToggleButtons::make('alive')
                                         ->options([

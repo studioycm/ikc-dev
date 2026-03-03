@@ -16,12 +16,12 @@ class BreedingInquiry extends Model
     protected function casts(): array
     {
         return [
-            'puppies' => 'array',
             'status' => BreedingInquiryStatus::class,
             'breeding_date' => 'date',
-            'birthing_date' => 'date',
-            'submitted_at' => 'datetime',
             'breeding_rights' => 'array',
+            'birthing_date' => 'date',
+            'puppies' => 'array',
+            'submitted_at' => 'datetime',
         ];
     }
 
@@ -38,5 +38,15 @@ class BreedingInquiry extends Model
     public function maleDog(): BelongsTo
     {
         return $this->belongsTo(PrevDog::class, 'male_sagir_id', 'SagirID');
+    }
+
+    public function breedingHouse(): BelongsTo
+    {
+        return $this->belongsTo(PrevBreedingHouse::class, 'prev_breeding_house_id', 'id');
+    }
+
+    public function breeder(): BelongsTo
+    {
+        return $this->belongsTo(PrevUser::class, 'prev_breeder_id', 'id');
     }
 }

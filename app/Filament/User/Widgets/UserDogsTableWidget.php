@@ -332,6 +332,7 @@ class UserDogsTableWidget extends BaseWidget
                     ->label(__('Pedigree'))
                     ->icon('fas-sitemap')
                     ->color('primary')
+                    ->hidden(fn(PrevDog $record): bool => empty($record->father) && empty($record->mother))
                     ->modalWidth(MaxWidth::Full)
                     ->modalSubmitAction(false)
                     ->modalCancelAction(fn(StaticAction $action) => $action->label(__('Close')))
@@ -345,24 +346,6 @@ class UserDogsTableWidget extends BaseWidget
                     ->visible(fn(PrevDog $record): bool => $record->GenderID === LegacyDogGender::Female)
                     ->url(fn(PrevDog $record): string => BreedingInquiryResource::getUrl('create', ['female_sagir_id' => $record->SagirID])),
 
-//                Tables\Actions\Action::make('medical')
-//                    ->hiddenLabel()
-//                    ->tooltip(__('Medical'))
-//                    ->icon('heroicon-o-document')
-//                    ->color('danger')
-//                    ->modalHeading(__('Medical Records'))
-//                    ->modalContent(fn() => view('filament.user.modals.placeholder', ['message' => 'Medical records coming soon']))
-//                    ->modalSubmitAction(false)
-//                    ->modalCancelActionLabel(__('Close')),
-//                Tables\Actions\Action::make('shows')
-//                    ->hiddenLabel()
-//                    ->tooltip(__('Shows'))
-//                    ->icon('heroicon-o-trophy')
-//                    ->color('warning')
-//                    ->modalHeading(__('Show History'))
-//                    ->modalContent(fn() => view('filament.user.modals.placeholder', ['message' => 'Show history coming soon']))
-//                    ->modalSubmitAction(false)
-//                    ->modalCancelActionLabel(__('Close')),
             ])
             ->paginated([5, 10, 15, 20, 'all'])
             ->defaultPaginationPageOption(10)
