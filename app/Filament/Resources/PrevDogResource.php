@@ -14,6 +14,7 @@ use App\Models\PrevDog;
 use App\Models\PrevHair;
 use App\Models\PrevUser;
 use App\Services\Legacy\PrevDogService;
+use Filament\Actions\StaticAction;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -34,11 +35,14 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\FontWeight;
+use Filament\Support\Enums\IconSize;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -89,7 +93,7 @@ class PrevDogResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('dog/model/general.labels.navigation_label');
+        return __('Studbook');
     }
 
     protected static ?string $recordTitleAttribute = 'Heb_Name';
@@ -1383,24 +1387,49 @@ class PrevDogResource extends Resource
 
             ], layout: FiltersLayout::AboveContentCollapsible)
             ->filtersFormColumns(3)
+            ->actionsPosition(Tables\Enums\ActionsPosition::BeforeColumns)
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('pedigree')
-                    ->label(__('Pedigree'))
+                Tables\Actions\ViewAction::make()
+                    ->iconButton()
+                    ->iconSize(IconSize::Large)
+                    ->tooltip(__('View')),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->iconSize(IconSize::Large)
+                    ->tooltip(__('Edit')),
+                Tables\Actions\Action::make('pedigree_tree_modal')
+                    ->iconButton()
+                    ->iconSize(IconSize::Large)
+                    ->tooltip(__('Pedigree'))
+                    ->icon('fas-sitemap')
+                    ->color('info')
+                    ->hidden(fn(PrevDog $record): bool => empty($record->father) && empty($record->mother))
+                    ->modalWidth(MaxWidth::Full)
+                    ->modalSubmitAction(false)
+                    ->modalCancelAction(fn(StaticAction $action) => $action->label(__('Close')))
+                    ->modalContent(fn(PrevDog $record): View => view('legacy.pedigree.pedigree-tree-modal', ['dogId' => $record->id])),
+
+                Tables\Actions\Action::make('edit_pedigree')
+                    ->iconButton()
+                    ->iconSize(IconSize::Large)
+                    ->tooltip(__('Manage Pedigree'))
                     ->icon('heroicon-m-share')
                     ->url(fn(PrevDog $record): string => PrevDogResource::getUrl('pedigree', ['record' => $record])),
-                Tables\Actions\DeleteAction::make()
-                    ->label(__('Delete'))
-                    ->icon('fas-trash-alt')
-                    ->requiresConfirmation()
-                    ->hidden(fn($record) => $record->trashed()),
-                Tables\Actions\ForceDeleteAction::make()
-                    ->label(__('Force Delete'))
-                    ->icon('fas-trash')
-                    ->requiresConfirmation()
-                    ->color('danger')
-                    ->visible(fn($record) => $record->trashed()),
+//                Tables\Actions\DeleteAction::make()
+//                    ->iconButton()
+//                    ->iconSize(IconSize::Large)
+//                    ->tooltip(__('Delete'))
+//                    ->icon('fas-trash-alt')
+//                    ->requiresConfirmation()
+//                    ->hidden(fn($record) => $record->trashed()),
+//                Tables\Actions\ForceDeleteAction::make()
+//                    ->iconButton()
+//                    ->iconSize(IconSize::Large)
+//                    ->tooltip(__('Force Delete'))
+//                    ->icon('fas-trash')
+//                    ->requiresConfirmation()
+//                    ->color('danger')
+//                    ->visible(fn($record) => $record->trashed()),
 
             ])
             ->headerActions([

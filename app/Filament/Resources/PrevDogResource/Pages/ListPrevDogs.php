@@ -16,6 +16,16 @@ class ListPrevDogs extends ListRecords
 
     protected static string $resource = PrevDogResource::class;
 
+    public function getTitle(): string
+    {
+        return __('Studbook');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Studbook');
+    }
+
     protected function getHeaderActions(): array
     {
         return [
