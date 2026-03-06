@@ -1,4 +1,9 @@
 {
+    "Studbook": "ספר גידול",
+    "ISR Studbook": "ספר גידול ישראלי",
+    "IMP Studbook": "ספר גידול ייבוא",
+    "EXT Studbook": "ספר גידול חיצוני",
+    "APX Studbook": "ספר גידול נילווה",
     "Dogs Count": "כמות כלבים",
     "My Dogs": "הכלבים שלי",
     "Users": "משתמשים",
@@ -297,6 +302,7 @@
     "-without-": "-ללא-",
     "Without": "ללא",
     "All": "הכל",
+    "Show All": "הצג הכל",
     "None": "ללא",
     "Yes": "כן",
     "No": "לא",

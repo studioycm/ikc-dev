@@ -109,7 +109,22 @@ class BreedingInquiryResource extends Resource
                                             ->afterStateUpdated(
                                                 fn(Set $set, Get $get, ?string $state, Select $component) => self::hydrateFemale($get, $set, $component)
                                             ),
-                                        Placeholder::make('suitability')
+                                        Placeholder::make('female_suitability_dna')
+                                            ->label(__('DNA Test'))
+                                            ->inlineLabel(true)
+                                            ->content(fn(Get $get) => $get('female_dna_state') ? __('Yes') : __('No'))
+                                            ->visible(fn(Get $get) => filled($get('female_sagir_id'))),
+                                        Placeholder::make('female_suitability_dna')
+                                            ->label(__('DNA Test'))
+                                            ->inlineLabel(true)
+                                            ->content(fn(Get $get) => $get('female_dna_state') ? __('Yes') : __('No'))
+                                            ->visible(fn(Get $get) => filled($get('female_sagir_id'))),
+                                        Placeholder::make('female_suitability_dna')
+                                            ->label(__('DNA Test'))
+                                            ->inlineLabel(true)
+                                            ->content(fn(Get $get) => $get('female_dna_state') ? __('Yes') : __('No'))
+                                            ->visible(fn(Get $get) => filled($get('female_sagir_id'))),
+                                        Placeholder::make('female_suitability_dna')
                                             ->label(__('DNA Test'))
                                             ->inlineLabel(true)
                                             ->content(fn(Get $get) => $get('female_dna_state') ? __('Yes') : __('No'))
@@ -155,7 +170,7 @@ class BreedingInquiryResource extends Resource
                                             ->afterStateUpdated(
                                                 fn(Set $set, Get $get, ?string $state, Select $component) => self::hydrateMale($get, $set, $component)
                                             ),
-                                        Placeholder::make('suitability')
+                                        Placeholder::make('male_suitability_dna')
                                             ->label(__('DNA Test'))
                                             ->content(fn(Get $get) => $get('male_dna_state') ? __('Yes') : __('No'))
                                             ->visible(fn(Get $get) => filled($get('male_sagir_id'))),
@@ -200,13 +215,37 @@ class BreedingInquiryResource extends Resource
                                                 : $prices->get('non_member', "0") . 'ש"ח';
                                         }),
 
+                                    Placeholder::make('club_price_per_puppy')
+                                        ->label(__('Per puppy'))
+                                        ->content(function (Get $get) {
+                                            $status_key = $get('club_membership_state.status_key');
+                                            $prices = $get('club_membership_state.prices');
+                                            if (!$prices) {
+                                                return '---';
+                                            }
+                                            return $status_key === 'active'
+                                                ? $prices->get('member', "0") . 'ש"ח לאחר הנחה'
+                                                : $prices->get('non_member', "0") . 'ש"ח';
+                                        }),
+
                                     Placeholder::make('club_conditions')
                                         ->label(__('Club Breeding Conditions'))
                                         ->columnSpanFull()
                                         ->content(fn() => __('Club special breeding conditions will be displayed here.')),
                                 ])
-                                ->columns(4)
-                                ->visible(fn(Get $get) => filled($get('female_sagir_id'))),
+                                ->columns(2)
+                                ->visible(fn(Get $get) => filled($get('female_sagir_id')))
+                                ->columnSpan(1),
+
+                            Section::make(__('Breed Information'))
+                                ->schema([
+                                    Placeholder::make('breed_conditions')
+                                        ->label(__('Breed Breeding Conditions'))
+                                        ->columnSpanFull()
+                                        ->content(fn() => __('Breed special breeding conditions will be displayed here.')),
+                                ])
+                                ->columns(2)
+                                ->columnSpan(1),
                         ]),
 
                     /*
