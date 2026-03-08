@@ -15,6 +15,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -180,6 +181,11 @@ class AdminPanelProvider extends PanelProvider
             ->globalSearchKeyBindings(['ctrl+k', 'command+k'])
             ->globalSearchDebounce('2000')
             ->theme(asset('css/filament/admin/theme.css'))
-            ->LazyLoadedDatabaseNotifications();
+            ->LazyLoadedDatabaseNotifications()
+            ->renderHook(
+            // PanelsRenderHook::BODY_END, only on local:
+                PanelsRenderHook::BODY_END,
+                fn() => view('footer-instruckt')
+            );
     }
 }

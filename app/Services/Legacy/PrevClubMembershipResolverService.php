@@ -60,7 +60,7 @@ class PrevClubMembershipResolverService
         $isActive =
             $membership->expire_date >= now()
             && is_null($membership->deleted_at)
-            && (is_null($membership->payment_status) || $membership->payment_status === 1);
+            && ($membership->payment_status === 1);
 
         if ($isActive) {
             return $this->statusResponse(

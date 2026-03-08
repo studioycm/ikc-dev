@@ -1,3 +1,3 @@
 <div>
-    @livewire('legacy.pedigree.pedigree-tree', ['dogId' => $dogId])
+    @livewire('legacy.pedigree.pedigree-tree-regular', ['dogId' => $dogId])
 </div>

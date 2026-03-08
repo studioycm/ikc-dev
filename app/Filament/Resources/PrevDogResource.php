@@ -8,6 +8,7 @@ use App\Enums\Legacy\LegacyDogStatus;
 use App\Enums\Legacy\LegacyPedigreeColor;
 use App\Enums\Legacy\LegacySagirPrefix;
 use App\Filament\Resources\PrevDogResource\Pages;
+use App\Livewire\Legacy\Pedigree\PedigreeTree;
 use App\Models\PrevBreed;
 use App\Models\PrevColor;
 use App\Models\PrevDog;
@@ -23,15 +24,16 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs as FormTabs;
 use Filament\Forms\Components\Tabs\Tab as FormTab;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\Actions\Action as InfolistAction;
 use Filament\Infolists\Components\Grid as InfolistGrid;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\Livewire as InfolistLivewire;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\View as InfolistView;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
@@ -1572,29 +1574,32 @@ class PrevDogResource extends Resource
                                     ->columns(2)
                                     ->columnSpanFull(),
                                 TextEntry::make('pedigree_color')
-                                    ->label(__('Pedigree Color')),
+                                    ->label(__('Pedigree Color'))
+                                    ->columnSpan(1),
                                 IconEntry::make('red_pedigree')
-                                    ->label(__('Red Pedigree')),
+                                    ->label(__('Red Pedigree'))
+                                    ->columnSpan(1),
                                 TextEntry::make('PedigreeNotes')
                                     ->label(__('Pedigree Notes'))
-                                    ->columnSpanFull(),
+                                    ->columnSpan(2),
                             ])
                             ->heading(__('Pedigree'))
                             ->headerActions([
-                                InfolistAction::make('pedigree_tree_modal')
-                                    ->label(__('Pedigree'))
-                                    ->icon('fas-sitemap')
-                                    ->color('info')
-                                    ->hidden(fn(PrevDog $record): bool => empty($record->father) && empty($record->mother))
-                                    ->modalWidth(MaxWidth::Full)
-                                    ->modalSubmitAction(false)
-                                    ->modalCancelAction(fn(StaticAction $action) => $action->label(__('Close')))
-                                    ->modalContent(fn(PrevDog $record): View => view('legacy.pedigree.pedigree-tree-modal', ['dogId' => $record->id])),
+                                //                                InfolistAction::make('pedigree_tree_modal')
+                                //                                    ->label(__('Pedigree'))
+                                //                                    ->icon('fas-sitemap')
+                                //                                    ->color('info')
+                                //                                    ->hidden(fn(PrevDog $record): bool => empty($record->father) && empty($record->mother))
+                                //                                    ->modalWidth(MaxWidth::Full)
+                                //                                    ->modalHeading(__('Pedigree'))
+                                //                                    ->modalSubmitAction(false)
+                                //                                    ->modalCancelAction(fn(StaticAction $action) => $action->label(__('Close')))
+                                //                                    ->modalContent(fn(PrevDog $record): View => view('legacy.pedigree.pedigree-tree-modal', ['dogId' => $record->id])),
 
-//                                InfolistAction::make('edit_pedigree')
-//                                ->label(__('Manage Pedigree'))
-//                                ->icon('heroicon-m-share')
-//                                ->url(fn (PrevDog $record): string => PrevDogResource::getUrl('pedigree', ['record' => $record])),
+                                //                                InfolistAction::make('edit_pedigree')
+                                //                                ->label(__('Manage Pedigree'))
+                                //                                ->icon('heroicon-m-share')
+                                //                                ->url(fn (PrevDog $record): string => PrevDogResource::getUrl('pedigree', ['record' => $record])),
                             ]),
                         InfolistSection::make('Titles & Shows')->schema([
                             RepeatableEntry::make('titles')
@@ -1628,6 +1633,21 @@ class PrevDogResource extends Resource
                         TextEntry::make('TitleName')->label(__('Titles pre 2022')),
                     ])
                         ->label(__('Pedigree & Titles')),
+
+                    Tab::make('Pedigree Tree')
+                        ->schema([
+                            InfolistView::make('filament.infolists.components.prev-dog-pedigree-tree')
+                                ->schema([
+                                    InfolistLivewire::make(PedigreeTree::class, fn(PrevDog $record): array => [
+                                        'dogId' => $record->getKey(),
+                                        'depth' => 4,
+                                    ])
+                                        ->key(fn(PrevDog $record): string => "prev-dog-pedigree-tree-{$record->getKey()}")
+                                        ->lazy(),
+                                ])
+                                ->columnSpanFull(),
+                        ])
+                        ->label(__('Pedigree Tree')),
 
                     /***** 4. Metrics & Performance *****/
                     Tab::make('Metrics & Performance')->schema([

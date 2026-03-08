@@ -12,7 +12,7 @@ return [
     */
 
     'labels' => [
-        'navigation_group' => 'ניהול כלבים',
+        'navigation_group' => 'ניהול ספר גידול',
         'navigation_label' => 'כלבים',
         'plural' => 'כלבים',
         'singular' => 'כלב',

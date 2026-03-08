@@ -21,6 +21,7 @@
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "joshcirre/instruckt-laravel": "^0.4.17",
         "laravel/boost": "^1.0",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.13",
