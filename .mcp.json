@@ -15,14 +15,6 @@
             "env": {
                 "SITE_PATH": "D:\\0-Dev\\Herd\\ikc-dev"
             }
-        },
-        "instruckt": {
-            "command": "php",
-            "args": [
-                "D:\\0-Dev\\Herd\\ikc-dev\\artisan",
-                "mcp:start",
-                "instruckt"
-            ]
         }
     }
 }
