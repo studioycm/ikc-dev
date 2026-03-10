@@ -25,6 +25,7 @@ class PedigreeTreeBuilderService
         'PedigreeNotes',
         'GenderID',
     ];
+    private int $titles_limit = 10;
 
     public function build(
         int    $dogId,
@@ -267,6 +268,9 @@ class PedigreeTreeBuilderService
             'mother_sagir' => $dog->MotherSAGIR,
             'titles' => $titles,
             'owners' => $owners,
+            'titles_short' => implode(', ', array_slice($titles, 0, $this->titles_limit)),
+            'titles_string' => implode(', ', $titles),
+            'owners_string' => implode(', ', $owners),
         ];
     }
 
@@ -293,6 +297,9 @@ class PedigreeTreeBuilderService
             'mother_sagir' => null,
             'titles' => [],
             'owners' => [],
+            'titles_short' => null,
+            'titles_string' => null,
+            'owners_string' => null,
         ];
     }
 

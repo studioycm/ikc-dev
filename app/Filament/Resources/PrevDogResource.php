@@ -298,10 +298,6 @@ class PrevDogResource extends Resource
                                     ->columns(4),
                                 Section::make('miscellaneous')
                                     ->schema([
-                                        Forms\Components\Select::make('RemarkCode')
-                                            ->label(__('Remark Code'))
-                                            ->options(fn() => array_combine(range(0, 36), range(0, 36)))
-                                            ->searchable(),
                                         Forms\Components\Toggle::make('encoding')
                                             ->label(__('Encoding Issue'))
                                             ->inline(false),
@@ -311,18 +307,6 @@ class PrevDogResource extends Resource
                                         Forms\Components\Toggle::make('not_relevant')
                                             ->label(__('Not Relevant'))
                                             ->inline(false),
-                                        Forms\Components\Textarea::make('Notes')
-                                            ->label(__('Notes'))
-                                            ->maxLength(1000),
-                                        Forms\Components\Textarea::make('Notes_2')
-                                            ->label(__('Notes (2)'))
-                                            ->maxLength(1000),
-                                        Forms\Components\Textarea::make('message')
-                                            ->label(__('Message'))
-                                            ->maxLength(255),
-                                        Forms\Components\Textarea::make('message_test')
-                                            ->label(__('Message Test'))
-                                            ->maxLength(255),
                                         Forms\Components\DateTimePicker::make('ModificationDateTime')
                                             ->label(__('Modified On'))
                                             ->format('Y-m-d H:i:s')
@@ -352,7 +336,7 @@ class PrevDogResource extends Resource
 
                         FormTab::make('pedigree_and_parents')
                             ->schema([
-                                Section::make('pedigree')
+                                Section::make('parents')
                                     ->schema([
                                         Forms\Components\Group::make([
                                             Select::make('FatherSAGIR')
@@ -569,6 +553,11 @@ class PrevDogResource extends Resource
                                         ])
                                             ->columns(2)
                                             ->columnSpan(2),
+                                    ])
+                                    ->heading(__('Parents'))
+                                    ->columns(3),
+                                Section::make('pedigree')
+                                    ->schema([
                                         Forms\Components\Group::make([
                                             Forms\Components\TextInput::make('sheger_id')
                                                 ->label(__('Sheger ID'))
@@ -577,14 +566,18 @@ class PrevDogResource extends Resource
                                                 ->label(__('Pedigree Color'))
                                                 ->options(LegacyPedigreeColor::class)
                                                 ->grouped(),
+                                            Forms\Components\Select::make('RemarkCode')
+                                                ->label(__('Remark Code'))
+                                                ->options(fn() => array_combine(range(0, 36), range(0, 36)))
+                                                ->searchable(),
                                             Forms\Components\Toggle::make('red_pedigree')
                                                 ->label(__('Red Pedigree'))
                                                 ->inline(false)
                                                 ->onColor('danger')
                                                 ->offColor('gray'),
                                         ])
-                                            ->columns(3)
-                                            ->columnSpan(2),
+                                            ->columns(2)
+                                            ->columnSpan(1),
                                         Forms\Components\Group::make([
                                             Forms\Components\Textarea::make('PedigreeNotes')
                                                 ->label(__('Pedigree Notes'))
@@ -594,21 +587,24 @@ class PrevDogResource extends Resource
                                                 ->label(__('Pedigree Notes (2)'))
                                                 ->maxLength(1000)
                                                 ->columnSpan(1),
+                                            Forms\Components\Textarea::make('Notes')
+                                                ->label(__('Notes'))
+                                                ->maxLength(1000),
+                                            Forms\Components\Textarea::make('Notes_2')
+                                                ->label(__('Notes (2)'))
+                                                ->maxLength(1000),
+                                            Forms\Components\Textarea::make('message')
+                                                ->label(__('Message'))
+                                                ->maxLength(255),
+                                            Forms\Components\Textarea::make('message_test')
+                                                ->label(__('Message Test'))
+                                                ->maxLength(255),
                                         ])
-                                            ->columns(3)
-                                            ->columnSpan(2),
+                                            ->columns(2)
+                                            ->columnSpan(1),
                                     ])
                                     ->heading(__('Pedigree'))
-                                    ->columns(3),
-                                Section::make('pedigree tree')
-                                    ->schema([
-                                        Forms\Components\Placeholder::make('pedigree_form_placeholder')
-                                            ->content(new HtmlString(__('<img src="' . asset('images/ancestry-form-placeholder.png') . '" alt="Dog pedigree form" />')))
-                                            ->label(false),
-                                        Forms\Components\Placeholder::make('pedigree_placeholder')
-                                            ->content(new HtmlString(__('A 3-generation pedigree form view will appear here soon.'))),
-                                    ])
-                                    ->heading(__('Pedigree (coming soon)')),
+                                    ->columns(2),
                             ])
                             ->label(__('Pedigree')),
 

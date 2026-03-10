@@ -92,9 +92,9 @@
             </div>
 
             @if (($visibleFields['titles'] ?? false) && filled($dog['titles']))
-                <div title="{{ implode(', ', $dog['titles']) }}"
+                <div title="{{ $dog['titles_string'] }}"
                     class="border-t border-gray-200/70 pt-2 text-[12px] leading-4 text-gray-500 dark:border-white/10 dark:text-gray-400">
-                    {{ implode(', ', array_slice($dog['titles'], 0, 10)) }}
+                    {{ $dog['titles_short'] }}
                 </div>
             @endif
         </div>

@@ -96,7 +96,7 @@
                 </div>
                 <div class="mt-1 text-sm font-semibold text-gray-950 dark:text-white">
 
-                    {{ implode(', ', $root['owners']) }}
+                    {{ $root['owners_string'] }}
 
                 </div>
             </div>
@@ -115,7 +115,7 @@
                     {{ __('Titles') }}
                 </div>
                 <div class="mt-1 text-sm font-semibold text-gray-950 dark:text-white">
-                    {{ implode(', ', $root['titles']) }}
+                    {{ $root['titles_string'] }}
                 </div>
             </div>
         </div>

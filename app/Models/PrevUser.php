@@ -282,4 +282,32 @@ class PrevUser extends Model implements HasName
         // prefer explicit email, then owner_email
         return $this->email ?: $this->owner_email ?: null;
     }
+
+    // get and set address mutator and accessor laravel Attribute
+    public function address(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->addressArray(),
+        );
+    }
+
+    public function buildAddress(): string
+    {
+        $short_address = array_filter($this->addressArray(), fn($value) => !empty($value));
+        return implode(', ', $short_address);
+    }
+
+    public function addressArray(): array
+    {
+
+        return [
+            'city' => $this->address_city,
+            'city_en' => $this->address_city_en,
+            'street' => $this->address_street,
+            'street_en' => $this->address_street_en,
+            'street_number' => $this->address_street_number,
+            'house_number' => $this->house_number,
+            'zip' => $this->address_zip,
+        ];
+    }
 }
