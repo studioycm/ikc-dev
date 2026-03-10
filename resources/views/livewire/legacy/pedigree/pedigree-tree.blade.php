@@ -60,9 +60,9 @@
                             class="grid gap-3"
                             dir="{{ $this->direction }}"
                             style="
-                                --pedigree-row-height: {{ $this->density === 'compact' ? '5.25rem' : '6.5rem' }};
+                                --pedigree-row-height: {{ $this->density === 'compact' ? '8.75rem' : '13.25rem' }};
                                 grid-template-columns: repeat({{ $this->pedigree['column_count'] }}, minmax(16rem, 1fr));
-                                grid-template-rows: repeat({{ $this->pedigree['row_count'] }}, minmax(0, 6.5rem));
+                                grid-template-rows: repeat({{ $this->pedigree['row_count'] }}, minmax(0, var(--pedigree-row-height)));
                             "
                         >
                             @foreach ($this->pedigree['nodes'] as $node)

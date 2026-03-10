@@ -60,6 +60,9 @@ class PedigreeTree extends Component implements HasForms
                                         3 => '3',
                                         4 => '4',
                                         5 => '5',
+                                        6 => '6',
+                                        7 => '7',
+                                        8 => '8',
                                     ])
                                     ->native(false)
                                     ->live()
@@ -224,23 +227,23 @@ class PedigreeTree extends Component implements HasForms
     {
         return [
             'name_he' => [
-                'label' => __('Hebrew name'),
+                'label' => __('Hebrew Name'),
                 'default' => true,
             ],
             'name_en' => [
-                'label' => __('English name'),
+                'label' => __('English Name'),
                 'default' => true,
             ],
             'sagir_id' => [
-                'label' => __('Sagir-ID'),
+                'label' => __('Sagir ID'),
                 'default' => true,
             ],
             'import_number' => [
-                'label' => __('Import number'),
+                'label' => __('Import Number'),
                 'default' => false,
             ],
             'breeding_house' => [
-                'label' => __('Kennel / בית-גידול'),
+                'label' => __('Kennel'),
                 'default' => true,
             ],
             'breed_name' => [
@@ -252,7 +255,7 @@ class PedigreeTree extends Component implements HasForms
                 'default' => true,
             ],
             'birth_date' => [
-                'label' => __('Birth date'),
+                'label' => __('Birth Date'),
                 'default' => true,
             ],
             'age' => [
@@ -268,7 +271,7 @@ class PedigreeTree extends Component implements HasForms
 
     protected function sanitizeDepth(int $depth): int
     {
-        return max(2, min(5, $depth));
+        return max(2, min(10, $depth));
     }
 
     protected function sanitizeDirection(?string $direction): string

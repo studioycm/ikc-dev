@@ -21,6 +21,8 @@ class PedigreeTreeBuilderService
         'BeitGidulID',
         'ImportNumber',
         'BirthDate',
+        'RegDate',
+        'PedigreeNotes',
         'GenderID',
     ];
 
@@ -31,9 +33,8 @@ class PedigreeTreeBuilderService
         bool   $includeTitles = false,
     ): array
     {
-        $depth = max(2, min(5, $depth));
+        $depth = max(2, min(8, $depth));
         $direction = $direction === 'ltr' ? 'ltr' : 'rtl';
-
         $dog = $this->loadRootDog(
             dogId: $dogId,
             depth: $depth,
@@ -82,7 +83,7 @@ class PedigreeTreeBuilderService
         ];
 
         if ($includeTitles) {
-            $relations[] = 'titles';
+            $relations[] = 'titles:TitleName';
         }
 
         return $relations;
@@ -222,7 +223,6 @@ class PedigreeTreeBuilderService
             $titles = $dog->titles
                 ->pluck('TitleName')
                 ->filter()
-                ->take(8)
                 ->values()
                 ->all();
         }
@@ -244,8 +244,11 @@ class PedigreeTreeBuilderService
                 ? $this->blankToNull($dog->color?->ColorNameHE)
                 : null,
             'birth_date' => $dog->BirthDate?->format('d/m/Y'),
+            'reg_date' => $dog->RegDate?->format('d/m/Y'),
+            'pedigree_notes' => $dog->PedigreeNotes,
             'age' => $this->formatAge($dog->BirthDate),
             'gender_value' => $this->normalizeGenderValue($dog->GenderID),
+            'gender_label_raw' => $dog->GenderID->getLabel(),
             'gender_label' => $this->genderLabel($dog->GenderID),
             'father_sagir' => $dog->FatherSAGIR,
             'mother_sagir' => $dog->MotherSAGIR,
@@ -266,8 +269,11 @@ class PedigreeTreeBuilderService
             'breeding_house' => null,
             'color_name' => null,
             'birth_date' => null,
+            'reg_date' => null,
+            'pedigree_notes' => null,
             'age' => null,
             'gender_value' => null,
+            'gender_label_raw' => null,
             'gender_label' => __('Unknown'),
             'father_sagir' => null,
             'mother_sagir' => null,

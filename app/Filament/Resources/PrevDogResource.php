@@ -785,6 +785,7 @@ class PrevDogResource extends Resource
                     ->label(__('Owners'))
                     ->listWithLineBreaks()
                     ->limitList(2)
+                    ->searchable(['users.first_name', 'users.last_name', 'users.first_name_en', 'users.last_name_en'], isIndividual: true, isGlobal: false)
                     ->description(function (PrevDog $record): string {
                         // Get the first two owners' names
                         return $record->owners?->pluck('id')->implode(', ');
@@ -1457,7 +1458,8 @@ class PrevDogResource extends Resource
             ->searchOnBlur()
             ->striped()
             ->deferLoading()
-            ->recordUrl(fn(PrevDog $record): string => PrevDogResource::getUrl('edit', ['record' => $record]))
+            ->recordUrl(false)
+//            ->recordUrl(fn(PrevDog $record): string => PrevDogResource::getUrl('edit', ['record' => $record]))
             ->recordClasses(fn (Model $record) => $record->trashed() ? 'fi-ta-row-deleted' : null);
     }
 
