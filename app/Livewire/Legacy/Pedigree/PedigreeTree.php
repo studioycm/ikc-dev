@@ -22,7 +22,7 @@ class PedigreeTree extends Component implements HasForms
     #[Locked]
     public int $dogId;
 
-    public int $depth = 4;
+    public int $depth = 3;
 
     public string $direction = 'rtl';
 
@@ -32,7 +32,7 @@ class PedigreeTree extends Component implements HasForms
 
     public ?array $settingsData = [];
 
-    public function mount(int $dogId, int $depth = 4, ?string $direction = null): void
+    public function mount(int $dogId, int $depth = 3, ?string $direction = null): void
     {
         $this->dogId = $dogId;
         $this->depth = $this->sanitizeDepth($depth);
@@ -48,13 +48,13 @@ class PedigreeTree extends Component implements HasForms
     {
         return $form
             ->schema([
-                Section::make(__('Certificate layout'))
-                    ->description(__('Control the pedigree depth, direction, density, and placeholder behavior.'))
+                Section::make('pedigree_settings')
+                    ->heading(fn(): string => __('Pedigree Settings'))
                     ->schema([
                         Grid::make(12)
                             ->schema([
                                 Select::make('depth')
-                                    ->label(__('Ancestor generations'))
+                                    ->label(__('Generations'))
                                     ->options([
                                         2 => '2',
                                         3 => '3',
@@ -98,7 +98,7 @@ class PedigreeTree extends Component implements HasForms
                                     ]),
 
                                 Toggle::make('show_placeholders')
-                                    ->label(__('Show placeholder content'))
+                                    ->label(__('Show empty cards'))
                                     ->helperText(__('When disabled, empty ancestors still keep their slot for alignment but render as minimal empty cards.'))
                                     ->live()
                                     ->columnSpan([
@@ -106,14 +106,15 @@ class PedigreeTree extends Component implements HasForms
                                         'md' => 3,
                                     ]),
                             ]),
-                    ]),
+                    ])
+                    ->collapsed(),
 
-                Section::make(__('Visible fields on ancestor nodes'))
-                    ->description(__('All node fields are controlled from this main Livewire component.'))
+                Section::make(__('Visible fields'))
                     ->schema([
                         Grid::make(12)
                             ->schema($this->visibleFieldComponents()),
-                    ]),
+                    ])
+                    ->collapsed(),
             ])
             ->statePath('settingsData');
     }
@@ -226,14 +227,6 @@ class PedigreeTree extends Component implements HasForms
     protected function nodeFieldDefinitions(): array
     {
         return [
-            'name_he' => [
-                'label' => __('Hebrew Name'),
-                'default' => true,
-            ],
-            'name_en' => [
-                'label' => __('English Name'),
-                'default' => true,
-            ],
             'sagir_id' => [
                 'label' => __('Sagir ID'),
                 'default' => true,
@@ -271,7 +264,7 @@ class PedigreeTree extends Component implements HasForms
 
     protected function sanitizeDepth(int $depth): int
     {
-        return max(2, min(10, $depth));
+        return max(2, min(8, $depth));
     }
 
     protected function sanitizeDirection(?string $direction): string

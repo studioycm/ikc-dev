@@ -30,7 +30,7 @@
     </div>
 @else
     <div class="h-full rounded-xl border shadow-sm {{ $cardClasses }} {{ $densityClasses }}">
-        <div class="flex h-full flex-col gap-2">
+        <div class="flex h-full flex-col justify-center gap-2">
             <div class="flex items-start justify-between gap-2">
                 <span
                     class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $badgeClasses }}">
@@ -44,32 +44,26 @@
                 </div>
             </div>
 
-            <div class="min-h-0 flex-1 space-y-1 overflow-hidden">
+            <div class="min-h-0 space-y-1">
 
                 <div class="flex items-start justify-between gap-2">
-                @if (($visibleFields['name_he'] ?? false) && $dog['name_he'])
                     <div class="font-semibold leading-tight text-gray-950 dark:text-white">
-                        {{ $dog['name_he'] }}
+                        {{ $dog['full_name'] }}
+                    </div>
+                </div>
+
+                @if (($visibleFields['breeding_house'] ?? false) && $dog['breeding_house'])
+                    <div class="leading-tight text-gray-500 dark:text-gray-400">
+                        {{ $dog['breeding_house'] }}
                     </div>
                 @endif
 
-                @if (($visibleFields['name_en'] ?? false) && $dog['name_en'])
-                    <div class="leading-tight text-gray-700 dark:text-gray-300">
-                        {{ $dog['name_en'] }}
-                    </div>
-                @endif
-                </div>
                 @if (($visibleFields['import_number'] ?? false) && $dog['import_number'])
                     <div class="leading-tight text-gray-500 dark:text-gray-400">
                         {{ __('Import') }}: {{ $dog['import_number'] }}
                     </div>
                 @endif
 
-                @if (($visibleFields['breeding_house'] ?? false) && $dog['breeding_house'])
-                    <div class="leading-tight text-gray-500 dark:text-gray-400">
-                        {{ __('Kennel') }}: {{ $dog['breeding_house'] }}
-                    </div>
-                @endif
 
                 @if (($visibleFields['breed_name'] ?? false) && $dog['breed_name'])
                     <div class="font-semibold leading-tight text-gray-500 dark:text-gray-400">
@@ -88,18 +82,19 @@
                         {{ $dog['birth_date'] }}
                     </div>
                 @endif
+
+                    @if (($visibleFields['age'] ?? false) && $dog['age'])
+                        <div class="leading-tight text-gray-500 dark:text-gray-400">
+                            {{ $dog['age'] }}
+                        </div>
+                    @endif
                 </div>
-                @if (($visibleFields['age'] ?? false) && $dog['age'])
-                    <div class="leading-tight text-gray-500 dark:text-gray-400">
-                        {{ $dog['age'] }}
-                    </div>
-                @endif
             </div>
 
             @if (($visibleFields['titles'] ?? false) && filled($dog['titles']))
-                <div
+                <div title="{{ implode(', ', $dog['titles']) }}"
                     class="border-t border-gray-200/70 pt-2 text-[12px] leading-4 text-gray-500 dark:border-white/10 dark:text-gray-400">
-                    {{ implode(', ', $dog['titles']) }}
+                    {{ implode(', ', array_slice($dog['titles'], 0, 10)) }}
                 </div>
             @endif
         </div>

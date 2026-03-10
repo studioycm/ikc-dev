@@ -28,12 +28,12 @@ class PedigreeTreeBuilderService
 
     public function build(
         int    $dogId,
-        int    $depth = 4,
+        int $depth = 3,
         string $direction = 'rtl',
         bool   $includeTitles = false,
     ): array
     {
-        $depth = max(2, min(8, $depth));
+        $depth = max(2, min(7, $depth));
         $direction = $direction === 'ltr' ? 'ltr' : 'rtl';
         $dog = $this->loadRootDog(
             dogId: $dogId,
@@ -69,12 +69,12 @@ class PedigreeTreeBuilderService
     {
         return PrevDog::query()
             ->select($this->dogColumns)
-            ->with($this->nodeRelations($includeTitles))
+            ->with($this->nodeRelations(true, true))
             ->with($this->pedigreeRelations($depth, $includeTitles))
             ->find($dogId);
     }
 
-    protected function nodeRelations(bool $includeTitles): array
+    protected function nodeRelations(bool $includeTitles, bool $withOwners): array
     {
         $relations = [
             'breed:BreedCode,BreedName',
@@ -83,7 +83,11 @@ class PedigreeTreeBuilderService
         ];
 
         if ($includeTitles) {
-            $relations[] = 'titles:TitleName';
+            $relations[] = 'titles:TitleCode,TitleName';
+        }
+
+        if ($withOwners) {
+            $relations[] = 'owners:id,first_name,last_name,first_name_en,last_name_en';
         }
 
         return $relations;
@@ -117,7 +121,7 @@ class PedigreeTreeBuilderService
     {
         $query
             ->select($this->dogColumns)
-            ->with($this->nodeRelations($includeTitles));
+            ->with($this->nodeRelations($includeTitles, false));
 
         if ($remainingDepth > 1) {
             $query->with(
@@ -156,7 +160,7 @@ class PedigreeTreeBuilderService
             3 => __('Great Grandparents'),
             4 => __('4th generation'),
             5 => __('5th generation'),
-            default => __(':n Generation', ['generation' => $generation]),
+            default => __(':n Generation', ['n' => $generation]),
         };
     }
 
@@ -218,10 +222,19 @@ class PedigreeTreeBuilderService
     protected function normalizeDog(PrevDog $dog): array
     {
         $titles = [];
+        $owners = [];
 
         if ($dog->relationLoaded('titles')) {
             $titles = $dog->titles
                 ->pluck('TitleName')
+                ->filter()
+                ->values()
+                ->all();
+        }
+
+        if ($dog->relationLoaded('owners')) {
+            $owners = $dog->owners
+                ->pluck('full_name_heb')
                 ->filter()
                 ->values()
                 ->all();
@@ -253,6 +266,7 @@ class PedigreeTreeBuilderService
             'father_sagir' => $dog->FatherSAGIR,
             'mother_sagir' => $dog->MotherSAGIR,
             'titles' => $titles,
+            'owners' => $owners,
         ];
     }
 
@@ -278,6 +292,7 @@ class PedigreeTreeBuilderService
             'father_sagir' => null,
             'mother_sagir' => null,
             'titles' => [],
+            'owners' => [],
         ];
     }
 

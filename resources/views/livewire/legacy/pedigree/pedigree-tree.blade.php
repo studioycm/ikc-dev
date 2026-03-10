@@ -16,7 +16,7 @@
     @if (! $this->pedigree['root'])
         <x-filament::section>
             <x-slot name="heading">
-                {{ __('Pedigree certificate') }}
+                {{ __('Pedigree Tree') }}
             </x-slot>
 
             <div
@@ -32,11 +32,6 @@
 
         <x-filament::section>
             <x-slot name="heading">
-                {{ __('Pedigree tree') }}
-            </x-slot>
-
-            <x-slot name="description">
-                {{ __('The tree is placed on one global grid, so missing ancestors never collapse later generations out of alignment.') }}
             </x-slot>
 
             <div class="space-y-4">
@@ -57,7 +52,7 @@
                 <div class="overflow-x-auto">
                     <div class="min-w-[1100px]">
                         <div
-                            class="grid gap-3"
+                            class="pedigree-row grid gap-3"
                             dir="{{ $this->direction }}"
                             style="
                                 --pedigree-row-height: {{ $this->density === 'compact' ? '8.75rem' : '13.25rem' }};

@@ -128,3 +128,7 @@
 .breeding-wizard .fi-fo-wizard-header-step:nth-child(4).fi-active {
     background-color: #c55a11 !important;
 }
+
+.pedigree-row {
+    --pedigree-row-height: 13.25rem;
+}

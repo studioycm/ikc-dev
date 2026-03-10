@@ -273,6 +273,7 @@
     "Generation": "דור",
     "Generations": "דורות",
     ":n Generation": "דור :n",
+    ":n Generations": ":n דורות",
     "4th generation": "דור רביעי",
     "5th generation": "דור חמישי",
     "Lineage": "שושלת",
@@ -422,6 +423,7 @@
     "Pedigree": "אילן יוחסין",
     "Pedigrees": "שושלות",
     "Pedigree Tree": "הצגת אילן יוחסין",
+    "Pedigree Settings": "הגדרות אילן יוחסין",
     "Pedigree Management": "ניהול אילן יוחסין",
     "Manage Pedigree": "ניהול אילן יוחסין",
     "Red Pedigree": "תעודה אדומה",
@@ -603,5 +605,10 @@
     "Dam Information": "מידע נקבה",
     "Sire Information": "מידע זכר",
     "Basic Info": "מידע בסיסי",
-    "Home": "בית"
+    "Home": "בית",
+    "Displaying": "מציג",
+    "Direction": "כיוון",
+    "Density": "צפיפות",
+    "Visible fields": "הצגת שדות",
+    "Show empty cards": "הצגת כרטיס ריק"
 }

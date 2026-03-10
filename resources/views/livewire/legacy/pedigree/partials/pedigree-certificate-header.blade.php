@@ -1,8 +1,10 @@
 <x-filament::section>
     <x-slot name="heading">
+        {{ __('Pedigree Tree') . ": " . $root['full_name'] }}
     </x-slot>
 
     <x-slot name="description">
+        {{ __('Displaying') . " " . __(':n Generations', ['n' => $depth]) }}
     </x-slot>
 
     <div class="grid gap-6 lg:grid-cols-[1fr,1.35fr,1fr]">
@@ -40,6 +42,15 @@
                 </div>
                 <div class="mt-1 text-sm font-semibold text-gray-950 dark:text-white">
                     {{ $root['birth_date'] ?: '—' }}
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
+                <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    {{ __('Registration Date') }}
+                </div>
+                <div class="mt-1 text-sm font-semibold text-gray-950 dark:text-white">
+                    {{ $root['reg_date'] ?: '—' }}
                 </div>
             </div>
         </div>
@@ -81,37 +92,30 @@
         <div class="space-y-3">
             <div class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
                 <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    {{ __('Breeder') }}
+                    {{ __('Owners') }}
                 </div>
                 <div class="mt-1 text-sm font-semibold text-gray-950 dark:text-white">
-                    {{ $root['breeder'] ?? '—' }}
-                </div>
-            </div>
 
-            <div class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
-                <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-
-                </div>
-                <div class="mt-1 text-sm font-semibold text-gray-950 dark:text-white">
+                    {{ implode(', ', $root['owners']) }}
 
                 </div>
             </div>
 
             <div class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
                 <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-
+                    {{ __('Pedigree Notes') }}
                 </div>
                 <div class="mt-1 text-sm font-semibold text-gray-950 dark:text-white">
-
+                    {{ $root['pedigree_notes'] }}
                 </div>
             </div>
 
             <div class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
                 <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    {{ __('Generations') }}
+                    {{ __('Titles') }}
                 </div>
                 <div class="mt-1 text-sm font-semibold text-gray-950 dark:text-white">
-                    {{ $depth }}
+                    {{ implode(', ', $root['titles']) }}
                 </div>
             </div>
         </div>
