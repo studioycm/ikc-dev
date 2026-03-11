@@ -19,6 +19,7 @@ use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -30,6 +31,8 @@ use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -210,7 +213,7 @@ class PrevShowResource extends Resource
                     ->toggleable()
                     ->searchable(),
                 TextColumn::make('ShowType')
-                    ->label(__('Show Type'))
+                    ->label(__('Show type'))
                     ->badge()
                     ->icon(fn(PrevShow $r): ?string => $r->ShowType?->getIcon())
                     ->color(fn(PrevShow $r): ?string => $r->ShowType?->getColor())
@@ -220,121 +223,249 @@ class PrevShowResource extends Resource
                     ->label(__('Club'))
                     ->searchable(['clubs.Name'], isIndividual: true, isGlobal: false)
                     ->sortable('clubs.Name'),
-                TextColumn::make('TitleName')
-                    ->label(__('Show Title')),
                 TextColumn::make('location')
                     ->label(__('Location'))
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->sortable(),
-                TextColumn::make('LongDesc')
-                    ->label(__('Description'))
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable()
-                    ->html()
-                    ->limit(400)
-                    ->extraHeaderAttributes(['style' => 'max-width: 320px']),
+                // 1. Combined Title & Description Column
+                TextColumn::make('TitleName')
+                    ->label(__('Show Title & Description'))
+                    ->searchable(['TitleName', 'LongDesc'])
+                    ->sortable(['TitleName'])
+                    ->wrap()
+                    ->color('primary')
+                    ->description(function (PrevShow $record): string {
+                        if (blank($record->LongDesc)) return '';
+                        $cleanText = html_entity_decode(strip_tags(str_replace('&nbsp;', ' ', $record->LongDesc)), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        return str($cleanText)->trim()->limit(60);
+                    })
+                    ->extraAttributes(fn(PrevShow $record) => !blank($record->LongDesc) ? ['class' => 'cursor-pointer underline'] : [])
+                    ->action(
+                        Action::make('view_description')
+                            ->modalHeading(__('Description'))
+                            ->modalWidth('2xl')
+                            ->modalSubmitAction(false)
+                            ->modalCancelActionLabel(__('Close'))
+                            ->infolist([
+                                TextEntry::make('LongDesc')
+                                    ->hiddenLabel()
+                                    ->html()
+                            ])
+                            ->disabled(fn($record) => blank($record->LongDesc))
+                    ),
+
+                // 2. Combined Dates Column
                 TextColumn::make('StartDate')
-                    ->label(__('Starts'))
-                    ->dateTime('d/m/Y H:i')
-                    ->sortable()
-                    ->toggleable(),
-                TextColumn::make('EndDate')
-                    ->label(__('Ends'))
-                    ->dateTime('d/m/Y H:i')
-                    ->sortable()
-                    ->toggleable(),
-                TextColumn::make('EndRegistrationDate')
-                    ->label(__('Registration Ends'))
-                    ->date('d/m/Y')
-                    ->sortable()
-                    ->toggleable(),
+                    ->label(__('Show Dates'))
+                    // Clicking the header sorts sequentially by all three date fields
+                    ->sortable(['StartDate', 'EndDate', 'EndRegistrationDate'])
+                    ->html()
+                    ->formatStateUsing(function (PrevShow $record) {
+                        $start = $record->StartDate ? $record->StartDate->format('d/m/Y H:i') : '-';
+                        $end = $record->EndDate ? $record->EndDate->format('d/m/Y H:i') : '-';
+                        $reg = $record->EndRegistrationDate ? $record->EndRegistrationDate->format('d/m/Y') : '-';
+
+                        return "<div class='leading-tight space-y-1'>
+                                <div class='text-sm'><strong>" . __('Start') . ":</strong> {$start}</div>
+                                <div class='text-xs text-gray-500 dark:text-gray-400'><strong>" . __('End') . ":</strong> {$end}</div>
+                                <div class='text-xs text-gray-500 dark:text-gray-400'><strong>" . __('Reg') . ":</strong> {$reg}</div>
+                            </div>";
+                    }),
 
                 IconColumn::make('ShowStatus')
                     ->label(__('Show Status'))
                     ->boolean(fn($state): bool => $state === 2)
                     ->color(fn($state): string => $state === 2 ? 'success' : 'danger')
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('arenas_count')
                     ->label(__('Arenas'))
-                    ->counts('arenas')
                     ->numeric()
                     ->sortable()
                     ->toggleable(),
+
                 TextColumn::make('classes_count')
                     ->label(__('Classes'))
-                    ->counts('classes')
                     ->numeric()
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('registrations_count')
-                    ->label(__('Registrations'))
-                    ->counts('registrations')
+                    ->label(__('Registration'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(),
+
+                // 3. Show Dogs Count -> Converted to Action Column
                 TextColumn::make('show_dogs_count')
                     ->label(__('Show Dogs'))
-                    ->counts('showDogs')
                     ->numeric()
                     ->sortable()
-                    ->toggleable(),
+                    ->badge()
+                    ->color(fn(int $state): string => $state > 0 ? 'info' : 'black')
+                    ->toggleable()
+                    ->extraAttributes(fn(int $state) => $state > 0 ? ['class' => 'cursor-pointer font-bold'] : [])
+                    ->url(fn(PrevShow $record, int $state): ?string => $state > 0
+                        ? PrevShowDogResource::getUrl('index', ['tableFilters' => ['ShowID' => ['value' => $record->id]]])
+                        : null
+                    ),
+
+                // 4. Results Count -> Converted to Action Column
                 TextColumn::make('results_count')
                     ->label(__('Results'))
-                    ->counts('results')
-                    ->numeric()
+                    ->badge()
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable()
+                    ->color(fn(int $state): string => $state > 0 ? 'warning' : 'grey')
+                    ->extraAttributes(fn(int $state) => $state > 0 ? ['class' => 'cursor-pointer font-bold'] : [])
+                    ->url(fn(PrevShow $record, int $state): ?string => $state > 0
+                        ? PrevShowResultResource::getUrl('index', ['tableFilters' => ['ShowID' => ['value' => $record->id]]])
+                        : null
+                    ),
 
                 TextColumn::make('IsExtraTickets')
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('IsParking')
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('MoreTicketsSelect')
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('ParkingSelect')
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('start_from_index')
                     ->label(__('Index Start'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 IconColumn::make('Check_all_members')
                     ->label(__('All Members'))
                     ->boolean(fn($state): bool => $state === 1)
                     ->color(fn($state): string => $state === 1 ? 'success' : 'danger')
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('DataID')
                     ->numeric()
                     ->label(__('Data ID'))
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('ModificationDateTime')
                     ->date()
                     ->label(__('Last Modified Date'))
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('CreationDateTime')
                     ->date()
                     ->label(__('Created Date'))
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
 
             ])
             ->filters([
+                TernaryFilter::make('has_results')
+                    ->label(__('Has results'))
+                    ->trueLabel(__('Yes'))
+                    ->falseLabel(__('No'))
+                    ->queries(
+                        true: function (Builder $query) {
+                            $showIdsWithResults = DB::connection('mysql_prev')
+                                ->table('shows_results')
+                                ->whereNotNull('ShowID')
+                                ->distinct()
+                                ->pluck('ShowID')
+                                ->toArray();
+                            return $query->whereIn('ShowsDB.id', $showIdsWithResults);
+                        },
+                        false: function (Builder $query) {
+                            $showIdsWithResults = DB::connection('mysql_prev')
+                                ->table('shows_results')
+                                ->whereNotNull('ShowID')
+                                ->distinct()
+                                ->pluck('ShowID')
+                                ->toArray();
+                            return $query->whereNotIn('ShowsDB.id', $showIdsWithResults);
+                        },
+                        blank: fn(Builder $query) => $query,
+                    ),
+                TernaryFilter::make('is_assessment')
+                    ->label(__('Assessment'))
+                    ->trueLabel(__('Yes'))
+                    ->falseLabel(__('No'))
+                    ->queries(
+                        true: fn(Builder $query) => $query->where(function (Builder $q) {
+                            $q->orWhereRaw("TitleName REGEXP 'מבדק|מבחן'")
+                                ->orWhereRaw("LongDesc REGEXP 'מבדק|מבחן'");
+                        }),
+
+                        false: fn(Builder $query) => $query->where(function (Builder $q) {
+                            $q->where(fn($sub) => $sub->whereRaw("TitleName NOT REGEXP 'מבדק|מבחן'")->orWhereNull('TitleName'))
+                                ->where(fn($sub) => $sub->whereRaw("LongDesc NOT REGEXP 'מבדק|מבחן'")->orWhereNull('LongDesc'));
+                        }),
+
+                        blank: fn(Builder $query) => $query,
+                    ),
+                // Date Filters
+                Filter::make('StartDate')
+                    ->form([
+                        DatePicker::make('start_from')->label(__('Starts From')),
+                        DatePicker::make('start_until')->label(__('Starts Until')),
+                    ])
+                    ->query(fn(Builder $query, array $data): Builder => $query
+                        ->when($data['start_from'] ?? null, fn($q, $date) => $q->whereDate('StartDate', '>=', $date))
+                        ->when($data['start_until'] ?? null, fn($q, $date) => $q->whereDate('StartDate', '<=', $date))
+                    ),
+
+                Filter::make('EndDate')
+                    ->form([
+                        DatePicker::make('end_from')->label(__('Ends From')),
+                        DatePicker::make('end_until')->label(__('Ends Until')),
+                    ])
+                    ->query(fn(Builder $query, array $data): Builder => $query
+                        ->when($data['end_from'] ?? null, fn($q, $date) => $q->whereDate('EndDate', '>=', $date))
+                        ->when($data['end_until'] ?? null, fn($q, $date) => $q->whereDate('EndDate', '<=', $date))
+                    ),
+
+                Filter::make('EndRegistrationDate')
+                    ->form([
+                        DatePicker::make('reg_from')->label(__('Reg. Ends From')),
+                        DatePicker::make('reg_until')->label(__('Reg. Ends Until')),
+                    ])
+                    ->query(fn(Builder $query, array $data): Builder => $query
+                        ->when($data['reg_from'] ?? null, fn($q, $date) => $q->whereDate('EndRegistrationDate', '>=', $date))
+                        ->when($data['reg_until'] ?? null, fn($q, $date) => $q->whereDate('EndRegistrationDate', '<=', $date))
+                    ),
                 TrashedFilter::make('trashed'),
             ])
             ->actions([
                 ViewAction::make(),
+//                Action::make('view_dogs')
+//                    ->label(false)
+//                    ->tooltip(__('Show Dogs'))
+//                    ->icon('fas-dog')
+//                    ->color('info')
+//                    ->badge(fn (PrevShow $record): int => $record->show_dogs_count ?? 0)
+//                    ->url(fn (PrevShow $record): string => PrevShowDogResource::getUrl('index', [
+//                        'tableFilters' => [
+//                            'ShowID' => ['value' => $record->id],
+//                        ],
+//                    ])),
+//
+//                Action::make('view_results')
+//                    ->label(false)
+//                    ->tooltip(__('Results'))
+//                    ->icon('fas-check-circle')
+//                    ->color('warning')
+//                    ->badge(fn (PrevShow $record): int => $record->results_count ?? 0)
+//                    ->url(fn (PrevShow $record): string => PrevShowResultResource::getUrl('index', [
+//                        'tableFilters' => [
+//                            'ShowID' => ['value' => $record->id],
+//                        ],
+//                    ])),
                 EditAction::make(),
                 DeleteAction::make(),
                 RestoreAction::make(),
@@ -349,8 +480,7 @@ class PrevShowResource extends Resource
             ])
             ->defaultSort(function (Builder $query): Builder {
                 return $query
-                    ->orderBy(DB::raw('YEAR(StartDate)'), 'desc')
-                    ->orderBy(DB::raw('MONTH(StartDate)'), 'desc')
+                    ->orderBy('StartDate', 'desc')
                     ->orderBy('id', 'desc');
             });
     }

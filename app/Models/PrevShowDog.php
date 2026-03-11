@@ -30,6 +30,7 @@ class PrevShowDog extends Model
         'ShowID' => 'integer',
         'ArenaID' => 'integer',
         'ClassID' => 'integer',
+        'OrderID' => 'integer',
         'ShowRegistrationID' => 'integer',
         'new_show_registration_id' => 'integer',
         'OwnerID' => 'integer',
@@ -102,6 +103,6 @@ class PrevShowDog extends Model
     public function prevShowResult(): HasOne
     {
         // Bind by literals so eager loading does not inject nulls or try to reference parent table
-        return $this->hasOne(PrevShowResult::class, ['SagirID', 'ShowID', 'MainArenaID'], ['SagirID', 'ShowID', 'ArenaID']);
+        return $this->hasOne(PrevShowResult::class, ['SagirID', 'ShowID'], ['SagirID', 'ShowID']);
     }
 }

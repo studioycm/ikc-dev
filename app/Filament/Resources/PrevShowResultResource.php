@@ -16,9 +16,16 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Grid as InfolistGrid;
+use Filament\Infolists\Components\Section as InfolistSection;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -56,7 +63,7 @@ class PrevShowResultResource extends Resource
     {
         return $form
             ->schema([
-                Grid::make(2)
+                Grid::make(6)
                     ->schema([
                         Group::make([
                             Section::make('result_general')
@@ -128,9 +135,9 @@ class PrevShowResultResource extends Resource
 
                             Section::make('show_info')
                                 ->schema([
-                                    TextInput::make('ShowOrderID')
+                                    Placeholder::make('showDog.OrderID')
                                         ->label(__('Position'))
-                                        ->integer(),
+                                        ->content(fn(PrevShowResult $record): int => $record->ShowOrderID),
 
                                     TextInput::make('ShowID')
                                         ->label(__('Show ID'))
@@ -149,7 +156,8 @@ class PrevShowResultResource extends Resource
                                 ])
                                 ->heading(__('Show Information'))
                                 ->columns(5),
-                        ]),
+                        ])
+                            ->columnSpan(3),
                         Group::make([
                             Section::make('result_options')
                                 ->schema([
@@ -220,7 +228,7 @@ class PrevShowResultResource extends Resource
                                         ->offColor(null),
                                 ])
                                 ->heading(__('Result Options'))
-                                ->columns(4),
+                                ->columns(5),
 
                             Section::make('titles_awards')
                                 ->schema([
@@ -472,9 +480,111 @@ class PrevShowResultResource extends Resource
                                         ->offColor(null),
                                 ])
                                 ->heading(__('Titles & Awards'))
-                                ->columns(4),
-                        ]),
+                                ->columns(5),
+                        ])
+                            ->columnSpan(3),
                     ]),
+            ]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                InfolistGrid::make(3)->schema([
+
+                    // Left Column: Main Details
+                    InfolistGrid::make(1)->schema([
+                        InfolistSection::make(__('Dog Information'))
+                            ->schema([
+                                TextEntry::make('SagirID')
+                                    ->label(__('Sagir ID'))
+                                    ->inlineLabel(),
+                                TextEntry::make('dogName')
+                                    ->label(__('Name'))
+                                    ->inlineLabel(),
+                                TextEntry::make('breedName')
+                                    ->label(__('Breed'))
+                                    ->inlineLabel(),
+                                TextEntry::make('GenderID')
+                                    ->label(__('Gender'))
+                                    ->badge()
+                                    ->inlineLabel(),
+                            ]),
+
+                        InfolistSection::make(__('Show Information'))
+                            ->schema([
+                                TextEntry::make('show.TitleName')
+                                    ->label(__('Show Name'))
+                                    ->default('-')
+                                    ->inlineLabel(),
+                                TextEntry::make('arena.GroupName')
+                                    ->label(__('Arena name'))
+                                    ->default('-')
+                                    ->inlineLabel(),
+                                TextEntry::make('class.ClassName')
+                                    ->label(__('Class type'))
+                                    ->default('-')
+                                    ->inlineLabel(),
+                                TextEntry::make('JudgeName')
+                                    ->label(__('Judge'))
+                                    ->default('-')
+                                    ->inlineLabel(),
+                                TextEntry::make('showDog.OrderID')
+                                    ->label(__('Position'))
+                                    ->default('-')
+                                    ->color('info')
+                                    ->weight('bold')
+                                    ->size(TextEntry\TextEntrySize::Large)
+                                    ->inlineLabel(),
+                            ]),
+                    ])->columnSpan(1),
+
+                    // Right Column: Results, Titles & Meta
+                    InfolistGrid::make(1)->schema([
+                        InfolistSection::make(__('Awards & Ratings'))
+                            ->schema([
+                                TextEntry::make('Rank')
+                                    ->label(__('Rank'))
+                                    ->size(TextEntry\TextEntrySize::Large)
+                                    ->weight('bold')
+                                    ->columnSpan(1),
+
+                                // Utilizing your model's excellent custom accessors
+                                TextEntry::make('resultsLabels')
+                                    ->label(__('Result'))
+                                    ->badge()
+                                    ->color('info')
+                                    ->default('-')
+                                    ->columnSpan(2),
+
+                                TextEntry::make('titlesLabels')
+                                    ->label(__('Titles'))
+                                    ->badge()
+                                    ->color('warning')
+                                    ->default('-')
+                                    ->columnSpan(3),
+
+                                TextEntry::make('Remarks')
+                                    ->label(__('Remarks'))
+                                    ->default('-')
+                                    ->columnSpanFull(),
+                            ])
+                            ->columns(6),
+
+                        InfolistSection::make(__('System Data'))
+                            ->schema([
+                                TextEntry::make('DataID')
+                                    ->label(__('Result ID')),
+                                TextEntry::make('CreationDateTime')
+                                    ->label(__('Created'))
+                                    ->dateTime('d/m/Y H:i'),
+                                TextEntry::make('ModificationDateTime')
+                                    ->label(__('Modified'))
+                                    ->dateTime('d/m/Y H:i'),
+                            ])->columns(3),
+                    ])->columnSpan(2),
+                ]),
             ]);
     }
 
@@ -523,9 +633,16 @@ class PrevShowResultResource extends Resource
                     ->toggleable(),
             ])
             ->filters([
+                SelectFilter::make('ShowID')
+                    ->label(__('Filter by Show'))
+                    ->relationship('show', 'TitleName') // Connects to your show() relation
+                    ->searchable()
+                    ->preload(false),
             ])
             ->actions([
                 EditAction::make(),
+                ViewAction::make()
+                    ->modalWidth(MaxWidth::Full),
             ])
             ->bulkActions([
             ])
@@ -540,6 +657,7 @@ class PrevShowResultResource extends Resource
         return [
             'index' => Pages\ListPrevShowResults::route('/'),
             'create' => Pages\CreatePrevShowResult::route('/create'),
+            'view' => Pages\ViewPrevShowResult::route('/{record}'),
             'edit' => Pages\EditPrevShowResult::route('/{record}/edit'),
         ];
     }

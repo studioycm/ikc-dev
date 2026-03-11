@@ -7,16 +7,16 @@ use App\Models\PrevShowDog;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Support\Enums\IconPosition;
+use Filament\Support\Enums\MaxWidth;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -166,36 +166,64 @@ class PrevShowDogResource extends Resource
 
                 TextColumn::make('breed_summary')
                     ->label(__('Breed'))
-                    ->state(fn(PrevShowDog $r) => $r->breed?->BreedNameEN ?: ($r->breed?->BreedName ?: '—'))
-                    ->description(fn(PrevShowDog $r) => __('Breed Code') . ': ' . ($r->breed?->BreedCode ?? '—'))
+                    ->state(fn(PrevShowDog $r) => $r->breed?->BreedName ?? '—')
+                    ->description(fn(PrevShowDog $r) => $r->breed?->BreedNameEN ?? '—')
                     ->url(fn(PrevShowDog $r) => $r->ShowBreedID ? PrevShowBreedResource::getUrl('view', ['record' => $r->ShowBreedID]) : null)
                     ->openUrlInNewTab()
                     ->toggleable(),
 
+                TextColumn::make('OrderID')
+                    ->label(__('Position'))
+                    ->badge()
+                    ->color('primary')
+                    ->sortable()
+                    ->toggleable(),
+
                 TextColumn::make('prevShowResult.DataID')
                     ->label(__('Result'))
-                    ->description(fn(PrevShowDog $record): string => (string)$record->prevShowResult?->DataID)
-                    ->url(function ($state) {
-                        return $state ? PrevShowResultResource::getUrl('edit', ['record' => $state]) : null;
-                    })
+                    ->color('success')
+                    ->icon('fas-award')
+                    ->iconPosition(IconPosition::After)
+                    ->extraAttributes(fn(PrevShowDog $record) => $record->prevShowResult ? ['class' => 'cursor-pointer underline'] : [])
+                    ->action(
+                        Action::make('viewShowResult')
+                            ->modalHeading(__('Show Result Details'))
+                            ->modalWidth(MaxWidth::FiveExtraLarge) // Optional: Makes the modal a nice readable width
+
+                            // 1. Swap the record context to the related result
+                            ->record(fn(PrevShowDog $record) => $record->prevShowResult)
+
+                            // 2. Hide the submit button so it's view-only
+                            ->modalSubmitAction(false)
+                            ->modalCancelActionLabel(__('Close'))
+                            ->infolist(fn(Infolist $infolist, PrevShowDog $record) => PrevShowResultResource::infolist($infolist)->record($record->prevShowResult)
+                            )
+                            ->disabled(fn(PrevShowDog $record) => $record->prevShowResult === null)
+                    )
                     ->toggleable(),
 
             ])
             ->filters([
-
+                SelectFilter::make('ShowID')
+                    ->label(__('Filter by Show'))
+                    ->relationship('show', 'TitleName') // Connects to your show() relation
+                    ->searchable()
+                    ->preload(false),
+                TernaryFilter::make('has_results')
+                    ->label(__('Has results'))
+                    ->trueLabel(__('Yes'))
+                    ->falseLabel(__('No'))
+                    ->queries(
+                        true: fn(Builder $query) => $query->has('prevShowResult'),
+                        false: fn(Builder $query) => $query->doesntHave('prevShowResult'),
+                        blank: fn(Builder $query) => $query, // Returns all records when the filter is cleared
+                    ),
             ])
             ->actions([
                 EditAction::make(),
-                DeleteAction::make(),
-                RestoreAction::make(),
-                ForceDeleteAction::make(),
+                ViewAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                ]),
             ])
             ->defaultSort('Shows_Dogs_DB.id', 'desc')
             ->searchOnBlur()
@@ -210,6 +238,7 @@ class PrevShowDogResource extends Resource
         return [
             'index' => Pages\ListPrevShowDogs::route('/'),
             'create' => Pages\CreatePrevShowDog::route('/create'),
+            'view' => Pages\ViewPrevShowDog::route('/{record}'),
             'edit' => Pages\EditPrevShowDog::route('/{record}/edit'),
         ];
     }

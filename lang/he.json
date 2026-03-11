@@ -220,6 +220,8 @@
     "Reports Management": "ניהול דוחות",
     "Registration Date": "תאריך רישום",
     "Registration": "רישום",
+    "Reg": "רישום",
+    "Registrations": "הרשמות",
     "Registered Dog": "כלב רשום",
     "Birth Date": "תאריך לידה",
     "Last Update": "עדכון אחרון",
@@ -341,6 +343,7 @@
     "Class type": "סוג כיתה",
     "Results count": "מספר תוצאות",
     "Result": "תוצאה",
+    "Results": "תוצאות",
     "Summary": "סיכום",
     "Dog Summary": "פרטי כלב",
     "Select a dog to view its summary": "בחר כלב כדי לראות את פרטיו",
@@ -470,6 +473,7 @@
     "MAG 2nd Notes": "הערות מה\"ג שני",
     "MAG 2nd Judge": "שופט מה\"ג שני",
     "MAG 2nd Place": "מקום מה\"ג שני",
+    "Assessment": "מבחן התאמה לגידול",
     "DNA Tests": "בדיקות DNA",
     "DNA Test": "בדיקת DNA",
     "Tests": "בדיקות",
@@ -611,5 +615,11 @@
     "Direction": "כיוון",
     "Density": "צפיפות",
     "Visible fields": "הצגת שדות",
-    "Show empty cards": "הצגת כרטיס ריק"
+    "Show empty cards": "הצגת כרטיס ריק",
+    "Dog Information": "מידע כלב",
+    "Awards & Ratings": "פרסים ודירוגים",
+    "Show Information": "מידע תערוכה",
+    "System Data": "נתוני מערכת",
+    "Rank": "דירוג",
+    "Has results": "יש תוצאות"
 }

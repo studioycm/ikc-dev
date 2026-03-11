@@ -156,26 +156,23 @@ class PrevShowClassResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('class_summary')
+                TextColumn::make('ClassName')
                     ->label(__('Class type'))
-                    ->state(fn(\App\Models\PrevShowClass $r) => $r->ClassName ?: '—')
-                    ->description(fn(\App\Models\PrevShowClass $r) => __('ID') . ': ' . ($r->DataID ?? '—'))
-                    ->searchable()
-                    ->sortable(),
+                    ->description(fn(PrevShowClass $r) => $r->DataID ?? '—')
+                    ->searchable(['ClassName', 'DataID'], isIndividual: true, isGlobal: false)
+                    ->sortable(['id', 'ShowID']),
 
-                TextColumn::make('arena_summary')
+                TextColumn::make('arena.GroupName')
                     ->label(__('Arena name'))
-                    ->state(fn(\App\Models\PrevShowClass $r) => $r->arena?->GroupName ?? '—')
-                    ->description(fn(\App\Models\PrevShowClass $r) => __('ID') . ': ' . ($r->ShowArenaID ?? '—'))
-                    ->url(fn(\App\Models\PrevShowClass $r) => $r->ShowArenaID ? ArenaRes::getUrl('view', ['record' => $r->ShowArenaID]) : null)
+                    ->description(fn(PrevShowClass $r) => $r->ShowArenaID ?? '—')
+                    ->url(fn(PrevShowClass $r) => $r->ShowArenaID ? ArenaRes::getUrl('view', ['record' => $r->ShowArenaID]) : null)
                     ->openUrlInNewTab()
                     ->toggleable(),
 
-                TextColumn::make('show_summary')
-                    ->label(__('Show title'))
-                    ->state(fn(\App\Models\PrevShowClass $r) => $r->show?->TitleName ?? '—')
-                    ->description(fn(\App\Models\PrevShowClass $r) => __('ID') . ': ' . ($r->ShowID ?? '—'))
-                    ->url(fn(\App\Models\PrevShowClass $r) => $r->ShowID ? ShowRes::getUrl('view', ['record' => $r->ShowID]) : null)
+                TextColumn::make('show.TitleName')
+                    ->label(__('Show Name'))
+                    ->description(fn(PrevShowClass $r) => $r->ShowID ?? '—')
+                    ->url(fn(PrevShowClass $r) => $r->ShowID ? ShowRes::getUrl('view', ['record' => $r->ShowID]) : null)
                     ->openUrlInNewTab()
                     ->toggleable(),
             ])

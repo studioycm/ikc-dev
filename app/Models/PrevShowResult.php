@@ -200,6 +200,14 @@ class PrevShowResult extends Model
         );
     }
 
+    protected function showOrderID(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->showDog->OrderID ?? null,
+            set: fn($value) => $this->attributes['ShowOrderID'] = $value,
+        );
+    }
+
     // --- Accessors (names) ---
     protected function titlesList(): Attribute
     {
@@ -334,7 +342,7 @@ class PrevShowResult extends Model
     public function showDog(): BelongsTo
     {
         // Constrain the related row by this result’s ShowID (and optionally MainArenaID)
-        return $this->belongsTo(PrevShowDog::class, ['SagirID', 'ShowID', 'ArenaID'], ['SagirID', 'ShowID', 'MainArenaID']);
+        return $this->belongsTo(PrevShowDog::class, ['SagirID', 'ShowID'], ['SagirID', 'ShowID']);
     }
 
     public function resultDog(): BelongsTo
