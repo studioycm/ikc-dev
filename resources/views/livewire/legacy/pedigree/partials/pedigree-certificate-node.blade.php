@@ -1,9 +1,30 @@
 @php
     $dog = $node['dog'];
+    $titles = $dog['titles'] ?? [];
+    $titlesText = $dog['titles_text'] ?? null;
 
-    $densityClasses = $density === 'compact'
-        ? 'p-2 text-[11px]'
-        : 'p-3 text-sm';
+    $fontMap = match ($fontScale) {
+        'small' => [
+            'name' => $density === 'compact' ? 'text-xs' : 'text-sm',
+            'meta' => 'text-[11px]',
+            'badge' => 'text-[10px]',
+            'title' => 'text-[11px]',
+        ],
+        'large' => [
+            'name' => $density === 'compact' ? 'text-base' : 'text-lg',
+            'meta' => $density === 'compact' ? 'text-xs' : 'text-sm',
+            'badge' => 'text-xs',
+            'title' => $density === 'compact' ? 'text-xs' : 'text-sm',
+        ],
+        default => [
+            'name' => $density === 'compact' ? 'text-sm' : 'text-base',
+            'meta' => $density === 'compact' ? 'text-[11px]' : 'text-xs',
+            'badge' => 'text-[10px]',
+            'title' => $density === 'compact' ? 'text-[11px]' : 'text-xs',
+        ],
+    };
+
+    $paddingClasses = $density === 'compact' ? 'p-2.5' : 'p-3.5';
 
     $cardClasses = match ($dog['gender_value']) {
         1 => 'border-blue-200 bg-blue-50/40 dark:border-blue-900/50 dark:bg-blue-950/20',
@@ -16,87 +37,169 @@
         2 => 'bg-pink-100 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300',
         default => 'bg-gray-100 text-gray-700 dark:bg-white/10 dark:text-gray-300',
     };
+
+    $metadataItems = [];
+
+    if (($visibleFields['import_number'] ?? false) && $dog['import_number']) {
+        $metadataItems[] = ['label' => __('Import'), 'value' => $dog['import_number']];
+    }
+
+    if (($visibleFields['breeding_house'] ?? false) && $dog['breeding_house']) {
+        $metadataItems[] = ['label' => __('Kennel'), 'value' => $dog['breeding_house']];
+    }
+
+    if (($visibleFields['breed_name'] ?? false) && $dog['breed_name']) {
+        $metadataItems[] = ['label' => __('Breed'), 'value' => $dog['breed_name']];
+    }
+
+    if (($visibleFields['color_name'] ?? false) && $dog['color_name']) {
+        $metadataItems[] = ['label' => __('Color'), 'value' => $dog['color_name']];
+    }
+
+    if (($visibleFields['birth_date'] ?? false) && $dog['birth_date']) {
+        $metadataItems[] = ['label' => __('D.O.B'), 'value' => $dog['birth_date']];
+    }
+
+    if (($visibleFields['age'] ?? false) && $dog['age']) {
+        $metadataItems[] = ['label' => __('Age'), 'value' => $dog['age']];
+    }
+
+    $previousSide = $isRtl ? 'right-0' : 'left-0';
+    $previousOutside = $isRtl ? '-right-4' : '-left-4';
+    $nextSide = $isRtl ? 'left-0' : 'right-0';
+    $nextOutside = $isRtl ? '-left-4' : '-right-4';
 @endphp
 
-@if ($node['is_placeholder'])
-    <div
-        class="h-full rounded-xl border border-dashed border-gray-200 bg-gray-50/70 dark:border-white/10 dark:bg-white/5">
-        @if ($showPlaceholders)
-            <div
-                class="flex h-full items-center justify-center px-3 text-center text-[11px] font-medium text-gray-400 dark:text-gray-500">
-                {{ __('Missing ancestor record') }}
-            </div>
-        @endif
-    </div>
-@else
-    <div class="h-full rounded-xl border shadow-sm {{ $cardClasses }} {{ $densityClasses }}">
-        <div class="flex h-full flex-col justify-center gap-2">
-            <div class="flex items-start justify-between gap-2">
-                <span
-                    class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $badgeClasses }}">
-                    {{ $dog['gender_label'] }}
-                </span>
+<div class="relative h-full">
+    @if ($node['generation'] >= 1)
+        <div
+            class="pointer-events-none absolute top-1/2 z-0 h-px w-4 -translate-y-1/2 bg-gray-300/90 dark:bg-white/15 {{ $previousOutside }}"></div>
+        <div
+            class="pointer-events-none absolute top-1/2 z-0 h-px w-4 -translate-y-1/2 bg-gray-300/90 dark:bg-white/15 {{ $previousSide }}"></div>
+    @endif
 
-                <div class="text-[12px] bg-gray-100 text-gray-700 dark:bg-white/10 dark:text-gray-300">
-                    @if (($visibleFields['sagir_id'] ?? false) && $dog['sagir_id'])
-                        {{ $dog['sagir_id'] }}
-                    @endif
-                </div>
-            </div>
+    @if ($node['generation'] < $maxGeneration)
+        <div
+            class="pointer-events-none absolute top-1/2 z-0 h-px w-4 -translate-y-1/2 bg-gray-300/70 dark:bg-white/10 {{ $nextOutside }}"></div>
+        <div
+            class="pointer-events-none absolute top-1/2 z-0 h-px w-4 -translate-y-1/2 bg-gray-300/70 dark:bg-white/10 {{ $nextSide }}"></div>
+    @endif
 
-            <div class="min-h-0 space-y-1">
-
-                <div class="flex items-start justify-between gap-2">
-                    <div class="font-semibold leading-tight text-gray-950 dark:text-white">
-                        {{ $dog['full_name'] }}
-                    </div>
-                </div>
-
-                @if (($visibleFields['breeding_house'] ?? false) && $dog['breeding_house'])
-                    <div class="leading-tight text-gray-500 dark:text-gray-400">
-                        {{ $dog['breeding_house'] }}
-                    </div>
-                @endif
-
-                @if (($visibleFields['import_number'] ?? false) && $dog['import_number'])
-                    <div class="leading-tight text-gray-500 dark:text-gray-400">
-                        {{ __('Import') }}: {{ $dog['import_number'] }}
-                    </div>
-                @endif
-
-
-                @if (($visibleFields['breed_name'] ?? false) && $dog['breed_name'])
-                    <div class="font-semibold leading-tight text-gray-500 dark:text-gray-400">
-                        {{ $dog['breed_name'] }}
-                    </div>
-                @endif
-                <div class="flex items-start justify-between gap-2">
-                @if (($visibleFields['color_name'] ?? false) && $dog['color_name'])
-                    <div class="leading-tight text-gray-500 dark:text-gray-400">
-                        {{ $dog['color_name'] }}
-                    </div>
-                @endif
-
-                @if (($visibleFields['birth_date'] ?? false) && $dog['birth_date'])
-                    <div class="leading-tight text-gray-500 dark:text-gray-400">
-                        {{ $dog['birth_date'] }}
-                    </div>
-                @endif
-
-                    @if (($visibleFields['age'] ?? false) && $dog['age'])
-                        <div class="leading-tight text-gray-500 dark:text-gray-400">
-                            {{ $dog['age'] }}
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            @if (($visibleFields['titles'] ?? false) && filled($dog['titles']))
-                <div title="{{ $dog['titles_string'] }}"
-                    class="border-t border-gray-200/70 pt-2 text-[12px] leading-4 text-gray-500 dark:border-white/10 dark:text-gray-400">
-                    {{ $dog['titles_short'] }}
+    @if ($node['is_placeholder'])
+        <div
+            class="relative z-10 h-full rounded-xl border border-dashed border-gray-200 bg-gray-50/70 dark:border-white/10 dark:bg-white/5">
+            @if ($showPlaceholders)
+                <div
+                    class="flex h-full items-center justify-center px-3 text-center text-[11px] font-medium text-gray-400 dark:text-gray-500">
+                    {{ __('Missing ancestor record') }}
                 </div>
             @endif
         </div>
-    </div>
-@endif
+    @else
+        <div class="relative z-10 h-full rounded-xl border shadow-sm {{ $cardClasses }} {{ $paddingClasses }}">
+            <div class="grid content-start gap-2.5">
+                <div class="flex items-start justify-between gap-2">
+                    <span
+                        class="inline-flex items-center rounded-full px-2 py-0.5 font-semibold {{ $badgeClasses }} {{ $fontMap['badge'] }}">
+                        {{ $dog['gender_label'] }}
+                    </span>
+
+                    @if (($visibleFields['sagir_id'] ?? false) && $dog['sagir_id'])
+                        <span
+                            class="rounded-md bg-white/80 px-2 py-0.5 font-medium text-gray-700 shadow-sm dark:bg-white/10 dark:text-gray-200 {{ $fontMap['badge'] }}">
+                            {{ $dog['sagir_id'] }}
+                        </span>
+                    @endif
+                </div>
+
+                <div class="space-y-1">
+                    @if (($visibleFields['name_he'] ?? false) && $dog['name_he'])
+                        <div class="font-semibold leading-tight text-gray-950 dark:text-white {{ $fontMap['name'] }}">
+                            {{ $dog['name_he'] }}
+                        </div>
+                    @endif
+
+                    @if (($visibleFields['name_en'] ?? false) && $dog['name_en'])
+                        <div class="leading-tight text-gray-700 dark:text-gray-300 {{ $fontMap['meta'] }}">
+                            {{ $dog['name_en'] }}
+                        </div>
+                    @endif
+                </div>
+
+                @if (filled($metadataItems))
+                    @if ($density === 'compact')
+                        <div class="grid grid-cols-2 gap-x-2 gap-y-1">
+                            @foreach ($metadataItems as $item)
+                                <div class="min-w-0 text-gray-600 dark:text-gray-300 {{ $fontMap['meta'] }}">
+                                    <span class="font-medium">{{ $item['label'] }}:</span>
+                                    <span class="break-words">{{ $item['value'] }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="space-y-1">
+                            @foreach ($metadataItems as $item)
+                                <div class="text-gray-600 dark:text-gray-300 {{ $fontMap['meta'] }}">
+                                    <span class="font-medium">{{ $item['label'] }}:</span>
+                                    <span>{{ $item['value'] }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                @endif
+
+                @if (($visibleFields['titles'] ?? false) && filled($titlesText))
+                    <div x-data="{ open: false }"
+                         class="relative border-t border-gray-200/70 pt-2 dark:border-white/10">
+                        <div class="flex items-start gap-2">
+                            <div
+                                class="min-w-0 flex-1 leading-4 text-gray-600 dark:text-gray-300 {{ $fontMap['title'] }}"
+                                style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
+                            >
+                                {{ $titlesText }}
+                            </div>
+
+                            @if ($dog['titles_has_popup'])
+                                <button
+                                    type="button"
+                                    x-on:click.stop="open = ! open"
+                                    class="inline-flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition hover:border-primary-300 hover:text-primary-600 dark:border-white/10 dark:bg-gray-900/70 dark:text-gray-300 dark:hover:border-primary-700 dark:hover:text-primary-300"
+                                    title="{{ __('Show full title list') }}"
+                                >
+                                    <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+                                        <path fill-rule="evenodd"
+                                              d="M10 18a8 8 0 100-16 8 8 0 000 16Zm.75-10.75a.75.75 0 10-1.5 0v.5a.75.75 0 001.5 0v-.5Zm0 3a.75.75 0 10-1.5 0v3a.75.75 0 001.5 0v-3Z"
+                                              clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                            @endif
+                        </div>
+
+                        @if ($dog['titles_has_popup'])
+                            <div
+                                x-cloak
+                                x-show="open"
+                                x-transition.opacity
+                                x-on:click.outside="open = false"
+                                class="absolute top-full z-20 mt-2 rounded-xl border border-gray-200 bg-white p-3 shadow-2xl dark:border-white/10 dark:bg-gray-900 {{ $isRtl ? 'left-0' : 'right-0' }}"
+                            >
+                                <div class="text-xs font-semibold text-gray-900 dark:text-white">
+                                    {{ __('Titles') }}
+                                </div>
+
+                                <div class="mt-3 max-h-56 space-y-1 overflow-auto">
+                                    @foreach ($titles as $title)
+                                        <div
+                                            class="rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-xs text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-200">
+                                            {{ $title }}
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
+</div>

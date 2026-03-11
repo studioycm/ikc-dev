@@ -11,9 +11,10 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Illuminate\Contracts\View\View;
-use Livewire\Attributes\Computed;
+use Illuminate\Support\Facades\App;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
+use Throwable;
 
 class PedigreeTree extends Component implements HasForms
 {
@@ -22,63 +23,59 @@ class PedigreeTree extends Component implements HasForms
     #[Locked]
     public int $dogId;
 
-    public int $depth = 3;
+    public int $depth = 4;
 
     public string $direction = 'rtl';
 
     public string $density = 'comfortable';
 
+    public string $fontScale = 'normal';
+
+    public string $cardHeight = 'normal';
+
+    public string $rootTitlesMode = 'compact';
+
     public bool $showPlaceholders = true;
+
+    public array $visibleNodeFields = [];
 
     public ?array $settingsData = [];
 
-    public function mount(int $dogId, int $depth = 3, ?string $direction = null): void
+    public ?array $pedigreeData = null;
+
+    public ?string $loadError = null;
+
+    public ?string $loadErrorTechnical = null;
+
+    public bool $hasLoaded = false;
+
+    public function mount(int $dogId, int $depth = 4): void
     {
         $this->dogId = $dogId;
         $this->depth = $this->sanitizeDepth($depth);
-        $this->direction = $this->sanitizeDirection(
-            $direction ?: $this->defaultDirection(),
-        );
+        $this->direction = $this->resolveDirectionFromLocale();
 
         $this->form->fill($this->defaultSettings());
-        $this->applySettingsFromForm();
+        $this->syncSettingsFromForm(shouldLoad: false);
     }
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Section::make('pedigree_settings')
-                    ->heading(fn(): string => __('Pedigree Settings'))
+                Section::make(__('Tree settings'))
+                    ->description(__('Configure pedigree depth, density, typography, card height, and the main-title display mode') . ".")
+                    ->collapsible()
+                    ->collapsed()
                     ->schema([
                         Grid::make(12)
                             ->schema([
                                 Select::make('depth')
                                     ->label(__('Generations'))
-                                    ->options([
-                                        2 => '2',
-                                        3 => '3',
-                                        4 => '4',
-                                        5 => '5',
-                                        6 => '6',
-                                        7 => '7',
-                                        8 => '8',
-                                    ])
+                                    ->options(collect(range(2, 8))->mapWithKeys(fn(int $value): array => [$value => (string)$value])->all())
                                     ->native(false)
-                                    ->live()
-                                    ->columnSpan([
-                                        'default' => 12,
-                                        'md' => 3,
-                                    ]),
-
-                                Select::make('direction')
-                                    ->label(__('Direction'))
-                                    ->options([
-                                        'rtl' => 'RTL',
-                                        'ltr' => 'LTR',
-                                    ])
-                                    ->native(false)
-                                    ->live()
+                                    ->required()
+                                    ->helperText(__('Depths 6–8 are much heavier and may take longer to build.'))
                                     ->columnSpan([
                                         'default' => 12,
                                         'md' => 3,
@@ -91,86 +88,173 @@ class PedigreeTree extends Component implements HasForms
                                         'compact' => __('Compact'),
                                     ])
                                     ->native(false)
-                                    ->live()
+                                    ->required()
                                     ->columnSpan([
                                         'default' => 12,
                                         'md' => 3,
+                                    ]),
+
+                                Select::make('font_scale')
+                                    ->label(__('Font size'))
+                                    ->options([
+                                        'small' => __('Small font'),
+                                        'normal' => __('Normal'),
+                                        'large' => __('Large font'),
+                                    ])
+                                    ->native(false)
+                                    ->required()
+                                    ->columnSpan([
+                                        'default' => 12,
+                                        'md' => 3,
+                                    ]),
+
+                                Select::make('card_height')
+                                    ->label(__('Card height'))
+                                    ->options([
+                                        'short' => __('Short'),
+                                        'normal' => __('Normal'),
+                                        'tall' => __('Tall'),
+                                        'x_tall' => __('Extra tall'),
+                                    ])
+                                    ->native(false)
+                                    ->required()
+                                    ->columnSpan([
+                                        'default' => 12,
+                                        'md' => 3,
+                                    ]),
+
+                                Select::make('root_titles_mode')
+                                    ->label(__('Main dog titles'))
+                                    ->options([
+                                        'compact' => __('Compact'),
+                                        'expanded' => __('Expanded'),
+                                    ])
+                                    ->native(false)
+                                    ->required()
+                                    ->columnSpan([
+                                        'default' => 12,
+                                        'md' => 6,
                                     ]),
 
                                 Toggle::make('show_placeholders')
                                     ->label(__('Show empty cards'))
-                                    ->helperText(__('When disabled, empty ancestors still keep their slot for alignment but render as minimal empty cards.'))
-                                    ->live()
+                                    ->inline(false)
                                     ->columnSpan([
                                         'default' => 12,
-                                        'md' => 3,
+                                        'md' => 6,
                                     ]),
                             ]),
-                    ])
-                    ->collapsed(),
+                    ]),
 
                 Section::make(__('Visible fields'))
+                    ->description(__('Control which fields appear on ancestor cards'))
+                    ->collapsible()
+                    ->collapsed()
                     ->schema([
                         Grid::make(12)
                             ->schema($this->visibleFieldComponents()),
-                    ])
-                    ->collapsed(),
+                    ]),
             ])
             ->statePath('settingsData');
     }
 
-    public function updated(string $name, mixed $value): void
+    public function loadPedigree(): void
     {
-        if (str_starts_with($name, 'settingsData.')) {
-            $this->applySettingsFromForm();
+        $this->direction = $this->resolveDirectionFromLocale();
+        $this->loadError = null;
+        $this->loadErrorTechnical = null;
+
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(45);
+        }
+
+        try {
+            $this->pedigreeData = app(PedigreeTreeBuilderService::class)->build(
+                dogId: $this->dogId,
+                depth: $this->depth,
+                direction: $this->direction,
+                includeNodeTitles: $this->visibleNodeFields['titles'] ?? false,
+            );
+
+            $this->hasLoaded = true;
+        } catch (Throwable $throwable) {
+            report($throwable);
+
+            $message = mb_strtolower($throwable->getMessage());
+
+            $this->loadError = str_contains($message, 'maximum execution time')
+            || str_contains($message, 'timed out')
+            || str_contains($message, 'timeout')
+                ? __('The pedigree tree took too long to build. Try fewer generations, shorter cards, or hide ancestor titles and try again.')
+                : __('The pedigree tree could not be built right now. Review the settings and try again.');
+
+            $this->loadErrorTechnical = $throwable->getMessage();
+            $this->hasLoaded = true;
         }
     }
 
-    public function applySettingsFromForm(): void
+    public function submitSettings(): void
     {
-        $state = $this->form->getState();
-
-        $this->depth = $this->sanitizeDepth((int)($state['depth'] ?? $this->depth));
-        $this->direction = $this->sanitizeDirection($state['direction'] ?? $this->direction);
-        $this->density = $this->sanitizeDensity($state['density'] ?? $this->density);
-        $this->showPlaceholders = (bool)($state['show_placeholders'] ?? true);
-
-        $this->settingsData['visible_fields'] = $this->normalizeVisibleFields(
-            $state['visible_fields'] ?? [],
-        );
-
-        unset($this->visibleNodeFields);
-        unset($this->pedigree);
+        $this->syncSettingsFromForm(shouldLoad: true);
     }
 
     public function resetCertificateSettings(): void
     {
         $this->form->fill($this->defaultSettings());
-        $this->applySettingsFromForm();
+        $this->syncSettingsFromForm(shouldLoad: true);
     }
 
-    #[Computed]
-    public function visibleNodeFields(): array
+    public function retryLoadPedigree(): void
     {
-        return $this->normalizeVisibleFields(
-            $this->settingsData['visible_fields'] ?? [],
-        );
-    }
-
-    #[Computed]
-    public function pedigree(): array
-    {
-        return app(PedigreeTreeBuilderService::class)->build(
-            dogId: $this->dogId,
-            depth: $this->depth,
-            direction: $this->direction,
-            includeTitles: $this->visibleNodeFields['titles'] ?? false,
-        );
+        $this->loadPedigree();
     }
 
     public function render(): View
     {
         return view('livewire.legacy.pedigree.pedigree-tree');
+    }
+
+    public function treeRowHeight(): string
+    {
+        return match ($this->density) {
+            'compact' => match ($this->cardHeight) {
+                'short' => '8rem',
+                'normal' => '9.5rem',
+                'tall' => '11rem',
+                'x_tall' => '12.5rem',
+                default => '9.5rem',
+            },
+            default => match ($this->cardHeight) {
+                'short' => '11rem',
+                'normal' => '13rem',
+                'tall' => '15rem',
+                'x_tall' => '17rem',
+                default => '13rem',
+            },
+        };
+    }
+
+    public function treeColumnMinWidth(): string
+    {
+        return $this->density === 'compact' ? '13.75rem' : '16rem';
+    }
+
+    protected function syncSettingsFromForm(bool $shouldLoad): void
+    {
+        $state = $this->form->getState();
+
+        $this->depth = $this->sanitizeDepth((int)($state['depth'] ?? $this->depth));
+        $this->density = $this->sanitizeDensity($state['density'] ?? $this->density);
+        $this->fontScale = $this->sanitizeFontScale($state['font_scale'] ?? $this->fontScale);
+        $this->cardHeight = $this->sanitizeCardHeight($state['card_height'] ?? $this->cardHeight);
+        $this->rootTitlesMode = $this->sanitizeRootTitlesMode($state['root_titles_mode'] ?? $this->rootTitlesMode);
+        $this->showPlaceholders = (bool)($state['show_placeholders'] ?? true);
+        $this->visibleNodeFields = $this->normalizeVisibleFields($state['visible_fields'] ?? []);
+        $this->direction = $this->resolveDirectionFromLocale();
+
+        if ($shouldLoad) {
+            $this->loadPedigree();
+        }
     }
 
     protected function visibleFieldComponents(): array
@@ -180,7 +264,6 @@ class PedigreeTree extends Component implements HasForms
         foreach ($this->nodeFieldDefinitions() as $key => $config) {
             $components[] = Toggle::make("visible_fields.{$key}")
                 ->label($config['label'])
-                ->live()
                 ->columnSpan([
                     'default' => 12,
                     'sm' => 6,
@@ -195,8 +278,10 @@ class PedigreeTree extends Component implements HasForms
     {
         return [
             'depth' => $this->depth,
-            'direction' => $this->direction,
             'density' => $this->density,
+            'font_scale' => $this->fontScale,
+            'card_height' => $this->cardHeight,
+            'root_titles_mode' => $this->rootTitlesMode,
             'show_placeholders' => $this->showPlaceholders,
             'visible_fields' => $this->defaultVisibleFields(),
         ];
@@ -227,6 +312,14 @@ class PedigreeTree extends Component implements HasForms
     protected function nodeFieldDefinitions(): array
     {
         return [
+            'name_he' => [
+                'label' => __('Hebrew Name'),
+                'default' => true,
+            ],
+            'name_en' => [
+                'label' => __('English Name'),
+                'default' => true,
+            ],
             'sagir_id' => [
                 'label' => __('Sagir ID'),
                 'default' => true,
@@ -264,12 +357,7 @@ class PedigreeTree extends Component implements HasForms
 
     protected function sanitizeDepth(int $depth): int
     {
-        return max(2, min(8, $depth));
-    }
-
-    protected function sanitizeDirection(?string $direction): string
-    {
-        return $direction === 'ltr' ? 'ltr' : 'rtl';
+        return max(2, min(10, $depth));
     }
 
     protected function sanitizeDensity(?string $density): string
@@ -277,8 +365,27 @@ class PedigreeTree extends Component implements HasForms
         return $density === 'compact' ? 'compact' : 'comfortable';
     }
 
-    protected function defaultDirection(): string
+    protected function sanitizeFontScale(?string $fontScale): string
     {
-        return str_starts_with(app()->getLocale(), 'he') ? 'rtl' : 'ltr';
+        return in_array($fontScale, ['small', 'normal', 'large'], true) ? $fontScale : 'normal';
+    }
+
+    protected function sanitizeCardHeight(?string $cardHeight): string
+    {
+        return in_array($cardHeight, ['short', 'normal', 'tall', 'x_tall'], true) ? $cardHeight : 'normal';
+    }
+
+    protected function sanitizeRootTitlesMode(?string $mode): string
+    {
+        return in_array($mode, ['compact', 'expanded'], true) ? $mode : 'compact';
+    }
+
+    protected function resolveDirectionFromLocale(): string
+    {
+        $locale = App::currentLocale();
+
+        return str_starts_with($locale, 'he') || str_starts_with($locale, 'ar')
+            ? 'rtl'
+            : 'ltr';
     }
 }

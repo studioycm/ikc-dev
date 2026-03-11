@@ -131,4 +131,5 @@
 
 .pedigree-row {
     --pedigree-row-height: 13.25rem;
+    --pedigree-col-min: 10rem;
 }

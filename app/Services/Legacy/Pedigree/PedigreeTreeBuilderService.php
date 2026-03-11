@@ -4,12 +4,29 @@ namespace App\Services\Legacy\Pedigree;
 
 use App\Enums\Legacy\LegacyDogGender;
 use App\Models\PrevDog;
+use App\Models\PrevUser;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
 
 class PedigreeTreeBuilderService
 {
-    protected array $dogColumns = [
+    protected array $ancestorColumns = [
+        'id',
+        'SagirID',
+        'Heb_Name',
+        'Eng_Name',
+        'FatherSAGIR',
+        'MotherSAGIR',
+        'RaceID',
+        'ColorID',
+        'BeitGidulID',
+        'ImportNumber',
+        'BirthDate',
+        'GenderID',
+    ];
+
+    protected array $rootColumns = [
         'id',
         'SagirID',
         'Heb_Name',
@@ -24,26 +41,27 @@ class PedigreeTreeBuilderService
         'RegDate',
         'PedigreeNotes',
         'GenderID',
+        'Chip',
     ];
-    private int $titles_limit = 10;
 
     public function build(
-        int    $dogId,
-        int $depth = 3,
+        int  $dogId,
+        int  $depth = 4,
         string $direction = 'rtl',
-        bool   $includeTitles = false,
+        bool $includeNodeTitles = false,
     ): array
     {
-        $depth = max(2, min(7, $depth));
+        $depth = max(2, min(8, $depth));
         $direction = $direction === 'ltr' ? 'ltr' : 'rtl';
+
         $dog = $this->loadRootDog(
             dogId: $dogId,
             depth: $depth,
-            includeTitles: $includeTitles,
+            includeNodeTitles: $includeNodeTitles,
         );
 
         return [
-            'root' => $dog ? $this->normalizeDog($dog) : null,
+            'root' => $dog ? $this->normalizeRootDog($dog) : null,
             'depth' => $depth,
             'direction' => $direction,
             'column_count' => $depth,
@@ -65,30 +83,44 @@ class PedigreeTreeBuilderService
     protected function loadRootDog(
         int  $dogId,
         int  $depth,
-        bool $includeTitles,
+        bool $includeNodeTitles,
     ): ?PrevDog
     {
         return PrevDog::query()
-            ->select($this->dogColumns)
-            ->with($this->nodeRelations(true, true))
-            ->with($this->pedigreeRelations($depth, $includeTitles))
+            ->select($this->rootColumns)
+            ->with($this->rootRelations())
+            ->with($this->pedigreeRelations($depth, $includeNodeTitles))
             ->find($dogId);
     }
 
-    protected function nodeRelations(bool $includeTitles, bool $withOwners): array
+    protected function rootRelations(): array
+    {
+        return [
+            'breed:BreedCode,BreedName,BreedNameEN',
+            'color:OldCode,ColorNameHE,ColorNameEN',
+            'breedinghouse:id,GidulCode,HebName,EngName',
+            'owners' => fn(BelongsToMany $query) => $query->select($this->ownerSelectColumns()),
+            'breedinghouse.users' => fn(BelongsToMany $query) => $query->select($this->ownerSelectColumns()),
+            'titles' => fn(BelongsToMany $query) => $query->select([
+                'dogs_titles_db.TitleCode',
+                'dogs_titles_db.TitleName',
+            ]),
+        ];
+    }
+
+    protected function nodeRelations(bool $includeTitles): array
     {
         $relations = [
-            'breed:BreedCode,BreedName',
-            'color:OldCode,ColorNameHE',
-            'breedinghouse:GidulCode,HebName,EngName',
+            'breed:BreedCode,BreedName,BreedNameEN',
+            'color:OldCode,ColorNameHE,ColorNameEN',
+            'breedinghouse:id,GidulCode,HebName,EngName',
         ];
 
         if ($includeTitles) {
-            $relations[] = 'titles:TitleCode,TitleName';
-        }
-
-        if ($withOwners) {
-            $relations[] = 'owners:id,first_name,last_name,first_name_en,last_name_en';
+            $relations['titles'] = fn(BelongsToMany $query) => $query->select([
+                'dogs_titles_db.TitleCode',
+                'dogs_titles_db.TitleName',
+            ]);
         }
 
         return $relations;
@@ -116,13 +148,13 @@ class PedigreeTreeBuilderService
 
     protected function configureAncestorQuery(
         Relation $query,
-        int      $remainingDepth,
-        bool     $includeTitles,
+        int  $remainingDepth,
+        bool $includeTitles,
     ): void
     {
         $query
-            ->select($this->dogColumns)
-            ->with($this->nodeRelations($includeTitles, false));
+            ->select($this->ancestorColumns)
+            ->with($this->nodeRelations($includeTitles));
 
         if ($remainingDepth > 1) {
             $query->with(
@@ -161,22 +193,20 @@ class PedigreeTreeBuilderService
             3 => __('Great Grandparents'),
             4 => __('4th generation'),
             5 => __('5th generation'),
-            default => __(':n Generation', ['n' => $generation]),
+            6 => __('6th generation'),
+            7 => __('7th generation'),
+            8 => __('8th generation'),
+            default => __('Generation :generation', ['generation' => $generation]),
         };
     }
 
     protected function buildAncestorNodes(
         PrevDog $dog,
-        int     $depth,
-        string  $direction,
+        int    $depth,
+        string $direction,
     ): array
     {
         $nodes = [];
-
-        /**
-         * The tree starts from parents, not from the root dog.
-         * Nulls are preserved intentionally so later generations never collapse left/right.
-         */
         $currentGeneration = [$dog->father, $dog->mother];
 
         for ($generation = 1; $generation <= $depth; $generation++) {
@@ -195,8 +225,8 @@ class PedigreeTreeBuilderService
                     'row_span' => $rowSpan,
                     'is_placeholder' => !($ancestor instanceof PrevDog),
                     'dog' => $ancestor instanceof PrevDog
-                        ? $this->normalizeDog($ancestor)
-                        : $this->emptyDog(),
+                        ? $this->normalizeNodeDog($ancestor)
+                        : $this->emptyNodeDog(),
                 ];
             }
 
@@ -220,27 +250,60 @@ class PedigreeTreeBuilderService
         return $nodes;
     }
 
-    protected function normalizeDog(PrevDog $dog): array
+    protected function normalizeRootDog(PrevDog $dog): array
     {
-        $titles = [];
-        $owners = [];
+        $titles = $this->normalizeTitles($dog);
+        $firstOwner = $dog->relationLoaded('owners') ? $dog->owners->first() : null;
+        $ownerData = $firstOwner ? $this->normalizeUser($firstOwner) : null;
+        $breederNames = $this->resolveBreederNames($dog);
 
-        if ($dog->relationLoaded('titles')) {
-            $titles = $dog->titles
-                ->pluck('TitleName')
-                ->filter()
-                ->values()
-                ->all();
-        }
+        return array_merge(
+            $this->normalizeCommonDogData($dog),
+            [
+                'chip' => $this->blankToNull($dog->getAttribute('Chip') ?? $dog->getAttribute('chip')),
+                'reg_date' => $dog->RegDate?->format('d/m/Y'),
+                'pedigree_notes' => $this->blankToNull($dog->getAttribute('PedigreeNotes')),
+                'gender_label_raw' => $this->standardGenderLabel($dog->GenderID),
 
-        if ($dog->relationLoaded('owners')) {
-            $owners = $dog->owners
-                ->pluck('full_name_heb')
-                ->filter()
-                ->values()
-                ->all();
-        }
+                'owner_first_name' => $ownerData['first_name'] ?? null,
+                'owner_last_name' => $ownerData['last_name'] ?? null,
+                'owner_first_name_en' => $ownerData['first_name_en'] ?? null,
+                'owner_last_name_en' => $ownerData['last_name_en'] ?? null,
+                'owner_name_he' => $ownerData['name_he'] ?? null,
+                'owner_name_en' => $ownerData['name_en'] ?? null,
+                'owner_name' => $ownerData['display_name'] ?? null,
+                'owner_address_array' => $ownerData['address_array'] ?? [],
+                'owner_address' => $ownerData['address_text'] ?? null,
 
+                'breeder_names' => $breederNames,
+                'breeder_text' => filled($breederNames) ? implode(', ', $breederNames) : null,
+
+                'titles' => $titles,
+                'titles_count' => count($titles),
+                'titles_text' => implode(' • ', $titles),
+            ],
+        );
+    }
+
+    protected function normalizeNodeDog(PrevDog $dog): array
+    {
+        $titles = $this->normalizeTitles($dog);
+        $titlesText = implode(' • ', $titles);
+
+        return array_merge(
+            $this->normalizeCommonDogData($dog),
+            [
+                'gender_label' => $this->pedigreeGenderLabel($dog->GenderID),
+                'titles' => $titles,
+                'titles_count' => count($titles),
+                'titles_text' => $titlesText,
+                'titles_has_popup' => count($titles) > 2 || mb_strlen($titlesText) > 90,
+            ],
+        );
+    }
+
+    protected function normalizeCommonDogData(PrevDog $dog): array
+    {
         return [
             'id' => $dog->getKey(),
             'sagir_id' => $dog->SagirID,
@@ -249,32 +312,23 @@ class PedigreeTreeBuilderService
             'name_en' => $this->blankToNull($dog->Eng_Name),
             'full_name' => $dog->full_name,
             'breed_name' => $dog->relationLoaded('breed')
-                ? $this->blankToNull($dog->breed?->BreedName)
+                ? $this->blankToNull($dog->breed?->BreedName ?? $dog->breed?->BreedNameEN)
                 : null,
             'breeding_house' => $dog->relationLoaded('breedinghouse')
-                ? $this->blankToNull($dog->breedinghouse?->name)
+                ? $this->resolveBreedingHouseName($dog)
                 : null,
             'color_name' => $dog->relationLoaded('color')
-                ? $this->blankToNull($dog->color?->ColorNameHE)
+                ? $this->blankToNull($dog->color?->ColorNameHE ?? $dog->color?->ColorNameEN)
                 : null,
             'birth_date' => $dog->BirthDate?->format('d/m/Y'),
-            'reg_date' => $dog->RegDate?->format('d/m/Y'),
-            'pedigree_notes' => $dog->PedigreeNotes,
             'age' => $this->formatAge($dog->BirthDate),
             'gender_value' => $this->normalizeGenderValue($dog->GenderID),
-            'gender_label_raw' => $dog->GenderID->getLabel(),
-            'gender_label' => $this->genderLabel($dog->GenderID),
             'father_sagir' => $dog->FatherSAGIR,
             'mother_sagir' => $dog->MotherSAGIR,
-            'titles' => $titles,
-            'owners' => $owners,
-            'titles_short' => implode(', ', array_slice($titles, 0, $this->titles_limit)),
-            'titles_string' => implode(', ', $titles),
-            'owners_string' => implode(', ', $owners),
         ];
     }
 
-    protected function emptyDog(): array
+    protected function emptyNodeDog(): array
     {
         return [
             'id' => null,
@@ -287,20 +341,125 @@ class PedigreeTreeBuilderService
             'breeding_house' => null,
             'color_name' => null,
             'birth_date' => null,
-            'reg_date' => null,
-            'pedigree_notes' => null,
             'age' => null,
             'gender_value' => null,
-            'gender_label_raw' => null,
             'gender_label' => __('Unknown'),
             'father_sagir' => null,
             'mother_sagir' => null,
             'titles' => [],
-            'owners' => [],
-            'titles_short' => null,
-            'titles_string' => null,
-            'owners_string' => null,
+            'titles_count' => 0,
+            'titles_text' => null,
+            'titles_has_popup' => false,
         ];
+    }
+
+    protected function normalizeTitles(PrevDog $dog): array
+    {
+        if (!$dog->relationLoaded('titles')) {
+            return [];
+        }
+
+        return $dog->titles
+            ->pluck('TitleName')
+            ->map(fn($title) => $this->blankToNull($title))
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    protected function normalizeUser(PrevUser $user): array
+    {
+        $firstName = $this->blankToNull($user->first_name);
+        $lastName = $this->blankToNull($user->last_name);
+        $firstNameEn = $this->blankToNull($user->first_name_en);
+        $lastNameEn = $this->blankToNull($user->last_name_en);
+
+        $nameHe = $this->joinName([$firstName, $lastName]);
+        $nameEn = $this->joinName([$firstNameEn, $lastNameEn]);
+        $displayName = $this->joinLocalizedNames([$nameHe, $nameEn]);
+
+        $addressArray = method_exists($user, 'addressArray')
+            ? $user->addressArray()
+            : ((array)($user->address ?? []));
+
+        $addressText = method_exists($user, 'buildAddress')
+            ? $this->blankToNull($user->buildAddress())
+            : $this->joinAddressParts($addressArray);
+
+        return [
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'first_name_en' => $firstNameEn,
+            'last_name_en' => $lastNameEn,
+            'name_he' => $nameHe,
+            'name_en' => $nameEn,
+            'display_name' => $displayName,
+            'address_array' => $addressArray,
+            'address_text' => $addressText,
+        ];
+    }
+
+    protected function resolveBreederNames(PrevDog $dog): array
+    {
+        if ($dog->relationLoaded('breedinghouse') && $dog->breedinghouse) {
+            $breedingHouse = $dog->breedinghouse;
+
+            if (!$breedingHouse->relationLoaded('users')) {
+                $breedingHouse->loadMissing([
+                    'users' => fn(BelongsToMany $query) => $query->select($this->ownerSelectColumns()),
+                ]);
+            }
+
+            return $breedingHouse->users
+                ->map(fn(PrevUser $user) => $this->normalizeUser($user)['display_name'])
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+        }
+
+        $dog->loadMissing([
+            'mother.owners' => fn(BelongsToMany $query) => $query->select($this->ownerSelectColumns()),
+        ]);
+
+        $motherFirstOwner = $dog->mother?->owners?->first();
+
+        if (!$motherFirstOwner instanceof PrevUser) {
+            return [];
+        }
+
+        $displayName = $this->normalizeUser($motherFirstOwner)['display_name'];
+
+        return filled($displayName) ? [$displayName] : [];
+    }
+
+    protected function ownerSelectColumns(): array
+    {
+        return [
+            'users.id',
+            'users.first_name',
+            'users.last_name',
+            'users.first_name_en',
+            'users.last_name_en',
+            'users.address_city',
+            'users.address_city_en',
+            'users.address_street',
+            'users.address_street_en',
+            'users.address_street_number',
+            'users.house_number',
+            'users.address_zip',
+        ];
+    }
+
+    protected function resolveBreedingHouseName(PrevDog $dog): ?string
+    {
+        $house = $dog->breedinghouse;
+
+        return $this->blankToNull(
+            $house?->name
+            ?? $house?->HebName
+            ?? $house?->EngName,
+        );
     }
 
     protected function normalizeGenderValue(mixed $gender): int|string|null
@@ -312,11 +471,22 @@ class PedigreeTreeBuilderService
         return $gender;
     }
 
-    protected function genderLabel(mixed $gender): string
+    protected function standardGenderLabel(mixed $gender): string
     {
-        $value = $this->normalizeGenderValue($gender);
+        if ($gender instanceof LegacyDogGender) {
+            return $gender->getLabel();
+        }
 
-        return match ($value) {
+        return match ($this->normalizeGenderValue($gender)) {
+            1 => __('Male'),
+            2 => __('Female'),
+            default => __('Unknown'),
+        };
+    }
+
+    protected function pedigreeGenderLabel(mixed $gender): string
+    {
+        return match ($this->normalizeGenderValue($gender)) {
             1 => __('Sire'),
             2 => __('Dam'),
             default => __('Unknown'),
@@ -342,6 +512,27 @@ class PedigreeTreeBuilderService
         $months = $totalMonths % 12;
 
         return "{$years}y {$months}m";
+    }
+
+    protected function joinName(array $parts): ?string
+    {
+        $parts = array_values(array_filter(array_map(fn($value) => $this->blankToNull($value), $parts)));
+
+        return empty($parts) ? null : implode(' ', $parts);
+    }
+
+    protected function joinLocalizedNames(array $names): ?string
+    {
+        $names = array_values(array_unique(array_filter(array_map(fn($value) => $this->blankToNull($value), $names))));
+
+        return empty($names) ? null : implode(' | ', $names);
+    }
+
+    protected function joinAddressParts(array $parts): ?string
+    {
+        $values = array_values(array_filter(array_map(fn($value) => $this->blankToNull($value), $parts)));
+
+        return empty($values) ? null : implode(', ', $values);
     }
 
     protected function blankToNull(mixed $value): ?string
