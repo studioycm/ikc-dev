@@ -22,6 +22,7 @@
     "Owner Name": "שם בעלים",
     "Owner Phone": "טלפון בעלים",
     "Owner Email": "דוא\"ל בעלים",
+    "Owner Address": "כתובת בעלים",
     "Ownership Date": "תאריך בעלות",
     "Ownership": "בעלות",
     "Ownerships": "בעלויות",
@@ -318,6 +319,8 @@
     "Without": "ללא",
     "All": "הכל",
     "Show All": "הצג הכל",
+    "Show all (:count more)": "הצג הכל (:count נותרים)",
+    "Show compact list": "הצג רשימה מקוצרת",
     "None": "ללא",
     "Yes": "כן",
     "No": "לא",
@@ -644,5 +647,7 @@
     "Show Information": "מידע תערוכה",
     "System Data": "נתוני מערכת",
     "Rank": "דירוג",
-    "Has results": "יש תוצאות"
+    "Has results": "יש תוצאות",
+    "Showing :count generation": "מציג :count דור",
+    "Showing :count generations": "מציג :count דורות"
 }

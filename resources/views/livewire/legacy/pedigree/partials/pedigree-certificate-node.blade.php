@@ -97,7 +97,7 @@
         </div>
     @else
         <div class="relative z-10 h-full rounded-xl border shadow-sm {{ $cardClasses }} {{ $paddingClasses }}">
-            <div class="grid content-start gap-2.5">
+            <div class="grid h-full content-start gap-2.5">
                 <div class="flex items-start justify-between gap-2">
                     <span
                         class="inline-flex items-center rounded-full px-2 py-0.5 font-semibold {{ $badgeClasses }} {{ $fontMap['badge'] }}">
@@ -113,15 +113,13 @@
                 </div>
 
                 <div class="space-y-1">
-                    @if (($visibleFields['name_he'] ?? false) && $dog['name_he'])
-                        <div class="font-semibold leading-tight text-gray-950 dark:text-white {{ $fontMap['name'] }}">
-                            {{ $dog['name_he'] }}
-                        </div>
-                    @endif
+                    <div class="font-semibold leading-tight text-gray-950 dark:text-white {{ $fontMap['name'] }}">
+                        {{ $dog['name_primary'] ?: '—' }}
+                    </div>
 
-                    @if (($visibleFields['name_en'] ?? false) && $dog['name_en'])
+                    @if ($dog['name_secondary'])
                         <div class="leading-tight text-gray-700 dark:text-gray-300 {{ $fontMap['meta'] }}">
-                            {{ $dog['name_en'] }}
+                            {{ $dog['name_secondary'] }}
                         </div>
                     @endif
                 </div>
@@ -149,8 +147,27 @@
                 @endif
 
                 @if (($visibleFields['titles'] ?? false) && filled($titlesText))
-                    <div x-data="{ open: false }"
-                         class="relative border-t border-gray-200/70 pt-2 dark:border-white/10">
+                    <div
+                        x-data="{
+                            open: false,
+                            placeAbove: false,
+                            toggle() {
+                                this.open = ! this.open;
+
+                                if (this.open) {
+                                    this.$nextTick(() => {
+                                        const hostRect = this.$refs.host.getBoundingClientRect();
+                                        const panelRect = this.$refs.panel.getBoundingClientRect();
+
+                                        this.placeAbove = (window.innerHeight - hostRect.bottom) < (panelRect.height + 16)
+                                            && hostRect.top > (panelRect.height + 16);
+                                    });
+                                }
+                            }
+                        }"
+                        x-ref="host"
+                        class="relative border-t border-gray-200/70 pt-2 dark:border-white/10"
+                    >
                         <div class="flex items-start gap-2">
                             <div
                                 class="min-w-0 flex-1 leading-4 text-gray-600 dark:text-gray-300 {{ $fontMap['title'] }}"
@@ -162,7 +179,7 @@
                             @if ($dog['titles_has_popup'])
                                 <button
                                     type="button"
-                                    x-on:click.stop="open = ! open"
+                                    x-on:click.stop="toggle()"
                                     class="inline-flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition hover:border-primary-300 hover:text-primary-600 dark:border-white/10 dark:bg-gray-900/70 dark:text-gray-300 dark:hover:border-primary-700 dark:hover:text-primary-300"
                                     title="{{ __('Show full title list') }}"
                                 >
@@ -179,21 +196,18 @@
                             <div
                                 x-cloak
                                 x-show="open"
+                                x-ref="panel"
                                 x-transition.opacity
                                 x-on:click.outside="open = false"
-                                class="absolute top-full z-20 mt-2 rounded-xl border border-gray-200 bg-white p-3 shadow-2xl dark:border-white/10 dark:bg-gray-900 {{ $isRtl ? 'left-0' : 'right-0' }}"
+                                class="absolute inset-x-0 z-20 rounded-xl border border-gray-200 bg-white p-3 shadow-2xl dark:border-white/10 dark:bg-gray-900"
+                                :class="placeAbove ? 'bottom-full mb-2' : 'top-full mt-2'"
                             >
                                 <div class="text-xs font-semibold text-gray-900 dark:text-white">
                                     {{ __('Titles') }}
                                 </div>
 
-                                <div class="mt-3 max-h-56 space-y-1 overflow-auto">
-                                    @foreach ($titles as $title)
-                                        <div
-                                            class="rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-xs text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-200">
-                                            {{ $title }}
-                                        </div>
-                                    @endforeach
+                                <div class="mt-2 text-xs leading-5 text-gray-700 dark:text-gray-200">
+                                    {{ implode(', ', $titles) }}
                                 </div>
                             </div>
                         @endif

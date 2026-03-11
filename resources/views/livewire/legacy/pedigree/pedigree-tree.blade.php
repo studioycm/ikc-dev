@@ -75,9 +75,9 @@
 
     <div class="relative">
         <div
-            wire:loading.delay
+            wire:loading.flex
             wire:target="{{ $loadingTargets }}"
-            class="absolute inset-0 z-30 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-sm dark:bg-gray-950/75"
+            class="absolute inset-0 z-30 items-center justify-center rounded-2xl bg-white dark:bg-gray-950"
         >
             <div class="mx-auto flex max-w-md flex-col items-center px-6 py-10 text-center">
                 <svg class="h-24 w-24" viewBox="0 0 160 120" fill="none" aria-hidden="true">
@@ -124,7 +124,7 @@
                 </svg>
 
                 <div class="mt-4 text-sm font-semibold text-gray-900 dark:text-white">
-                    {{ __('Building pedigree') . "..." }}
+                    {{ __('Building pedigree') }}
                 </div>
 
                 <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
@@ -138,8 +138,7 @@
         </div>
 
         @if (($pedigree['root'] ?? null) !== null)
-            <div wire:loading.class="opacity-40" wire:target="{{ $loadingTargets }}"
-                 class="space-y-6 transition-opacity">
+            <div wire:loading.remove wire:target="{{ $loadingTargets }}" class="space-y-6">
                 @include('livewire.legacy.pedigree.partials.pedigree-certificate-header', [
                     'root' => $pedigree['root'],
                     'depth' => $pedigree['depth'],
@@ -147,13 +146,6 @@
                 ])
 
                 <x-filament::section>
-                    <x-slot name="heading">
-                        {{ __('Pedigree Tree') }}
-                    </x-slot>
-
-                    <x-slot name="description">
-                    </x-slot>
-
                     <div class="space-y-4">
                         <div
                             class="grid gap-3"

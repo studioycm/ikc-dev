@@ -1,9 +1,10 @@
 <x-filament::section>
     <x-slot name="heading">
-        {{ __('Show Pedigree') }}
+        {{ __('Pedigree Tree') }}
     </x-slot>
 
     <x-slot name="description">
+        {{ trans_choice('{1} Showing :count generation|[2,*] Showing :count generations', $depth, ['count' => $depth]) }}
     </x-slot>
 
     <div class="space-y-6">
@@ -17,6 +18,11 @@
                     <div class="mt-1 text-sm font-semibold text-gray-950 dark:text-white">
                         {{ $root['breed_name'] ?: '—' }}
                     </div>
+                    @if ($root['breed_name_secondary'])
+                        <div class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                            {{ $root['breed_name_secondary'] }}
+                        </div>
+                    @endif
                 </div>
 
                 <div
@@ -37,6 +43,11 @@
                     <div class="mt-1 text-sm font-semibold text-gray-950 dark:text-white">
                         {{ $root['color_name'] ?: '—' }}
                     </div>
+                    @if ($root['color_name_secondary'])
+                        <div class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                            {{ $root['color_name_secondary'] }}
+                        </div>
+                    @endif
                 </div>
 
                 <div
@@ -64,12 +75,14 @@
                 class="rounded-2xl border border-gray-200 bg-white px-6 py-5 text-center shadow-sm dark:border-white/10 dark:bg-white/5">
                 <div class="space-y-3">
                     <div class="text-2xl font-bold leading-tight text-gray-950 dark:text-white">
-                        {{ $root['name_he'] ?: '—' }}
+                        {{ $root['name_primary'] ?: '—' }}
                     </div>
 
-                    <div class="text-lg font-medium leading-tight text-gray-600 dark:text-gray-300">
-                        {{ $root['name_en'] ?: '—' }}
-                    </div>
+                    @if ($root['name_secondary'])
+                        <div class="text-lg font-medium leading-tight text-gray-600 dark:text-gray-300">
+                            {{ $root['name_secondary'] }}
+                        </div>
+                    @endif
 
                     @if ($root['breeding_house'])
                         <div class="text-base font-semibold text-gray-950 dark:text-white">
@@ -107,15 +120,20 @@
                 <div
                     class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
                     <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                        {{ __('Owner') }}
+                        {{ __('Owners') }}
                     </div>
-                    <div class="mt-1 space-y-1 text-sm font-semibold text-gray-950 dark:text-white">
-                        <div>{{ $root['owner_name'] ?: '—' }}</div>
-                        @if ($root['owner_address'])
-                            <div class="text-xs font-medium leading-5 text-gray-600 dark:text-gray-300">
-                                {{ $root['owner_address'] }}
-                            </div>
-                        @endif
+                    <div class="mt-1 text-sm font-semibold leading-6 text-gray-950 dark:text-white">
+                        {{ $root['owner_names_text'] ?: '—' }}
+                    </div>
+                </div>
+
+                <div
+                    class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
+                    <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        {{ __('Owner Address') }}
+                    </div>
+                    <div class="mt-1 text-sm font-semibold leading-6 text-gray-950 dark:text-white">
+                        {{ $root['owner_address_display'] ?: '—' }}
                     </div>
                 </div>
 
@@ -124,7 +142,7 @@
                     <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                         {{ __('Breeder') }}
                     </div>
-                    <div class="mt-1 text-sm font-semibold leading-5 text-gray-950 dark:text-white">
+                    <div class="mt-1 text-sm font-semibold leading-6 text-gray-950 dark:text-white">
                         {{ $root['breeder_text'] ?: '—' }}
                     </div>
                 </div>
@@ -155,7 +173,7 @@
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                            {{ __('Main dog titles') }}
+                            {{ __('Titles') }}
                         </div>
                         <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                             {{ trans_choice('{1} :count title|[2,*] :count titles', $root['titles_count'], ['count' => $root['titles_count']]) }}

@@ -56,15 +56,15 @@ class PedigreeTree extends Component implements HasForms
         $this->direction = $this->resolveDirectionFromLocale();
 
         $this->form->fill($this->defaultSettings());
-        $this->syncSettingsFromForm(shouldLoad: false);
+        $this->syncSettingsFromForm(false);
     }
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Section::make(__('Tree settings'))
-                    ->description(__('Configure pedigree depth, density, typography, card height, and the main-title display mode') . ".")
+                Section::make(__('Pedigree Builder'))
+                    ->description(__('Configure pedigree depth, density, typography, card height, and the main-title display mode'))
                     ->collapsible()
                     ->collapsed()
                     ->schema([
@@ -75,11 +75,8 @@ class PedigreeTree extends Component implements HasForms
                                     ->options(collect(range(2, 8))->mapWithKeys(fn(int $value): array => [$value => (string)$value])->all())
                                     ->native(false)
                                     ->required()
-                                    ->helperText(__('Depths 6–8 are much heavier and may take longer to build.'))
-                                    ->columnSpan([
-                                        'default' => 12,
-                                        'md' => 3,
-                                    ]),
+                                    ->helperText(__('Depths 6-8 are much heavier and may take longer to build.'))
+                                    ->columnSpan(['default' => 12, 'md' => 2]),
 
                                 Select::make('density')
                                     ->label(__('Density'))
@@ -89,10 +86,7 @@ class PedigreeTree extends Component implements HasForms
                                     ])
                                     ->native(false)
                                     ->required()
-                                    ->columnSpan([
-                                        'default' => 12,
-                                        'md' => 3,
-                                    ]),
+                                    ->columnSpan(['default' => 12, 'md' => 2]),
 
                                 Select::make('font_scale')
                                     ->label(__('Font size'))
@@ -103,10 +97,7 @@ class PedigreeTree extends Component implements HasForms
                                     ])
                                     ->native(false)
                                     ->required()
-                                    ->columnSpan([
-                                        'default' => 12,
-                                        'md' => 3,
-                                    ]),
+                                    ->columnSpan(['default' => 12, 'md' => 2]),
 
                                 Select::make('card_height')
                                     ->label(__('Card height'))
@@ -118,10 +109,7 @@ class PedigreeTree extends Component implements HasForms
                                     ])
                                     ->native(false)
                                     ->required()
-                                    ->columnSpan([
-                                        'default' => 12,
-                                        'md' => 3,
-                                    ]),
+                                    ->columnSpan(['default' => 12, 'md' => 2]),
 
                                 Select::make('root_titles_mode')
                                     ->label(__('Main dog titles'))
@@ -131,18 +119,12 @@ class PedigreeTree extends Component implements HasForms
                                     ])
                                     ->native(false)
                                     ->required()
-                                    ->columnSpan([
-                                        'default' => 12,
-                                        'md' => 6,
-                                    ]),
+                                    ->columnSpan(['default' => 12, 'md' => 2]),
 
                                 Toggle::make('show_placeholders')
                                     ->label(__('Show empty cards'))
                                     ->inline(false)
-                                    ->columnSpan([
-                                        'default' => 12,
-                                        'md' => 6,
-                                    ]),
+                                    ->columnSpan(['default' => 12, 'md' => 2]),
                             ]),
                     ]),
 
@@ -195,13 +177,13 @@ class PedigreeTree extends Component implements HasForms
 
     public function submitSettings(): void
     {
-        $this->syncSettingsFromForm(shouldLoad: true);
+        $this->syncSettingsFromForm(true);
     }
 
     public function resetCertificateSettings(): void
     {
         $this->form->fill($this->defaultSettings());
-        $this->syncSettingsFromForm(shouldLoad: true);
+        $this->syncSettingsFromForm(true);
     }
 
     public function retryLoadPedigree(): void
@@ -264,11 +246,7 @@ class PedigreeTree extends Component implements HasForms
         foreach ($this->nodeFieldDefinitions() as $key => $config) {
             $components[] = Toggle::make("visible_fields.{$key}")
                 ->label($config['label'])
-                ->columnSpan([
-                    'default' => 12,
-                    'sm' => 6,
-                    'xl' => 4,
-                ]);
+                ->columnSpan(['default' => 12, 'sm' => 3, 'xl' => 2]);
         }
 
         return $components;
@@ -312,52 +290,20 @@ class PedigreeTree extends Component implements HasForms
     protected function nodeFieldDefinitions(): array
     {
         return [
-            'name_he' => [
-                'label' => __('Hebrew Name'),
-                'default' => true,
-            ],
-            'name_en' => [
-                'label' => __('English Name'),
-                'default' => true,
-            ],
-            'sagir_id' => [
-                'label' => __('Sagir ID'),
-                'default' => true,
-            ],
-            'import_number' => [
-                'label' => __('Import Number'),
-                'default' => false,
-            ],
-            'breeding_house' => [
-                'label' => __('Kennel'),
-                'default' => true,
-            ],
-            'breed_name' => [
-                'label' => __('Breed'),
-                'default' => false,
-            ],
-            'color_name' => [
-                'label' => __('Color'),
-                'default' => true,
-            ],
-            'birth_date' => [
-                'label' => __('Birth Date'),
-                'default' => true,
-            ],
-            'age' => [
-                'label' => __('Age'),
-                'default' => false,
-            ],
-            'titles' => [
-                'label' => __('Titles'),
-                'default' => false,
-            ],
+            'sagir_id' => ['label' => __('Sagir ID'), 'default' => true],
+            'import_number' => ['label' => __('Import Number'), 'default' => false],
+            'breeding_house' => ['label' => __('Kennel'), 'default' => true],
+            'breed_name' => ['label' => __('Breed'), 'default' => false],
+            'color_name' => ['label' => __('Color'), 'default' => true],
+            'birth_date' => ['label' => __('Birth Date'), 'default' => true],
+            'age' => ['label' => __('Age'), 'default' => false],
+            'titles' => ['label' => __('Titles'), 'default' => false],
         ];
     }
 
     protected function sanitizeDepth(int $depth): int
     {
-        return max(2, min(10, $depth));
+        return max(2, min(8, $depth));
     }
 
     protected function sanitizeDensity(?string $density): string
