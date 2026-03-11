@@ -161,7 +161,7 @@
                             @endforeach
                         </div>
 
-                        <div class="overflow-x-auto">
+                        <div class="">
                             <div
                                 style="min-width: {{ max(1100, $pedigree['column_count'] * ($this->density === 'compact' ? 220 : 255)) }}px;"
                             >
