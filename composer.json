@@ -11,6 +11,7 @@
         "php": "^8.4",
         "ext-pdo": "*",
         "ext-pdo_mysql": "*",
+        "awobaz/compoships": "^2.5",
         "bezhansalleh/filament-language-switch": "^3.1",
         "bezhansalleh/filament-shield": "^3.3",
         "filament/filament": "^3.3",
@@ -20,7 +21,6 @@
         "owenvoke/blade-fontawesome": "^2.9"
     },
     "require-dev": {
-        "awobaz/compoships": "^2.5",
         "fakerphp/faker": "^1.23",
         "laravel/boost": "^1.0",
         "laravel/pail": "^1.2.2",

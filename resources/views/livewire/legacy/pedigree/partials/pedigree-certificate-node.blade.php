@@ -95,7 +95,7 @@
                 </div>
             @endif
         </div>
-    @else
+        @else
         <div class="relative z-10 h-full rounded-xl border shadow-sm {{ $cardClasses }} {{ $paddingClasses }}">
             <div class="grid h-full content-start gap-2.5">
                 <div class="flex items-start justify-between gap-2">
