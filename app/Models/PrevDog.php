@@ -210,7 +210,7 @@ class PrevDog extends Model implements HasName
 
     // current_owner dog owner registered pre 2022 using belongs-to relation with foreign key.
     // post 2022 we use belongs-to-many relation "owners" with pivot model PrevUserDog
-    public function currentOwner(): BelongsTo
+    public function legacyOwner(): BelongsTo
     {
         return $this->belongsTo(PrevUser::class, 'CurrentOwnerId', 'owner_code');
     }

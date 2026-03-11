@@ -4,12 +4,15 @@ namespace App\Models;
 
 use App\Casts\DecimalBooleanCast;
 use App\Casts\Legacy\LegacyDogGenderCast;
+use Awobaz\Compoships\Compoships;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PrevShowResult extends Model
 {
+    use Compoships;
+
     protected $connection = 'mysql_prev';
 
     /**
@@ -319,7 +322,7 @@ class PrevShowResult extends Model
 
     public function class(): BelongsTo
     {
-        return $this->belongsTo(PrevShowClass::class, 'ClassID', 'DataID');
+        return $this->belongsTo(PrevShowClass::class, ['ClassID', 'ShowID'], ['DataID', 'ShowID']);
     }
 
     public function registration(): BelongsTo
@@ -331,11 +334,7 @@ class PrevShowResult extends Model
     public function showDog(): BelongsTo
     {
         // Constrain the related row by this result’s ShowID (and optionally MainArenaID)
-        return $this->belongsTo(PrevShowDog::class, 'SagirID', 'SagirID')
-            ->where('Shows_Dogs_DB.ShowID', $this->ShowID)
-            // If arena must match too, keep this line; otherwise remove it:
-            ->when($this->MainArenaID !== null, fn($q) => $q->where('Shows_Dogs_DB.ArenaID', $this->MainArenaID))
-            ->orderBy('Shows_Dogs_DB.id', 'asc');
+        return $this->belongsTo(PrevShowDog::class, ['SagirID', 'ShowID', 'ArenaID'], ['SagirID', 'ShowID', 'MainArenaID']);
     }
 
     public function resultDog(): BelongsTo

@@ -582,23 +582,27 @@ class PrevDogResource extends Resource
                                             Forms\Components\Textarea::make('PedigreeNotes')
                                                 ->label(__('Pedigree Notes'))
                                                 ->maxLength(4000)
-                                                ->columnSpan(1),
+                                                ->autosize(),
                                             Forms\Components\Textarea::make('PedigreeNotes_2')
                                                 ->label(__('Pedigree Notes (2)'))
                                                 ->maxLength(1000)
-                                                ->columnSpan(1),
+                                                ->autosize(),
                                             Forms\Components\Textarea::make('Notes')
                                                 ->label(__('Notes'))
-                                                ->maxLength(1000),
+                                                ->maxLength(1000)
+                                                ->autosize(),
                                             Forms\Components\Textarea::make('Notes_2')
                                                 ->label(__('Notes (2)'))
-                                                ->maxLength(1000),
+                                                ->maxLength(1000)
+                                                ->autosize(),
                                             Forms\Components\Textarea::make('message')
                                                 ->label(__('Message'))
-                                                ->maxLength(255),
+                                                ->maxLength(255)
+                                                ->autosize(),
                                             Forms\Components\Textarea::make('message_test')
                                                 ->label(__('Message Test'))
-                                                ->maxLength(255),
+                                                ->maxLength(255)
+                                                ->autosize(),
                                         ])
                                             ->columns(2)
                                             ->columnSpan(1),
@@ -615,6 +619,7 @@ class PrevDogResource extends Resource
                                         Forms\Components\Textarea::make('HealthNotes')
                                             ->label(__('Health Notes (pre 22)'))
                                             ->maxLength(4000)
+                                            ->autosize()
                                             ->columnSpan(1),
                                         Forms\Components\TextInput::make('Pelvis')
                                             ->label(__('Pelvis Test Remark (pre 22)'))
@@ -688,7 +693,7 @@ class PrevDogResource extends Resource
                         'mother' => fn($r) => $r->select(['id', 'SagirID', 'Heb_Name', 'Eng_Name']),
                         // Many-to-many Owners: include related PK + fields shown in list
                         'owners' => fn($r) => $r->select(['users.id', 'first_name', 'last_name', 'first_name_en', 'last_name_en', 'mobile_phone', 'email']),
-                        //                        'currentOwner' => fn($r) => $r->select(['users.id', 'owner_code', 'first_name', 'last_name', 'first_name_en', 'last_name_en', 'mobile_phone', 'email']),
+                        //                        'legacyOwner' => fn($r) => $r->select(['users.id', 'owner_code', 'first_name', 'last_name', 'first_name_en', 'last_name_en', 'mobile_phone', 'email']),
                         'titles' => fn($r) => $r->select(['dogs_titles_db.TitleCode', 'dogs_titles_db.TitleName']),
                     ]);
                 //                    ->with('duplicates');
@@ -1531,7 +1536,7 @@ class PrevDogResource extends Resource
                                 ])
                                 ->label(fn(PrevDog $record): string => __('Owners') . " ({$record->owners->count()})")
                                 ->grid(4),
-                            TextEntry::make('currentOwner.full_name')
+                            TextEntry::make('legacyOwner.full_name')
                                 ->label(__('Owner pre 2022')),
                             TextEntry::make('OwnershipDate')
                                 ->label(__('Ownership pre 2022'))

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Awobaz\Compoships\Compoships;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PrevShowDog extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, Compoships;
 
     protected $connection = 'mysql_prev';
 
@@ -74,7 +75,7 @@ class PrevShowDog extends Model
 
     public function showClass(): BelongsTo
     {
-        return $this->belongsTo(PrevShowClass::class, 'ClassID', 'DataID');
+        return $this->belongsTo(PrevShowClass::class, ['ClassID', 'ShowID'], ['DataID', 'ShowID']);
     }
 
     public function registration(): BelongsTo
@@ -101,10 +102,6 @@ class PrevShowDog extends Model
     public function prevShowResult(): HasOne
     {
         // Bind by literals so eager loading does not inject nulls or try to reference parent table
-        return $this->hasOne(PrevShowResult::class, 'SagirID', 'SagirID')
-            ->where('shows_results.ShowID', $this->ShowID)
-            // If arena must match too, keep this line; otherwise remove it:
-            ->when($this->ArenaID !== null, fn($q) => $q->where('shows_results.MainArenaID', $this->ArenaID))
-            ->orderBy('shows_results.DataID', 'asc');
+        return $this->hasOne(PrevShowResult::class, ['SagirID', 'ShowID', 'MainArenaID'], ['SagirID', 'ShowID', 'ArenaID']);
     }
 }

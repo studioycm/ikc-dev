@@ -12,7 +12,6 @@ enum LegacyDogStatus: string implements HasColor, HasIcon, HasLabel
     case NotRecommended = 'notrecomm';
     case OnHold = 'onhold';
     case Waiting = 'waiting';
-
     // handle empty/null/none of the above values the right way
     case Off = 'Off';
 
@@ -25,7 +24,7 @@ enum LegacyDogStatus: string implements HasColor, HasIcon, HasLabel
             self::NotRecommended => __('Not Recommended'),
             self::OnHold => __('On Hold'),
             self::Waiting => __('Waiting'),
-            self::Off => "Off",
+            self::Off => __("Off"),
 
         };
     }
@@ -36,9 +35,9 @@ enum LegacyDogStatus: string implements HasColor, HasIcon, HasLabel
             self::NotApproved => 'danger',
             self::NotRecommended => 'warning',
 
-            self::OnHold => 'white',
+            self::OnHold => 'yellow',
             self::Waiting => 'info',
-            self::Off => 'grey',
+            self::Off => 'primary',
 
         };
     }

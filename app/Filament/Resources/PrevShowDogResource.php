@@ -138,6 +138,7 @@ class PrevShowDogResource extends Resource
 
                 TextColumn::make('show.TitleName')
                     ->label(__('Show Title'))
+                    ->searchable(['ShowsDB.id'], isIndividual: true, isGlobal: false)
                     ->description(fn(PrevShowDog $record): int => (int)$record->ShowID),
 
                 TextColumn::make('dog.full_name')
@@ -145,22 +146,21 @@ class PrevShowDogResource extends Resource
                     ->description(fn(PrevShowDog $r) => ($r->SagirID ?? '—'))
                     ->url(fn(PrevShowDog $r) => $r->dog ? PrevDogResource::getUrl('view', ['record' => $r->dog->getKey()]) : null)
                     ->openUrlInNewTab()
-                    ->searchable(['DogsDB.Heb_Name', 'DogsDB.Eng_Name', 'Shows_Dogs_DB.SagirID'], isIndividual: true, isGlobal: true)
+                    ->searchable(['DogsDB.Heb_Name', 'DogsDB.Eng_Name', 'Shows_Dogs_DB.SagirID'], isIndividual: true, isGlobal: false)
                     ->sortable(['DogsDB.Heb_Name', 'DogsDB.Eng_Name']),
 
-                TextColumn::make('arena_summary')
+                TextColumn::make('arena.GroupName')
                     ->label(__('Arena name'))
-                    ->state(fn(PrevShowDog $r) => $r->arena?->GroupName ?? '—')
                     ->description(fn(PrevShowDog $r) => ($r->ArenaID ?? '—'))
                     ->url(fn(PrevShowDog $r) => $r->ArenaID ? PrevShowArenaResource::getUrl('view', ['record' => $r->ArenaID]) : null)
                     ->openUrlInNewTab()
+                    ->searchable(['Shows_Structure.id'], isIndividual: true, isGlobal: false)
                     ->toggleable(),
 
-                TextColumn::make('class_summary')
+                TextColumn::make('showClass.ClassName')
                     ->label(__('Class type'))
-                    ->state(fn(PrevShowDog $r) => $r->showClass?->ClassName ?? '—')
                     ->description(fn(PrevShowDog $r) => ($r->ClassID ?? '—'))
-                    ->url(fn(PrevShowDog $r) => $r->ClassID ? PrevShowClassResource::getUrl('view', ['record' => $r->ClassID]) : null)
+                    ->url(fn(PrevShowDog $r) => $r->showClass?->id ? PrevShowClassResource::getUrl('view', ['record' => $r->showClass->id]) : null)
                     ->openUrlInNewTab()
                     ->toggleable(),
 
@@ -174,14 +174,15 @@ class PrevShowDogResource extends Resource
 
                 TextColumn::make('prevShowResult.DataID')
                     ->label(__('Result'))
-                    ->description(fn(PrevShowDog $record): string => (string)$record->prevShowResult)
-//                    ->url(function ($state) {
-//                        return $state ? PrevShowResultResource::getUrl('edit', ['record' => $state]) : null;
-//                    })
+                    ->description(fn(PrevShowDog $record): string => (string)$record->prevShowResult?->DataID)
+                    ->url(function ($state) {
+                        return $state ? PrevShowResultResource::getUrl('edit', ['record' => $state]) : null;
+                    })
                     ->toggleable(),
 
             ])
             ->filters([
+
             ])
             ->actions([
                 EditAction::make(),
@@ -196,8 +197,10 @@ class PrevShowDogResource extends Resource
                     ForceDeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('id', 'desc')
+            ->defaultSort('Shows_Dogs_DB.id', 'desc')
             ->searchOnBlur()
+            ->persistColumnSearchesInSession()
+            ->persistSortInSession()
             ->striped()
             ->deferLoading();
     }
