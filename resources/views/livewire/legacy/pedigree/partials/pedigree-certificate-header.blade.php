@@ -110,10 +110,10 @@
                 <div
                     class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
                     <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                        {{ __('Import Number') }}
+                        {{ __('Breeder') }}
                     </div>
-                    <div class="mt-1 text-sm font-semibold text-gray-950 dark:text-white">
-                        {{ $root['import_number'] ?: '—' }}
+                    <div class="mt-1 text-sm font-semibold leading-6 text-gray-950 dark:text-white">
+                        {{ $root['breeder_text'] ?: '—' }}
                     </div>
                 </div>
 
@@ -136,16 +136,17 @@
                         {{ $root['owner_address_display'] ?: '—' }}
                     </div>
                 </div>
-
+                @if ($root['import_number'])
                 <div
                     class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
                     <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                        {{ __('Breeder') }}
+                        {{ __('Import Number') }}
                     </div>
-                    <div class="mt-1 text-sm font-semibold leading-6 text-gray-950 dark:text-white">
-                        {{ $root['breeder_text'] ?: '—' }}
+                    <div class="mt-1 text-sm font-semibold text-gray-950 dark:text-white">
+                        {{ $root['import_number'] ?: '—' }}
                     </div>
                 </div>
+                @endif
             </div>
         </div>
 
