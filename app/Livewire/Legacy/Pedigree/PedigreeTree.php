@@ -72,10 +72,10 @@ class PedigreeTree extends Component implements HasForms
                             ->schema([
                                 Select::make('depth')
                                     ->label(__('Generations'))
-                                    ->options(collect(range(2, 8))->mapWithKeys(fn(int $value): array => [$value => (string)$value])->all())
+                                    ->options(collect(range(2, 10))->mapWithKeys(fn(int $value): array => [$value => (string)$value])->all())
                                     ->native(false)
                                     ->required()
-                                    ->helperText(__('Depths 6-8 are much heavier and may take longer to build.'))
+                                    ->helperText(__('Depths 7-10 are much heavier and may take longer to build'))
                                     ->columnSpan(['default' => 12, 'md' => 2]),
 
                                 Select::make('density')
@@ -303,7 +303,7 @@ class PedigreeTree extends Component implements HasForms
 
     protected function sanitizeDepth(int $depth): int
     {
-        return max(2, min(8, $depth));
+        return max(2, min(10, $depth));
     }
 
     protected function sanitizeDensity(?string $density): string

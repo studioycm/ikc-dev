@@ -52,7 +52,7 @@ class PedigreeTreeBuilderService
         bool $includeNodeTitles = false,
     ): array
     {
-        $depth = max(2, min(8, $depth));
+        $depth = max(2, min(10, $depth));
         $direction = $direction === 'ltr' ? 'ltr' : 'rtl';
 
         $dog = $this->loadRootDog(
