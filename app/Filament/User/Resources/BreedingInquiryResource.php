@@ -16,7 +16,8 @@ use Filament\Forms\Components\{DatePicker,
     Section,
     Select,
     TextInput,
-    ToggleButtons};
+    ToggleButtons,
+    ViewField};
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
@@ -109,25 +110,12 @@ class BreedingInquiryResource extends Resource
                                             ->afterStateUpdated(
                                                 fn(Set $set, Get $get, ?string $state, Select $component) => self::hydrateFemale($get, $set, $component)
                                             ),
-                                        Placeholder::make('female_suitability_dna')
-                                            ->label(__('DNA Test'))
-                                            ->inlineLabel(true)
-                                            ->content(fn(Get $get) => $get('female_dna_state') ? __('Yes') : __('No'))
-                                            ->visible(fn(Get $get) => filled($get('female_sagir_id'))),
-                                        Placeholder::make('female_suitability_dna')
-                                            ->label(__('DNA Test'))
-                                            ->inlineLabel(true)
-                                            ->content(fn(Get $get) => $get('female_dna_state') ? __('Yes') : __('No'))
-                                            ->visible(fn(Get $get) => filled($get('female_sagir_id'))),
-                                        Placeholder::make('female_suitability_dna')
-                                            ->label(__('DNA Test'))
-                                            ->inlineLabel(true)
-                                            ->content(fn(Get $get) => $get('female_dna_state') ? __('Yes') : __('No'))
-                                            ->visible(fn(Get $get) => filled($get('female_sagir_id'))),
-                                        Placeholder::make('female_suitability_dna')
-                                            ->label(__('DNA Test'))
-                                            ->inlineLabel(true)
-                                            ->content(fn(Get $get) => $get('female_dna_state') ? __('Yes') : __('No'))
+
+                                        ViewField::make('female_checks')
+                                            ->view('legacy.breeding.fields.female-dog-checks')
+                                            ->viewData(fn(Get $get): array => [
+                                                'sagirId' => $get('female_sagir_id'),
+                                            ])
                                             ->visible(fn(Get $get) => filled($get('female_sagir_id'))),
 
                                     ])
@@ -170,9 +158,12 @@ class BreedingInquiryResource extends Resource
                                             ->afterStateUpdated(
                                                 fn(Set $set, Get $get, ?string $state, Select $component) => self::hydrateMale($get, $set, $component)
                                             ),
-                                        Placeholder::make('male_suitability_dna')
-                                            ->label(__('DNA Test'))
-                                            ->content(fn(Get $get) => $get('male_dna_state') ? __('Yes') : __('No'))
+
+                                        ViewField::make('male_checks')
+                                            ->view('legacy.breeding.fields.male-dog-checks')
+                                            ->viewData(fn(Get $get): array => [
+                                                'sagirId' => $get('male_sagir_id'),
+                                            ])
                                             ->visible(fn(Get $get) => filled($get('male_sagir_id'))),
 
                                     ])
@@ -236,6 +227,20 @@ class BreedingInquiryResource extends Resource
                                 ->columns(2)
                                 ->visible(fn(Get $get) => filled($get('female_sagir_id')))
                                 ->columnSpan(1),
+
+                            ViewField::make('membership_badges')
+                                ->view('legacy.breeding.fields.membership-badges')
+                                ->viewData(fn(Get $get): array => [
+                                    'sagirId' => $get('female_sagir_id'),
+                                    'prevUserId' => auth()->user()?->prev_user_id,
+                                    'strategies' => [
+                                        'owner_breed_club',
+                                        'owner_any_club',
+                                        'at_least_one_co_owner_breed_club',
+                                    ],
+                                ])
+                                ->visible(fn(Get $get) => filled($get('female_sagir_id')))
+                                ->columnSpanFull(),
 
                             Section::make(__('Breed Information'))
                                 ->schema([
@@ -410,7 +415,8 @@ class BreedingInquiryResource extends Resource
 
                 ])
                     ->persistStepInQueryString('step')
-                    ->columnSpan('2xl')
+                    ->columnSpanFull()
+                    ->maxWidth('80')
                     ->extraAttributes(['class' => 'breeding-wizard']),
 
             ]);

@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 class PrevDog extends Model implements HasName
 {
@@ -421,6 +422,106 @@ class PrevDog extends Model implements HasName
     public function showDogs(): HasMany
     {
         return $this->hasMany(PrevShowDog::class, 'SagirID', 'SagirID');
+    }
+
+    /**
+     * Check if dog has a DNA record on file.
+     */
+    public function hasDnaRecord(): bool
+    {
+        return filled($this->DnaID);
+    }
+
+    /**
+     * Get the dog's age in months.
+     */
+    public function ageInMonths(): ?int
+    {
+        if (!$this->BirthDate) {
+            return null;
+        }
+
+        $birth = $this->BirthDate instanceof Carbon
+            ? $this->BirthDate
+            : Carbon::parse($this->BirthDate);
+
+        if ($birth->isFuture()) {
+            return null;
+        }
+
+        return (int)$birth->diffInMonths(now());
+    }
+
+    /**
+     * Get breeding count by role (female/male).
+     */
+    public function breedingCount(?string $role = null): ?int
+    {
+        $resolvedRole = $role ?? match ((int)($this->GenderID?->value ?? $this->GenderID)) {
+            2 => 'female',
+            1 => 'male',
+            default => null,
+        };
+
+        return match ($resolvedRole) {
+            'female' => $this->female_breedings_count ?? $this->femaleBreedingsCount,
+            'male' => $this->male_breedings_count ?? $this->maleBreedingsCount,
+            default => null,
+        };
+    }
+
+    /**
+     * Get raw breeding approval value from configured attribute candidates.
+     */
+    public function breedingApprovalRawValue(): mixed
+    {
+        foreach (config('breeding_checks.dog.approval_attribute_candidates', []) as $attribute) {
+            if (array_key_exists($attribute, $this->attributes) || isset($this->{$attribute})) {
+                $value = $this->{$attribute};
+
+                if ($value !== null) {
+                    return $value;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolve breeding approval to boolean.
+     */
+    public function breedingApprovalResolved(): ?bool
+    {
+        $value = $this->breedingApprovalRawValue();
+
+        if ($value === null) {
+            return null;
+        }
+
+        return in_array($value, [true, 1, '1', 'true', 'yes', 'Yes', 'Y', 'y'], true);
+    }
+
+    /**
+     * Get the breed's primary club.
+     */
+    public function breedClub(): ?PrevClub
+    {
+        $this->loadMissing('breed.clubs');
+
+        return $this->breed?->clubs?->first();
+    }
+
+    /**
+     * Get current owners excluding a specific user.
+     */
+    public function currentOwnersExcluding(?int $prevUserId): Collection
+    {
+        $this->loadMissing('owners');
+
+        return $this->owners
+            ->filter(fn($owner) => $prevUserId === null || (int)$owner->id !== (int)$prevUserId)
+            ->values();
     }
 
     /**
