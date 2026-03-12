@@ -649,5 +649,20 @@
     "Rank": "דירוג",
     "Has results": "יש תוצאות",
     "Showing :count generation": "מציג :count דור",
-    "Showing :count generations": "מציג :count דורות"
+    "Showing :count generations": "מציג :count דורות",
+    "View details": "צפה בפרטים",
+    "View Details": "צפה בפרטים",
+    "Check Details": "פרטי בדיקה",
+    "Value": "ערך",
+    "Blocking Issue": "בעיה חוסמת",
+    "This check does not meet the breeding requirements.": "בדיקה זו אינה עומדת בדרישות הרבייה.",
+    "Review Required": "נדרש ביקורת",
+    "This check requires office review or additional information.": "בדיקה זו דורשת ביקורת משרדית או מידע נוסף.",
+    "Available Actions": "פעולות זמינות",
+    "Member Price": "מחיר חבר",
+    "Standard Price": "מחיר רגיל",
+    "Membership Details": "פרטי חברות",
+    "Club Name": "שם מועדון",
+    "Discounted rate for active members": "מחיר מוזל לחברים פעילים",
+    "Actions": "פעולות"
 }

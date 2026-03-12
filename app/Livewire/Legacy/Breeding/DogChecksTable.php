@@ -62,12 +62,34 @@ class DogChecksTable extends Component implements HasActions, HasForms
         );
     }
 
+    public function viewDetailsAction(string $checkKey): Action
+    {
+        return Action::make("viewDetails_{$checkKey}")
+            ->icon('heroicon-m-information-circle')
+            ->modalHeading(__('Check Details'))
+            ->modalContent(function () use ($checkKey) {
+                $report = $this->report;
+                if (!$report) {
+                    return null;
+                }
+
+                $check = collect($report['checks'])->firstWhere('key', $checkKey);
+                if (!$check) {
+                    return null;
+                }
+
+                return view('livewire.legacy.breeding.dog-check-details-modal', [
+                    'check' => $check,
+                    'dog' => $report['dog'],
+                ]);
+            })
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel(__('Close'));
+    }
+
     public function configuredAction(string $actionKey, string $heading, string $description): Action
     {
         return Action::make("rowAction_{$actionKey}")
-            ->label('')
-            ->icon('heroicon-m-cog-6-tooth')
-            ->color('gray')
             ->modalHeading($heading)
             ->modalDescription($description)
             ->action(function () use ($actionKey, $heading, $description): void {

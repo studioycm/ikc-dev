@@ -177,54 +177,11 @@ class BreedingInquiryResource extends Resource
                             |--------------------------------------------------------------------------
                             */
 
-                            Section::make(__('Club Information'))
-                                ->schema([
-                                    Placeholder::make('club_name')
-                                        ->label(__('Club'))
-                                        ->content(fn(Get $get) => $get('club_membership_state.club_name') ?? '---'
-                                        ),
-                                    Placeholder::make('membership_status')
-                                        ->label(__('Membership Status'))
-                                        ->content(fn(Get $get) => $get('club_membership_state.status_label') ?? '---'
-                                        ),
-                                    Placeholder::make('membership_expiration_date')
-                                        ->label(__('Valid Until'))
-                                        ->content(fn(Get $get) => $get('club_membership_state.membership')->expire_date
-                                            ? $get('club_membership_state.membership')->expire_date->format('d/m/Y')
-                                            : '---'
-                                        ),
-                                    Placeholder::make('club_prices')
-                                        ->label(__('Club Price'))
-                                        ->content(function (Get $get) {
-                                            $status_key = $get('club_membership_state.status_key');
-                                            $prices = $get('club_membership_state.prices');
-                                            if (!$prices) {
-                                                return '---';
-                                            }
-                                            return $status_key === 'active'
-                                                ? $prices->get('member', "0") . 'ש"ח לאחר הנחה'
-                                                : $prices->get('non_member', "0") . 'ש"ח';
-                                        }),
-
-                                    Placeholder::make('club_price_per_puppy')
-                                        ->label(__('Per puppy'))
-                                        ->content(function (Get $get) {
-                                            $status_key = $get('club_membership_state.status_key');
-                                            $prices = $get('club_membership_state.prices');
-                                            if (!$prices) {
-                                                return '---';
-                                            }
-                                            return $status_key === 'active'
-                                                ? $prices->get('member', "0") . 'ש"ח לאחר הנחה'
-                                                : $prices->get('non_member', "0") . 'ש"ח';
-                                        }),
-
-                                    Placeholder::make('club_conditions')
-                                        ->label(__('Club Breeding Conditions'))
-                                        ->columnSpanFull()
-                                        ->content(fn() => __('Club special breeding conditions will be displayed here.')),
+                            ViewField::make('club_membership_compact')
+                                ->view('legacy.breeding.fields.club-membership-compact')
+                                ->viewData(fn(Get $get): array => [
+                                    'membershipState' => $get('club_membership_state'),
                                 ])
-                                ->columns(2)
                                 ->visible(fn(Get $get) => filled($get('female_sagir_id')))
                                 ->columnSpan(1),
 
@@ -240,7 +197,7 @@ class BreedingInquiryResource extends Resource
                                     ],
                                 ])
                                 ->visible(fn(Get $get) => filled($get('female_sagir_id')))
-                                ->columnSpanFull(),
+                                ->columnSpan(1),
 
                             Section::make(__('Breed Information'))
                                 ->schema([
