@@ -75,9 +75,11 @@ class UserResource extends Resource
                     ->searchable()
                     ->getSearchResultsUsing(fn(string $search): array => PrevUser::selectOptions($search, 50))
                     ->getOptionLabelUsing(function ($value) {
-                        if (!$value) return null;
+                        if (!$value) {
+                            return null;
+                        }
 
-                        // Optimisation: Select only columns needed for the 'search_label' accessor
+                        // Optimization: Select only columns needed for the 'search_label' accessor
                         return PrevUser::query()
                             ->select(['id', 'first_name', 'last_name', 'first_name_en', 'last_name_en', 'mobile_phone', 'phone', 'email'])
                             ->find($value)
@@ -89,8 +91,8 @@ class UserResource extends Resource
                     ->displayFormat('d/m/Y H:i'),
                 Forms\Components\TextInput::make('password')
                     ->password()
-                    ->revealable()
-                    ->required(),
+                    ->hidden(fn(string $context, PrevUser $record): bool => $context === 'edit' && auth()->user()->id === $record->id)
+                    ->revealable(),
                 Forms\Components\Select::make('roles')
                     ->relationship('roles', 'name')
                     ->multiple()
@@ -109,7 +111,7 @@ class UserResource extends Resource
                             // This runs entirely on the Legacy DB, so it works perfectly.
                             // It adds a 'dogs_count' attribute to the prevUser model.
                             $q->withCount('dogs');
-                        }
+                        },
                     ]);
             })
             ->columns([

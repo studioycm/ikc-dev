@@ -23,6 +23,8 @@ class PedigreeTree extends Component implements HasForms
     #[Locked]
     public int $dogId;
 
+    public bool $showBuilder = true;
+
     public int $depth = 4;
 
     public string $direction = 'rtl';
@@ -49,11 +51,32 @@ class PedigreeTree extends Component implements HasForms
 
     public bool $hasLoaded = false;
 
-    public function mount(int $dogId, int $depth = 4): void
+    public array $initialSettings = [];
+
+    protected PedigreeTreeBuilderService $builderService;
+
+    public function boot(PedigreeTreeBuilderService $builderService): void
+    {
+        $this->builderService = $builderService;
+    }
+
+    public function mount(
+        int   $dogId,
+        ?int  $depth = null,
+        bool  $showBuilder = true,
+        array $settings = [],
+    ): void
     {
         $this->dogId = $dogId;
-        $this->depth = $this->sanitizeDepth($depth);
+        $this->showBuilder = $showBuilder;
         $this->direction = $this->resolveDirectionFromLocale();
+
+        $this->initialSettings = $this->resolveInitialSettings(
+            depth: $depth,
+            overrides: $settings,
+        );
+
+        $this->applyResolvedSettings($this->initialSettings);
 
         $this->form->fill($this->defaultSettings());
         $this->syncSettingsFromForm(false);
@@ -151,7 +174,7 @@ class PedigreeTree extends Component implements HasForms
         }
 
         try {
-            $this->pedigreeData = app(PedigreeTreeBuilderService::class)->build(
+            $this->pedigreeData = $this->builderService->build(
                 dogId: $this->dogId,
                 depth: $this->depth,
                 direction: $this->direction,
@@ -182,8 +205,9 @@ class PedigreeTree extends Component implements HasForms
 
     public function resetCertificateSettings(): void
     {
+        $this->applyResolvedSettings($this->resolveInitialSettings(depth: null, overrides: $this->initialSettings));
         $this->form->fill($this->defaultSettings());
-        $this->syncSettingsFromForm(true);
+        $this->loadPedigree();
     }
 
     public function retryLoadPedigree(): void
@@ -254,14 +278,23 @@ class PedigreeTree extends Component implements HasForms
 
     protected function defaultSettings(): array
     {
+        $settings = $this->initialSettings !== []
+            ? $this->initialSettings
+            : $this->resolveInitialSettings(depth: $this->depth, overrides: []);
+
+        return $this->settingsFormState($settings);
+    }
+
+    protected function settingsFormState(array $settings): array
+    {
         return [
-            'depth' => $this->depth,
-            'density' => $this->density,
-            'font_scale' => $this->fontScale,
-            'card_height' => $this->cardHeight,
-            'root_titles_mode' => $this->rootTitlesMode,
-            'show_placeholders' => $this->showPlaceholders,
-            'visible_fields' => $this->defaultVisibleFields(),
+            'depth' => $settings['depth'],
+            'density' => $settings['density'],
+            'font_scale' => $settings['font_scale'],
+            'card_height' => $settings['card_height'],
+            'root_titles_mode' => $settings['root_titles_mode'],
+            'show_placeholders' => $settings['show_placeholders'],
+            'visible_fields' => $settings['visible_fields'],
         ];
     }
 
@@ -274,6 +307,39 @@ class PedigreeTree extends Component implements HasForms
         }
 
         return $defaults;
+    }
+
+    protected function applyResolvedSettings(array $settings): void
+    {
+        $this->depth = $settings['depth'];
+        $this->density = $settings['density'];
+        $this->fontScale = $settings['font_scale'];
+        $this->cardHeight = $settings['card_height'];
+        $this->rootTitlesMode = $settings['root_titles_mode'];
+        $this->showPlaceholders = $settings['show_placeholders'];
+        $this->visibleNodeFields = $settings['visible_fields'];
+    }
+
+    protected function resolveInitialSettings(?int $depth, array $overrides): array
+    {
+        if ($depth !== null) {
+            $overrides['depth'] = $depth;
+        }
+
+        $settings = array_replace_recursive(
+            config('pedigree_tree.defaults', []),
+            $overrides,
+        );
+
+        return [
+            'depth' => $this->sanitizeDepth((int)($settings['depth'] ?? $this->depth)),
+            'density' => $this->sanitizeDensity($settings['density'] ?? $this->density),
+            'font_scale' => $this->sanitizeFontScale($settings['font_scale'] ?? $this->fontScale),
+            'card_height' => $this->sanitizeCardHeight($settings['card_height'] ?? $this->cardHeight),
+            'root_titles_mode' => $this->sanitizeRootTitlesMode($settings['root_titles_mode'] ?? $this->rootTitlesMode),
+            'show_placeholders' => (bool)($settings['show_placeholders'] ?? $this->showPlaceholders),
+            'visible_fields' => $this->normalizeVisibleFields($settings['visible_fields'] ?? []),
+        ];
     }
 
     protected function normalizeVisibleFields(array $state): array

@@ -5,33 +5,35 @@
 @endphp
 
 <div wire:init="loadPedigree" class="space-y-6">
-    <form wire:submit.prevent="submitSettings" class="space-y-6">
-        {{ $this->form }}
+    @if ($this->showBuilder)
+        <form wire:submit.prevent="submitSettings" class="space-y-6">
+            {{ $this->form }}
 
-        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div class="text-xs text-gray-500 dark:text-gray-400">
-                @if ($this->depth >= 8)
-                    {{ __('Large pedigree depths can take noticeably longer to build, especially when ancestor titles are enabled.') }}
-                @else
-                    {{ __('Apply the settings to rebuild the pedigree certificate.') }}
-                @endif
+            <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div class="text-xs text-gray-500 dark:text-gray-400">
+                    @if ($this->depth >= 8)
+                        {{ __('Large pedigree depths can take noticeably longer to build, especially when ancestor titles are enabled.') }}
+                    @else
+                        {{ __('Apply the settings to rebuild the pedigree certificate.') }}
+                    @endif
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <x-filament::button
+                        type="button"
+                        color="gray"
+                        wire:click="resetCertificateSettings"
+                    >
+                        {{ __('Reset') }}
+                    </x-filament::button>
+
+                    <x-filament::button type="submit">
+                        {{ __('Apply') }}
+                    </x-filament::button>
+                </div>
             </div>
-
-            <div class="flex items-center gap-3">
-                <x-filament::button
-                    type="button"
-                    color="gray"
-                    wire:click="resetCertificateSettings"
-                >
-                    {{ __('Reset') }}
-                </x-filament::button>
-
-                <x-filament::button type="submit">
-                    {{ __('Apply') }}
-                </x-filament::button>
-            </div>
-        </div>
-    </form>
+        </form>
+    @endif
 
     @if ($this->loadError)
         <x-filament::section>

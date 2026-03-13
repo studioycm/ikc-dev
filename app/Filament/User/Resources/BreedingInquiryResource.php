@@ -4,20 +4,22 @@ namespace App\Filament\User\Resources;
 
 use App\Enums\Legacy\LegacyDogGender;
 use App\Filament\User\Resources\BreedingInquiryResource\Pages;
+use App\Livewire\Legacy\Breeding\DogChecksTable;
 use App\Models\BreedingInquiry;
 use App\Models\PrevDog;
 use App\Models\PrevUser;
-use App\Services\Legacy\PrevClubMembershipResolverService;
-use Filament\Forms\Components\{DatePicker,
-    Group,
-    Hidden,
-    Placeholder,
-    Repeater,
-    Section,
-    Select,
-    TextInput,
-    ToggleButtons,
-    ViewField};
+use App\Services\Legacy\LegacyMembershipResolverService;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Livewire as LivewireComponent;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ToggleButtons;
+use Filament\Forms\Components\ViewField;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
@@ -29,7 +31,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
-
 
 class BreedingInquiryResource extends Resource
 {
@@ -111,12 +112,13 @@ class BreedingInquiryResource extends Resource
                                                 fn(Set $set, Get $get, ?string $state, Select $component) => self::hydrateFemale($get, $set, $component)
                                             ),
 
-                                        ViewField::make('female_checks')
-                                            ->view('legacy.breeding.fields.female-dog-checks')
-                                            ->viewData(fn(Get $get): array => [
-                                                'sagirId' => $get('female_sagir_id'),
-                                            ])
-                                            ->visible(fn(Get $get) => filled($get('female_sagir_id'))),
+                                        LivewireComponent::make(DogChecksTable::class, fn(Get $get): array => [
+                                            'sagirId' => $get('female_sagir_id'),
+                                            'role' => 'female',
+                                            'title' => __('Dam validity and breeding checks'),
+                                        ])
+                                            ->hidden(fn(Get $get): bool => blank($get('female_sagir_id')))
+                                            ->key(fn(Get $get): string => 'female-checks-' . ($get('female_sagir_id') ?: 'empty')),
 
                                     ])
                                     ->columnSpan(1),
@@ -159,12 +161,13 @@ class BreedingInquiryResource extends Resource
                                                 fn(Set $set, Get $get, ?string $state, Select $component) => self::hydrateMale($get, $set, $component)
                                             ),
 
-                                        ViewField::make('male_checks')
-                                            ->view('legacy.breeding.fields.male-dog-checks')
-                                            ->viewData(fn(Get $get): array => [
-                                                'sagirId' => $get('male_sagir_id'),
-                                            ])
-                                            ->visible(fn(Get $get) => filled($get('male_sagir_id'))),
+                                        LivewireComponent::make(DogChecksTable::class, fn(Get $get): array => [
+                                            'sagirId' => $get('male_sagir_id'),
+                                            'role' => 'male',
+                                            'title' => __('Sire validity and breeding checks'),
+                                        ])
+                                            ->hidden(fn(Get $get): bool => blank($get('male_sagir_id')))
+                                            ->key(fn(Get $get): string => 'male-checks-' . ($get('male_sagir_id') ?: 'empty')),
 
                                     ])
                                     ->columnSpan(1),
@@ -246,6 +249,7 @@ class BreedingInquiryResource extends Resource
                                             if (!filled($get('male_sagir_id'))) {
                                                 unset($options['male_owner']);
                                             }
+
                                             return $options;
                                         })
                                         ->live()
@@ -278,11 +282,11 @@ class BreedingInquiryResource extends Resource
                                         ->visible(fn($get) => $get('type') === 'kennel'),
 
                                     // SMS Request Approval Action
-//                                            Action::make('sms')
-//                                                ->label(__('SMS Request Approval'))
-//                                                ->icon('heroicon-o-chat')
-//                                                ->size('sm')
-//                                                ->button(),
+                                    //                                            Action::make('sms')
+                                    //                                                ->label(__('SMS Request Approval'))
+                                    //                                                ->icon('heroicon-o-chat')
+                                    //                                                ->size('sm')
+                                    //                                                ->button(),
 
                                 ]),
                         ])
@@ -373,7 +377,6 @@ class BreedingInquiryResource extends Resource
                 ])
                     ->persistStepInQueryString('step')
                     ->columnSpanFull()
-                    ->maxWidth('80')
                     ->extraAttributes(['class' => 'breeding-wizard']),
 
             ]);
@@ -460,8 +463,8 @@ class BreedingInquiryResource extends Resource
     }
 
     protected static function hydrateFemale(
-        Get     $get,
-        Set     $set,
+        Get $get,
+        Set $set,
         ?Select $component
     ): void
     {
@@ -470,6 +473,7 @@ class BreedingInquiryResource extends Resource
 
         if (blank($femaleId)) {
             self::resetFemale($set);
+
             return;
         }
 
@@ -491,6 +495,7 @@ class BreedingInquiryResource extends Resource
 
         if (!$dog) {
             self::resetFemale($set);
+
             return;
         }
 
@@ -505,11 +510,22 @@ class BreedingInquiryResource extends Resource
         $set('female_suitable_state', self::calculateSuitability($dog));
 
         // Club
-        $resolver = app(PrevClubMembershipResolverService::class);
+        $resolver = app(LegacyMembershipResolverService::class);
 
-        $membership = $resolver->resolveForFemaleDog($dog);
+        $membershipSummary = $resolver->resolveSummaryForDogAndUser($dog);
 
-        $set('club_membership_state', $membership);
+        $set('club_membership_state', [
+            'status_key' => match ($membershipSummary['status_key'] ?? null) {
+                'absolute_yes' => 'active',
+                'absolute_no' => 'not_member',
+                default => 'expired',
+            },
+            'status_label' => $membershipSummary['status_label'] ?? __('Unknown'),
+            'club_name' => $membershipSummary['club']?->ClubName
+                ?? $membershipSummary['club']?->name
+                    ?? null,
+            'membership' => $membershipSummary['membership'] ?? null,
+        ]);
     }
 
     protected static function calculateSuitability(PrevDog $dog): array
@@ -523,8 +539,8 @@ class BreedingInquiryResource extends Resource
     }
 
     protected static function hydrateMale(
-        Get     $get,
-        Set     $set,
+        Get $get,
+        Set $set,
         ?Select $component
     ): void
     {
@@ -533,6 +549,7 @@ class BreedingInquiryResource extends Resource
 
         if (blank($maleId)) {
             self::resetMale($set);
+
             return;
         }
 
@@ -549,6 +566,7 @@ class BreedingInquiryResource extends Resource
 
         if (!$dog) {
             self::resetMale($set);
+
             return;
         }
 
@@ -576,5 +594,4 @@ class BreedingInquiryResource extends Resource
         $set('male_dna_state', null);
         $set('male_red_pedigree_state', null);
     }
-
 }

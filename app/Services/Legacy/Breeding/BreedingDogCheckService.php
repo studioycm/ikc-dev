@@ -131,7 +131,7 @@ class BreedingDogCheckService
 
         return $this->makeRow(
             key: 'red_pedigree',
-            label: __('Red pedigree'),
+            label: __('Red Pedigree'),
             state: $state,
             value: $dog->RedPedigree,
         );
@@ -149,7 +149,7 @@ class BreedingDogCheckService
 
         return $this->makeRow(
             key: 'breeding_count',
-            label: __('Breeding count'),
+            label: __('Breeding Count'),
             state: $state,
             value: $count,
         );
@@ -169,16 +169,16 @@ class BreedingDogCheckService
         string $key,
         string $label,
         string $state,
-        mixed  $value = null,
-        array  $actions = [],
+        mixed $value = null,
+        array $actions = [],
     ): array
     {
         $stateConfig = config("breeding_checks.states.{$state}");
 
         return [
             'key' => $key,
-            'label' => $label,
-            'state' => $state,
+            'label' => __($label),
+            'state' => __($state),
             'state_label' => __($stateConfig['label'] ?? $state),
             'icon' => $stateConfig['icon'] ?? 'heroicon-m-information-circle',
             'color' => $stateConfig['color'] ?? 'gray',

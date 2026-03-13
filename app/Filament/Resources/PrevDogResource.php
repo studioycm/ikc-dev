@@ -19,6 +19,7 @@ use Filament\Actions\StaticAction;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Livewire as FormLivewire;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs as FormTabs;
@@ -33,7 +34,6 @@ use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\View as InfolistView;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
@@ -149,7 +149,7 @@ class PrevDogResource extends Resource
                                                     ->color(fn(Model $record): string => 'white')
                                                     ->modalHeading(__('Select SAGIR Prefix'))
                                                     ->form([
-                                                        Forms\Components\Select::make('prefix')
+                                                        Select::make('prefix')
                                                             ->label(__('Sagir Prefix'))
                                                             ->options(LegacySagirPrefix::class)
                                                             ->required(),
@@ -169,7 +169,7 @@ class PrevDogResource extends Resource
                                             ->label(__('Gender'))
                                             ->grouped()
                                             ->options(LegacyDogGender::class),
-                                        Forms\Components\DatePicker::make('BirthDate')
+                                        DatePicker::make('BirthDate')
                                             ->label(__('Birth Date'))
                                             ->timezone('Asia/Jerusalem')
                                             ->native(false)
@@ -178,7 +178,7 @@ class PrevDogResource extends Resource
                                             ->displayFormat('Y-m-d')
                                             ->weekStartsOnSunday()
                                             ->closeOnDateSelection(),
-                                        Forms\Components\DatePicker::make('RegDate')
+                                        DatePicker::make('RegDate')
                                             ->label(__('Registration Date'))
                                             ->timezone('Asia/Jerusalem')
                                             ->native(false)
@@ -227,7 +227,7 @@ class PrevDogResource extends Resource
                                             ->preload()
                                             ->default(4)
                                             ->required(),
-                                        Forms\Components\Select::make('GroupID')
+                                        Select::make('GroupID')
                                             ->label(__('Group ID'))
                                             ->options(array_combine(range(0, 7), range(0, 7))),
                                         Forms\Components\ToggleButtons::make('SizeID')
@@ -259,7 +259,7 @@ class PrevDogResource extends Resource
                                                     ->all();
                                             })
                                             ->getOptionLabelUsing(fn($value): ?string => PrevUser::query()->where('owner_code', $value)->first()?->name),
-                                        Forms\Components\DatePicker::make('OwnershipDate')
+                                        DatePicker::make('OwnershipDate')
                                             ->label(__('Ownership Date'))
                                             ->timezone('Asia/Jerusalem')
                                             ->native(false)
@@ -268,7 +268,7 @@ class PrevDogResource extends Resource
                                             ->displayFormat('Y-m-d')
                                             ->weekStartsOnSunday()
                                             ->closeOnDateSelection(),
-                                        Forms\Components\Select::make('BeitGidulID')
+                                        Select::make('BeitGidulID')
                                             ->label(__('Beit Gidul'))
                                             ->relationship('breedinghouse', 'GidulCode')
                                             ->searchable(['breedinghouses.HebName', 'breedinghouses.EngName', 'GidulCode'])
@@ -359,7 +359,7 @@ class PrevDogResource extends Resource
                                                                 ->label(__('Hebrew Name'))
                                                                 ->maxLength(200),
                                                             Forms\Components\Group::make([
-                                                                Forms\Components\DatePicker::make('BirthDate')
+                                                                DatePicker::make('BirthDate')
                                                                     ->label(__('Birth Date'))
                                                                     ->timezone('Asia/Jerusalem')
                                                                     ->native(false)
@@ -368,7 +368,7 @@ class PrevDogResource extends Resource
                                                                     ->displayFormat('Y-m-d')
                                                                     ->weekStartsOnSunday()
                                                                     ->closeOnDateSelection(),
-                                                                Forms\Components\DatePicker::make('RegDate')
+                                                                DatePicker::make('RegDate')
                                                                     ->label(__('Registration Date'))
                                                                     ->timezone('Asia/Jerusalem')
                                                                     ->native(false)
@@ -423,7 +423,7 @@ class PrevDogResource extends Resource
                                                                 ->grouped()
                                                                 ->options(LegacyDogGender::class)
                                                                 ->default(fn(Forms\Get $get) => LegacyDogGender::Male->value),
-                                                            Forms\Components\Select::make('sagir_prefix')
+                                                            Select::make('sagir_prefix')
                                                                 ->label(__('Sagir Prefix'))
                                                                 ->options(LegacySagirPrefix::class)
                                                                 ->default(LegacySagirPrefix::NUL->value),
@@ -465,7 +465,7 @@ class PrevDogResource extends Resource
                                                                 ->label(__('Hebrew Name'))
                                                                 ->maxLength(200),
                                                             Forms\Components\Group::make([
-                                                                Forms\Components\DatePicker::make('BirthDate')
+                                                                DatePicker::make('BirthDate')
                                                                     ->label(__('Birth Date'))
                                                                     ->timezone('Asia/Jerusalem')
                                                                     ->native(false)
@@ -474,7 +474,7 @@ class PrevDogResource extends Resource
                                                                     ->displayFormat('Y-m-d')
                                                                     ->weekStartsOnSunday()
                                                                     ->closeOnDateSelection(),
-                                                                Forms\Components\DatePicker::make('RegDate')
+                                                                DatePicker::make('RegDate')
                                                                     ->label(__('Registration Date'))
                                                                     ->timezone('Asia/Jerusalem')
                                                                     ->native(false)
@@ -529,7 +529,7 @@ class PrevDogResource extends Resource
                                                                 ->grouped()
                                                                 ->options(LegacyDogGender::class)
                                                                 ->default(fn(Forms\Get $get) => LegacyDogGender::Female->value),
-                                                            Forms\Components\Select::make('sagir_prefix')
+                                                            Select::make('sagir_prefix')
                                                                 ->label(__('Sagir Prefix'))
                                                                 ->options(LegacySagirPrefix::class)
                                                                 ->default(LegacySagirPrefix::NUL->value),
@@ -566,7 +566,7 @@ class PrevDogResource extends Resource
                                                 ->label(__('Pedigree Color'))
                                                 ->options(LegacyPedigreeColor::class)
                                                 ->grouped(),
-                                            Forms\Components\Select::make('RemarkCode')
+                                            Select::make('RemarkCode')
                                                 ->label(__('Remark Code'))
                                                 ->options(fn() => array_combine(range(0, 36), range(0, 36)))
                                                 ->searchable(),
@@ -612,6 +612,19 @@ class PrevDogResource extends Resource
                             ])
                             ->label(__('Pedigree')),
 
+                        FormTab::make('pedigree_tree')
+                            ->schema([
+                                FormLivewire::make(PedigreeTree::class, fn(?PrevDog $record): array => [
+                                    'dogId' => $record?->getKey(),
+                                    'showBuilder' => true,
+                                    'settings' => config('pedigree_tree.presets.resource_edit', []),
+                                ])
+                                    ->hidden(fn(?PrevDog $record): bool => $record === null)
+                                    ->key(fn(?PrevDog $record): string => 'prev-dog-form-pedigree-tree-' . ($record?->getKey() ?? 'new'))
+                                    ->lazy(),
+                            ])
+                            ->label(__('Pedigree Tree')),
+
                         FormTab::make('health_pre_2022')
                             ->schema([
                                 Section::make('health_section')
@@ -633,7 +646,7 @@ class PrevDogResource extends Resource
                                         Forms\Components\TextInput::make('IsMagPass')
                                             ->label(__('MAG Pass'))
                                             ->numeric(),
-                                        Forms\Components\DatePicker::make('MagDate')
+                                        DatePicker::make('MagDate')
                                             ->label(__('MAG Date'))
                                             ->timezone('Asia/Jerusalem')
                                             ->native(false)
@@ -651,7 +664,7 @@ class PrevDogResource extends Resource
                                         Forms\Components\TextInput::make('IsMagPass_2')
                                             ->label(__('MAG 2nd Pass'))
                                             ->numeric(),
-                                        Forms\Components\DatePicker::make('MagDate_2')
+                                        DatePicker::make('MagDate_2')
                                             ->label(__('MAG 2nd Date'))
                                             ->timezone('Asia/Jerusalem')
                                             ->native(false)
@@ -671,6 +684,7 @@ class PrevDogResource extends Resource
                                     ->columns(4),
                             ])
                             ->label(__('Health pre 22')),
+
                     ])
                     ->persistTabInQueryString()
                     ->columnSpanFull(),
@@ -1639,15 +1653,13 @@ class PrevDogResource extends Resource
 
                     Tab::make('Pedigree Tree')
                         ->schema([
-                            InfolistView::make('filament.infolists.components.prev-dog-pedigree-tree')
-                                ->schema([
-                                    InfolistLivewire::make(PedigreeTree::class, fn(PrevDog $record): array => [
-                                        'dogId' => $record->getKey(),
-                                        'depth' => 4,
-                                    ])
-                                        ->key(fn(PrevDog $record): string => "prev-dog-pedigree-tree-{$record->getKey()}")
-                                        ->lazy(),
-                                ])
+                            InfolistLivewire::make(PedigreeTree::class, fn(PrevDog $record): array => [
+                                'dogId' => $record->getKey(),
+                                'showBuilder' => false,
+                                'settings' => config('pedigree_tree.presets.resource_view', []),
+                            ])
+                                ->key(fn(PrevDog $record): string => "prev-dog-pedigree-tree-{$record->getKey()}")
+                                ->lazy()
                                 ->columnSpanFull(),
                         ])
                         ->label(__('Pedigree Tree')),

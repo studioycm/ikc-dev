@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Filament\Actions\StaticAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Infolists\Components\Grid as InfolistGrid;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
@@ -113,6 +114,7 @@ class UserDogsTableWidget extends BaseWidget
                     ->formatStateUsing(function (PrevDog $record, $state) {
                         // Exclude current user from the list
                         $currentUserId = auth()->user()?->prevUser?->id;
+
                         return $record->owners
                             ->where('id', '!=', $currentUserId)
                             ->pluck('full_name')
@@ -129,7 +131,7 @@ class UserDogsTableWidget extends BaseWidget
                 Filter::make('GenderID')
                     ->label(__('Gender'))
                     ->form([
-                        \Filament\Forms\Components\ToggleButtons::make('GenderID')
+                        ToggleButtons::make('GenderID')
                             ->label(__('Gender'))
                             ->options(LegacyDogGender::class)
                             ->grouped()
@@ -149,6 +151,7 @@ class UserDogsTableWidget extends BaseWidget
                             ->unique()
                             ->filter()
                             ->toArray() ?? [];
+
                         return $query->whereIn('id', $userBreedIds);
                     })
                     ->placeholder(__('All'))
@@ -173,7 +176,7 @@ class UserDogsTableWidget extends BaseWidget
                         return $query
                             ->when(
                                 $data['birth_date_start'] ?? null,
-                                fn(Builder $q, $date): Builder => $q->whereDate('BirthDate', '>=', $date)
+                                    fn(Builder $q, $date): Builder => $q->whereDate('BirthDate', '>=', $date)
                             )
                             ->when(
                                 ($data['birth_date_start'] ?? null) && !($data['birth_date_end'] ?? null),
@@ -181,12 +184,12 @@ class UserDogsTableWidget extends BaseWidget
                             )
                             ->when(
                                 $data['birth_date_end'] ?? null,
-                                fn(Builder $q, $date): Builder => $q->whereDate('BirthDate', '<=', $date)
+                                    fn(Builder $q, $date): Builder => $q->whereDate('BirthDate', '<=', $date)
                             );
                     }),
                 Filter::make('age_groups')
                     ->form([
-                        \Filament\Forms\Components\ToggleButtons::make('age_ranges')
+                        ToggleButtons::make('age_ranges')
                             ->label(__('Age Groups'))
                             ->options([
                                 'all' => __('All'),
@@ -214,15 +217,15 @@ class UserDogsTableWidget extends BaseWidget
                                         'below_9m' => $subQ->where('BirthDate', '>', $now->copy()->subMonths(9)),
                                         '9m_18m' => $subQ->whereBetween('BirthDate', [
                                             $now->copy()->subMonths(18),
-                                            $now->copy()->subMonths(9)
+                                            $now->copy()->subMonths(9),
                                         ]),
                                         '18m_36m' => $subQ->whereBetween('BirthDate', [
                                             $now->copy()->subMonths(36),
-                                            $now->copy()->subMonths(18)
+                                            $now->copy()->subMonths(18),
                                         ]),
                                         '3y_7y' => $subQ->whereBetween('BirthDate', [
                                             $now->copy()->subYears(7),
-                                            $now->copy()->subYears(3)
+                                            $now->copy()->subYears(3),
                                         ]),
                                         'above_7y' => $subQ->where('BirthDate', '<', $now->copy()->subYears(7)),
                                         default => null,
@@ -336,11 +339,15 @@ class UserDogsTableWidget extends BaseWidget
                     ->modalWidth(MaxWidth::Full)
                     ->modalSubmitAction(false)
                     ->modalCancelAction(fn(StaticAction $action) => $action->label(__('Close')))
-                    ->modalContent(fn(PrevDog $record): View => view('legacy.pedigree.pedigree-tree-modal', ['dogId' => $record->id])),
+                    ->modalContent(fn(PrevDog $record): View => view('legacy.pedigree.pedigree-tree-modal', [
+                        'dogId' => $record->id,
+                        'settings' => config('pedigree_tree.presets.user_widget_modal', []),
+                        'showBuilder' => false,
+                    ])),
 
                 Tables\Actions\Action::make('breeding')
                     ->label(__('Litter'))
-                    ->tooltip('פתיחת תיק המלטה')
+                    ->tooltip(__('Open Litter Report'))
                     ->icon('heroicon-o-heart')
                     ->color('success')
                     ->visible(fn(PrevDog $record): bool => $record->GenderID === LegacyDogGender::Female)

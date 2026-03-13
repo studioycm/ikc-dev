@@ -8,6 +8,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
+use Filament\Notifications\Notification;
 use Filament\Tables;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
@@ -194,7 +195,7 @@ class ClubMembershipsWidget extends BaseWidget
                     ->visible(fn(PrevClubUser $record) => $record->isActive)
                     ->form([
                         Select::make('membership_type')
-                            ->label('Membership Type')
+                            ->label(__('Membership Type'))
                             ->options([
                                 'Main' => __('Main'),
                                 'Sub' => __('Sub'),
@@ -202,43 +203,43 @@ class ClubMembershipsWidget extends BaseWidget
                             ->default(fn(PrevClubUser $record) => $record->type)
                             ->required(),
                         Select::make('duration')
-                            ->label('Duration')
+                            ->label(__('Duration'))
                             ->options([
-                                '1_year' => '1 Year',
-                                '2_years' => '2 Years',
-                                '3_years' => '3 Years',
+                                '1_year' => __('1 Year'),
+                                '2_years' => __('2 Years'),
+                                '3_years' => __('3 Years'),
                             ])
                             ->default('1_year')
                             ->required(),
                         Select::make('payment_method')
-                            ->label('Payment Method')
+                            ->label(__('Payment Method'))
                             ->options([
-                                'credit_card' => 'Credit Card',
-                                'bank_transfer' => 'Bank Transfer',
-                                'paypal' => 'PayPal',
-                                'cash' => 'Cash',
+                                'credit_card' => __('Credit Card'),
+                                'bank_transfer' => __('Bank Transfer'),
+                                'paypal' => __('PayPal'),
+                                'cash' => __('Cash'),
                             ])
                             ->required(),
                         TextInput::make('amount')
-                            ->label('Total Amount')
+                            ->label(__('Total Amount'))
                             ->prefix('₪')
                             ->numeric()
                             ->default(500)
                             ->disabled()
                             ->dehydrated(false),
                         Textarea::make('notes')
-                            ->label('Notes')
+                            ->label(__('Notes'))
                             ->rows(3)
-                            ->placeholder('Any additional information...'),
+                            ->placeholder(__('Any additional information...')),
                     ])
-                    ->modalHeading(fn(PrevClubUser $record): string => "Renew Membership - {$record->club->Name}")
-                    ->modalDescription('Complete the form to renew your club membership')
-                    ->modalSubmitActionLabel('Submit Renewal Request')
+                    ->modalHeading(fn(PrevClubUser $record): string => __('Renew Membership - :club', ['club' => $record->club->Name]))
+                    ->modalDescription(__('Complete the form to renew your club membership'))
+                    ->modalSubmitActionLabel(__('Submit Renewal Request'))
                     ->action(function (array $data, PrevClubUser $record) {
                         // Placeholder action - will be implemented later
-                        \Filament\Notifications\Notification::make()
-                            ->title('Renewal Request Submitted')
-                            ->body('Your membership renewal request has been submitted successfully. We will contact you soon.')
+                        Notification::make()
+                            ->title(__('Renewal Request Submitted'))
+                            ->body(__('Your membership renewal request has been submitted successfully. We will contact you soon.'))
                             ->success()
                             ->send();
                     }),
@@ -247,12 +248,12 @@ class ClubMembershipsWidget extends BaseWidget
                     ->tooltip(__('Details'))
                     ->icon('heroicon-o-eye')
                     ->color('info')
-                    ->modalHeading(fn(PrevClubUser $record): string => "Membership Details - {$record->club->Name}")
+                    ->modalHeading(fn(PrevClubUser $record): string => __('Membership Details - :club', ['club' => $record->club->Name]))
                     ->modalContent(fn(PrevClubUser $record) => view('filament.user.modals.membership-details', [
                         'membership' => $record,
                     ]))
                     ->modalSubmitAction(false)
-                    ->modalCancelActionLabel('Close'),
+                    ->modalCancelActionLabel(__('Close')),
             ])
             ->heading(__('Club Memberships'))
             ->description(__('Your active club memberships by breed associations'))
