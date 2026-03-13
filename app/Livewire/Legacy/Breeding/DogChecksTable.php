@@ -8,14 +8,19 @@ use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Infolists\Concerns\InteractsWithInfolists;
+use Filament\Infolists\Contracts\HasInfolists;
+use Filament\Infolists\Infolist;
+use Illuminate\Support\Facades\App;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Reactive;
 use Livewire\Component;
 
-class DogChecksTable extends Component implements HasActions, HasForms
+class DogChecksTable extends Component implements HasActions, HasForms, HasInfolists
 {
     use InteractsWithActions;
     use InteractsWithForms;
+    use InteractsWithInfolists;
 
     #[Reactive]
     public ?string $sagirId = null;
@@ -25,6 +30,8 @@ class DogChecksTable extends Component implements HasActions, HasForms
     public string $title = '';
 
     public array $configOverrides = [];
+
+    public string $direction = 'ltr';
 
     public ?string $selectedActionKey = null;
 
@@ -50,6 +57,7 @@ class DogChecksTable extends Component implements HasActions, HasForms
         $this->role = $role;
         $this->title = $title;
         $this->configOverrides = $configOverrides;
+        $this->direction = $this->resolveDirectionFromLocale();
     }
 
     #[Computed]
@@ -62,45 +70,101 @@ class DogChecksTable extends Component implements HasActions, HasForms
         );
     }
 
-    public function viewDetailsAction(string $checkKey): Action
+    public function checkDetailsInfolist(string $checkKey): Infolist
     {
-        return Action::make("viewDetails_{$checkKey}")
+        $report = $this->report;
+        $check = collect($report['checks'] ?? [])->firstWhere('key', $checkKey);
+
+        if (!$check) {
+            return Infolist::make()
+                ->state([])
+                ->schema([]);
+        }
+
+        return Infolist::make()
+            ->state($check)
+            ->schema([
+                \Filament\Infolists\Components\Section::make(__('Check Details'))
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('label')
+                            ->label(__('Check'))
+                            ->weight('bold'),
+                        \Filament\Infolists\Components\TextEntry::make('state_label')
+                            ->label(__('Status'))
+                            ->badge(),
+                        \Filament\Infolists\Components\TextEntry::make('value')
+                            ->label(__('Value'))
+                            ->visible(fn($state): bool => filled($state))
+                            ->default('—'),
+                    ])
+                    ->columns(2),
+                \Filament\Infolists\Components\Section::make(__('Dog Information'))
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('dog.name')
+                            ->label(__('Dog Name'))
+                            ->state(data_get($report, 'dog.name'))
+                            ->default('—'),
+                        \Filament\Infolists\Components\TextEntry::make('dog.sagir_id')
+                            ->label(__('Sagir ID'))
+                            ->state(data_get($report, 'dog.sagir_id'))
+                            ->default('—'),
+                    ])
+                    ->columns(2),
+            ]);
+    }
+
+    public function viewDetailsAction(): Action
+    {
+        return Action::make('viewDetails')
             ->icon('heroicon-m-information-circle')
             ->modalHeading(__('Check Details'))
-            ->modalContent(function () use ($checkKey) {
-                $report = $this->report;
-                if (!$report) {
-                    return null;
+            ->modalContent(function (array $arguments): Infolist {
+                $checkKey = $arguments['checkKey'] ?? null;
+
+                if (!$checkKey) {
+                    return Infolist::make()->state([])->schema([]);
                 }
 
-                $check = collect($report['checks'])->firstWhere('key', $checkKey);
-                if (!$check) {
-                    return null;
-                }
-
-                return view('livewire.legacy.breeding.dog-check-details-modal', [
-                    'check' => $check,
-                    'dog' => $report['dog'],
-                ]);
+                return $this->checkDetailsInfolist($checkKey);
             })
             ->modalSubmitAction(false)
             ->modalCancelActionLabel(__('Close'));
     }
 
-    public function configuredAction(string $actionKey, string $heading, string $description): Action
+    public function rowAction(): Action
     {
-        return Action::make("rowAction_{$actionKey}")
-            ->modalHeading($heading)
-            ->modalDescription($description)
-            ->action(function () use ($actionKey, $heading, $description): void {
-                $this->selectedActionKey = $actionKey;
-                $this->selectedActionHeading = $heading;
-                $this->selectedActionDescription = $description;
+        return Action::make('rowAction')
+            ->modalHeading(fn(array $arguments): string => $arguments['heading'] ?? __('Action'))
+            ->modalDescription(fn(array $arguments): string => $arguments['description'] ?? '')
+            ->action(function (array $arguments): void {
+                $this->selectedActionKey = $arguments['actionKey'] ?? null;
+                $this->selectedActionHeading = $arguments['heading'] ?? null;
+                $this->selectedActionDescription = $arguments['description'] ?? null;
             });
+    }
+
+    public function getTooltipContent(array $check): string
+    {
+        $content = $check['label'] . ': ' . $check['state_label'];
+
+        if (is_scalar($check['value'] ?? null) && filled($check['value'])) {
+            $content .= "\n" . __('Value') . ': ' . $check['value'];
+        }
+
+        return $content;
     }
 
     public function render()
     {
         return view('livewire.legacy.breeding.dog-checks-table');
+    }
+
+    protected function resolveDirectionFromLocale(): string
+    {
+        $locale = App::currentLocale();
+
+        return str_starts_with($locale, 'he') || str_starts_with($locale, 'ar')
+            ? 'rtl'
+            : 'ltr';
     }
 }

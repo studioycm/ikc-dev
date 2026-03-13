@@ -7,6 +7,8 @@ export default {
         './app/Livewire/**/*.php',
         './resources/views/filament/**/*.blade.php',
         './resources/views/livewire/**/*.blade.php',
+        './resources/views/legacy/**/*.blade.php',
+        './resources/views/mail/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
         './vendor/bezhansalleh/filament-language-switch/resources/views/language-switch.blade.php',
     ],

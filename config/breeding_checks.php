@@ -13,7 +13,7 @@ return [
             'color' => 'danger',
         ],
         'check_needed' => [
-            'label' => 'Check needed',
+            'label' => 'Check Needed',
             'icon' => 'heroicon-m-exclamation-triangle',
             'color' => 'warning',
         ],
@@ -67,7 +67,7 @@ return [
         'report_dna_id' => [
             'label' => 'Report DNA ID',
             'icon' => 'heroicon-m-pencil-square',
-            'color' => 'gray',
+            'color' => 'info',
             'visible_when' => ['dna' => 'check_needed'],
             'modal_heading' => 'Report DNA ID',
             'modal_description' => 'Placeholder DNA ID reporting flow.',
