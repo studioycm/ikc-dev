@@ -11,11 +11,13 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class UserPanelProvider extends PanelProvider
@@ -66,6 +68,16 @@ class UserPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->renderHook(
+                PanelsRenderHook::TOPBAR_END, function () {
+                return Blade::render('filament.user.components.prev-user-badge',
+                    [
+                        'color' => 'primary',
+                        'icon' => 'fas-user',
+                        'prev_user_name' => auth()->user()->prevUser->name,
+                    ]);
+            }
+            );
     }
 }
