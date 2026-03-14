@@ -4,6 +4,7 @@ namespace App\Filament\User\Resources;
 
 use App\Enums\Legacy\LegacyDogGender;
 use App\Filament\User\Resources\BreedingInquiryResource\Pages;
+use App\Livewire\Legacy\Breeding\ClubMembershipCompact;
 use App\Livewire\Legacy\Breeding\DogChecksTable;
 use App\Models\BreedingInquiry;
 use App\Models\PrevDog;
@@ -180,12 +181,11 @@ class BreedingInquiryResource extends Resource
                             |--------------------------------------------------------------------------
                             */
 
-                            ViewField::make('club_membership_compact')
-                                ->view('legacy.breeding.fields.club-membership-compact')
-                                ->viewData(fn(Get $get): array => [
-                                    'membershipState' => $get('club_membership_state'),
-                                ])
-                                ->visible(fn(Get $get) => filled($get('female_sagir_id')))
+                            LivewireComponent::make(ClubMembershipCompact::class, fn(Get $get): array => [
+                                'membershipState' => $get('club_membership_state'),
+                            ])
+                                ->hidden(fn(Get $get): bool => blank($get('female_sagir_id')))
+                                ->key(fn(Get $get): string => 'club-membership-' . ($get('female_sagir_id') ?: 'empty'))
                                 ->columnSpan(1),
 
                             ViewField::make('membership_badges')
@@ -514,18 +514,7 @@ class BreedingInquiryResource extends Resource
 
         $membershipSummary = $resolver->resolveSummaryForDogAndUser($dog);
 
-        $set('club_membership_state', [
-            'status_key' => match ($membershipSummary['status_key'] ?? null) {
-                'absolute_yes' => 'active',
-                'absolute_no' => 'not_member',
-                default => 'expired',
-            },
-            'status_label' => $membershipSummary['status_label'] ?? __('Unknown'),
-            'club_name' => $membershipSummary['club']?->ClubName
-                ?? $membershipSummary['club']?->name
-                    ?? null,
-            'membership' => $membershipSummary['membership'] ?? null,
-        ]);
+        $set('club_membership_state', $membershipSummary);
     }
 
     protected static function calculateSuitability(PrevDog $dog): array

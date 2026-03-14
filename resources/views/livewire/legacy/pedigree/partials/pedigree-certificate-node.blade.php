@@ -150,19 +150,9 @@
                     <div
                         x-data="{
                             open: false,
-                            placeAbove: false,
+                            placeAbove: true,
                             toggle() {
                                 this.open = ! this.open;
-
-                                if (this.open) {
-                                    this.$nextTick(() => {
-                                        const hostRect = this.$refs.host.getBoundingClientRect();
-                                        const panelRect = this.$refs.panel.getBoundingClientRect();
-
-                                        this.placeAbove = (window.innerHeight - hostRect.bottom) < (panelRect.height + 16)
-                                            && hostRect.top > (panelRect.height + 16);
-                                    });
-                                }
                             }
                         }"
                         x-ref="host"

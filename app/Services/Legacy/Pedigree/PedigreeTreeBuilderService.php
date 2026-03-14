@@ -240,6 +240,7 @@ class PedigreeTreeBuilderService
                 if ($ancestor instanceof PrevDog) {
                     $nextGeneration[] = $ancestor->father;
                     $nextGeneration[] = $ancestor->mother;
+
                     continue;
                 }
 
@@ -299,7 +300,7 @@ class PedigreeTreeBuilderService
                 'titles' => $titles,
                 'titles_count' => count($titles),
                 'titles_text' => $titlesText,
-                'titles_has_popup' => count($titles) > 4 || mb_strlen($titlesText) > 90,
+                'titles_has_popup' => (count($titles) > 10 || mb_strlen($titlesText) > 180),
             ],
         );
     }
