@@ -2,12 +2,14 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\User\Pages\Dashboard as UserDashboard;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Pages;
@@ -141,7 +143,15 @@ class AdminPanelProvider extends PanelProvider
                     ->label(fn (): string => __('Authorisation Management'))
                     ->icon('fas-shield-dog'),
             ])
+            ->userMenuItems([
+                MenuItem::make('user_panel')
+                    ->label(fn(): string => __('User Panel'))
+                    ->url(fn() => UserDashboard::getUrl(panel: 'user'))
+                    ->icon('fas-house-user')
+                    ->sort(1),
+            ])
             ->navigationItems([
+
                 NavigationItem::make('payments')
                     ->label(fn (): string => __('Payments'))
                     ->url(fn (): string => Pages\Dashboard::getUrl())

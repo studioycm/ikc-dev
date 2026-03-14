@@ -85,9 +85,9 @@
                     @endif
 
                     @if ($root['breeding_house'])
-                        <div class="text-center text-base font-semibold text-gray-950 dark:text-white">
+                        <x-filament::badge color="primary" icon="fas-house-user" class="rounded-full">
                             {{ $root['breeding_house'] }}
-                        </div>
+                        </x-filament::badge>
                     @endif
 
                     <div class="flex flex-wrap items-center justify-center gap-3 pt-2">

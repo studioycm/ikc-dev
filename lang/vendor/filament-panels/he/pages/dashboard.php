@@ -2,6 +2,6 @@
 
 return [
 
-    'title' => 'איזור אישי',
+    'title' => __('Dashboard'),
 
 ];

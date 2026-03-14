@@ -91,7 +91,7 @@ class UserResource extends Resource
                     ->displayFormat('d/m/Y H:i'),
                 Forms\Components\TextInput::make('password')
                     ->password()
-                    ->hidden(fn(string $context, PrevUser $record): bool => $context === 'edit' && auth()->user()->id === $record->id)
+                    ->hidden(fn(string $context, User $record): bool => $context === 'edit' && auth()->user()->id === $record->id)
                     ->revealable(),
                 Forms\Components\Select::make('roles')
                     ->relationship('roles', 'name')

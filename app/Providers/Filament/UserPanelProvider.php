@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -35,6 +36,7 @@ class UserPanelProvider extends PanelProvider
             ->maxContentWidth(MaxWidth::Full)
             ->breadcrumbs(true)
             ->favicon(url('favicon.ico'))
+            ->font('Assistant', provider: GoogleFontProvider::class)
             ->topNavigation()
             ->colors([
                 'primary' => Color::Amber,
