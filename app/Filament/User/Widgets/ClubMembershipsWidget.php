@@ -101,7 +101,7 @@ class ClubMembershipsWidget extends BaseWidget
                     ->date('Y-m-d')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('expire_date')
-                    ->label(__('Valid Until'))
+                    ->label(__('Valid until'))
                     ->date('Y-m-d')
                     ->description(fn(PrevClubUser $record): string => $record->expiration_human)
                     ->color(fn(PrevClubUser $record): string => $record->getExpirationColor())
