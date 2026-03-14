@@ -150,8 +150,7 @@ class ClubMembershipsWidget extends BaseWidget
                                 ->whereNull('deleted_at')
                                 ->where('expire_date', '>=', now())
                                 ->where(function (Builder $q) {
-                                    $q->whereNull('payment_status')
-                                        ->orWhere('payment_status', '1');
+                                    $q->where('payment_status', '1');
                                 })
                                 ->where(function (Builder $q) {
                                     $q->whereNull('forbidden')
@@ -165,13 +164,16 @@ class ClubMembershipsWidget extends BaseWidget
                             return $query
                                 ->whereNull('deleted_at')
                                 ->where('expire_date', '<', now())
-                                ->whereIn('id', function ($subquery) use ($prevUserId) {
-                                    $subquery->selectRaw('MAX(id)')
-                                        ->from('club2user')
-                                        ->where('user_id', $prevUserId)
-                                        ->whereNull('deleted_at')
-                                        ->where('expire_date', '<', now())
-                                        ->groupBy('club_id');
+                                ->where('payment_status', '1')
+                                ->whereNotExists(function ($subquery) use ($prevUserId) {
+                                    $subquery->select(\DB::raw(1))
+                                        ->from('club2user as cu2')
+                                        ->whereColumn('cu2.club_id', '=', 'club2user.club_id')
+                                        ->where('cu2.user_id', $prevUserId)
+                                        ->whereNull('cu2.deleted_at')
+                                        ->where('cu2.expire_date', '<', now())
+                                        ->where('cu2.payment_status', '1')
+                                        ->whereColumn('cu2.expire_date', '>', 'club2user.expire_date');
                                 });
                         }
 
