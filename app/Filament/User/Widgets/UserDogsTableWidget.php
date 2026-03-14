@@ -336,6 +336,7 @@ class UserDogsTableWidget extends BaseWidget
                     ->icon('fas-sitemap')
                     ->color('primary')
                     ->hidden(fn(PrevDog $record): bool => empty($record->father) && empty($record->mother))
+                    ->modalHeading(__('Pedigree Tree'))
                     ->modalWidth(MaxWidth::Full)
                     ->modalSubmitAction(false)
                     ->modalCancelAction(fn(StaticAction $action) => $action->label(__('Close')))

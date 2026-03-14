@@ -232,8 +232,30 @@ class PrevUserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
+                    ->color(fn(PrevUser $record): string => match ($record->record_type) {
+                        'Native' => 'success',
+                        'Owners' => 'warning',
+                        'Members' => 'blue',
+                        default => 'gray',
+                    })
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false),
+                Tables\Columns\TextColumn::make('record_type')
+                    ->label(__('User Type'))
+                    ->badge()
+                    ->color(fn(PrevUser $record): string => match ($record->record_type) {
+                        'Native' => 'success',
+                        'Owners' => 'warning',
+                        'Members' => 'blue',
+                        default => 'gray',
+                    })
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('owner_code')
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
+                    ->sortable()
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Name')
                     ->sortable(['last_name', 'first_name'])
@@ -333,25 +355,9 @@ class PrevUserResource extends Resource
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\TextColumn::make('record_type')
-                    ->label(__('User Type'))
-                    ->badge()
-                    ->color(fn (PrevUser $record): string => match ($record->record_type) {
-                        'Native' => 'success',
-                        'Owners' => 'warning',
-                        'Members' => 'blue',
-                        default => 'gray',
-                    })
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('migration_status')
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('data_id')
-                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->sortable()
-                    ->searchable(isIndividual: true, isGlobal: false)
-                    ->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\TextColumn::make('owner_code')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false)
