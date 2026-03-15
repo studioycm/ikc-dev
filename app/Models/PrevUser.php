@@ -87,7 +87,6 @@ class PrevUser extends Model implements HasName
             ->WherePivot('payment_status', 1);
     }
 
-
     public function user(): HasOne
     {
         return $this->hasOne(User::class, 'prev_user_id', 'id');
@@ -111,6 +110,80 @@ class PrevUser extends Model implements HasName
     {
         return $this->hasMany(PrevDog::class, 'Breeding_ManagerID', 'id')
             ->where('deleted_at', null);
+    }
+
+    public function dogImports(): HasMany
+    {
+        return $this->hasMany(PrevDogImport::class, 'user_id', 'id');
+    }
+
+    public function ownerFiles(): HasMany
+    {
+        return $this->hasMany(PrevOwnerFile::class, 'owner_id', 'id');
+    }
+
+    public function createdPayments(): HasMany
+    {
+        return $this->hasMany(PrevPayment::class, 'created_by', 'id');
+    }
+
+    public function updatedPayments(): HasMany
+    {
+        return $this->hasMany(PrevPayment::class, 'updated_by', 'id');
+    }
+
+    public function ownedRequests(): HasMany
+    {
+        return $this->hasMany(PrevUserRequest::class, 'owner_id', 'id');
+    }
+
+    public function completedRequests(): HasMany
+    {
+        return $this->hasMany(PrevUserRequest::class, 'DoneByUserID', 'id');
+    }
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(PrevUserActivity::class, 'UserID', 'id');
+    }
+
+    public function createdActivities(): HasMany
+    {
+        return $this->hasMany(PrevUserActivity::class, 'CreatedBy', 'id');
+    }
+
+    public function promotedBreeds(): BelongsToMany
+    {
+        return $this->belongsToMany(PrevBreed::class, 'user2breeds', 'user_id', 'breed_id')
+            ->using(PrevBreedUser::class)
+            ->withPivot('id', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivotNull('deleted_at');
+    }
+
+    public function managedClubs(): BelongsToMany
+    {
+        return $this->belongsToMany(PrevClub::class, 'user_club_manager', 'user_id', 'club_id')
+            ->using(PrevClubManager::class)
+            ->withPivot('id', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivotNull('deleted_at');
+    }
+
+    public function skills(): BelongsToMany
+    {
+        return $this->belongsToMany(PrevSkill::class, 'users_skills', 'user_id', 'skill_id')
+            ->using(PrevSkillUser::class)
+            ->withPivot('id', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivotNull('deleted_at');
+    }
+
+    public function managedTasks(): HasMany
+    {
+        return $this->hasMany(PrevUserTask::class, 'manager_user_id', 'id');
+    }
+
+    public function relatedTasks(): HasMany
+    {
+        return $this->hasMany(PrevUserTask::class, 'related_to_user_id', 'id');
     }
 
     /**
@@ -294,6 +367,7 @@ class PrevUser extends Model implements HasName
     public function buildAddress(): string
     {
         $short_address = array_filter($this->addressArray(), fn($value) => !empty($value));
+
         return implode(', ', $short_address);
     }
 

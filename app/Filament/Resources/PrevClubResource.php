@@ -272,11 +272,11 @@ class PrevClubResource extends Resource
             ->actions([
                 ViewAction::make()->label(__('View')),
                 EditAction::make()->label(__('Edit')),
-                DeleteAction::make()->label(__('Delete')),
+//                DeleteAction::make()->label(__('Delete')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->label(__('Delete Selected')),
+//                    DeleteBulkAction::make()->label(__('Delete Selected')),
                 ]),
             ])
             ->recordUrl(false);

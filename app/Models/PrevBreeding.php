@@ -12,15 +12,17 @@ class PrevBreeding extends Model
     use SoftDeletes;
 
     protected $connection = 'mysql_prev';
+
     protected $table = 'breedings';
+
     public $timestamps = true;
+
     protected $guarded = [];
+
     protected $primaryKey = 'id';
 
     /**
      * Get the attributes that should be cast.
-     *
-     * @return array
      */
     protected function casts(): array
     {
@@ -123,4 +125,8 @@ class PrevBreeding extends Model
         return $this->hasMany(PrevBreedingRelatedDog::class, 'breeding_id', 'id');
     }
 
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(PrevUserTask::class, 'related_breeding_process_id', 'id');
+    }
 }

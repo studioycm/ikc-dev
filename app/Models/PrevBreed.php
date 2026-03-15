@@ -38,18 +38,18 @@ class PrevBreed extends Model
     // reverse pivot relationship with PrevClub model
     public function clubs(): BelongsToMany
     {
-        return $this->belongsToMany(PrevClub::class, 'breed_club', 'breed_id', 'club_id');
+        return $this->belongsToMany(PrevClub::class, 'breed_club', 'breed_id', 'club_id')
+            ->using(PrevBreedClub::class)
+            ->withPivot('id', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivotNull('deleted_at');
     }
 
-    // relationships with PrevUser model for UserManagerID and ClubManagerID
-    public function userManager(): BelongsTo
+    public function promoters(): BelongsToMany
     {
-        return $this->belongsTo(PrevUser::class, 'UserManagerID', 'id');
-    }
-
-    public function clubManager(): BelongsTo
-    {
-        return $this->belongsTo(PrevUser::class, 'ClubManagerID', 'id');
+        return $this->belongsToMany(PrevUser::class, 'user2breeds', 'breed_id', 'user_id')
+            ->using(PrevBreedUser::class)
+            ->withPivot('id', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivotNull('deleted_at');
     }
 
     // dogs model (PrevDog) reverse relationship without soft deletes

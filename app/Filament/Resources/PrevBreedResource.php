@@ -87,6 +87,7 @@ class PrevBreedResource extends Resource
         return $table
             ->modifyQueryUsing(function (Builder $query) {
                 return $query
+                    ->with(['promoters'])
                     ->withCount(['dogs']);
             })
             ->columns([
@@ -147,19 +148,12 @@ class PrevBreedResource extends Resource
                     ->sortable()
                     ->searchable(isGlobal: false, isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('UserManagerID')
-                    ->label('User Manager ID')
-                    ->description(fn (PrevBreed $record): string => $record->userManager->FullName ?? 'n/a')
-                    ->numeric()
-                    ->sortable()
-                    ->searchable(isGlobal: false, isIndividual: true)
-                    ->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\TextColumn::make('ClubManagerID')
-                    ->label('Club Manager ID')
-                    ->description(fn (PrevBreed $record): string => $record->clubManager->FullName ?? 'n/a')
-                    ->numeric()
-                    ->sortable()
-                    ->searchable(isGlobal: false, isIndividual: true)
+                Tables\Columns\TextColumn::make('promoters.full_name')
+                    ->label(__('Promoters'))
+                    ->listWithLineBreaks()
+                    ->limitList(3)
+                    ->expandableLimitedList()
+                    ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en'], isGlobal: false, isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

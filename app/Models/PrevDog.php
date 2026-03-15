@@ -132,9 +132,10 @@ class PrevDog extends Model implements HasName
                 'mother' => function ($q) use ($depth, $columns) {
                     $q->select(...$columns)
                         ->withPedigree($depth - 1, $columns);
-                }
+                },
             ]);
         }
+
         return $query;
     }
 
@@ -175,7 +176,7 @@ class PrevDog extends Model implements HasName
             ->as('ownership')
             ->withPivot('status', 'created_at', 'updated_at', 'deleted_at')
             ->wherePivot('deleted_at', null)
-            ->wherePivot('status', "!=", 'current');
+            ->wherePivot('status', '!=', 'current');
     }
 
     // get dog titles by a relationship of many 2 many with PrevDogTitle model
@@ -422,6 +423,16 @@ class PrevDog extends Model implements HasName
     public function showDogs(): HasMany
     {
         return $this->hasMany(PrevShowDog::class, 'SagirID', 'SagirID');
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(PrevPayment::class, 'sagir_id', 'SagirID');
+    }
+
+    public function userRequests(): HasMany
+    {
+        return $this->hasMany(PrevUserRequest::class, 'sagirID', 'SagirID');
     }
 
     /**

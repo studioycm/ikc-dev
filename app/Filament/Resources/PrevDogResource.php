@@ -745,6 +745,14 @@ class PrevDogResource extends Resource
                     ->label(__('English Name'))
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('breedinghouse.name')
+                    ->label(__('Beit Gidul'))
+                    ->searchable(['breedinghouses.HebName', 'breedinghouses.EngName'], isIndividual: true, isGlobal: false)
+                    ->sortable(['breedinghouses.HebName'])
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('BeitGidulName')
+                    ->label(__('Beit Gidul Name (pre 2022)'))
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('breed.BreedName')
                     ->label(__('Breed'))
                     ->description(function (PrevDog $record): string {
@@ -841,14 +849,7 @@ class PrevDogResource extends Resource
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('breedinghouse.name')
-                    ->label(__('Beit Gidul'))
-                    ->searchable(['breedinghouses.HebName', 'breedinghouses.EngName'], isIndividual: true, isGlobal: false)
-                    ->sortable(['breedinghouses.HebName'])
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('BeitGidulName')
-                    ->label(__('Beit Gidul Name (pre 2022)'))
-                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('GrowerId')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()

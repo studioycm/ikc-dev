@@ -113,7 +113,7 @@ class AdminPanelProvider extends PanelProvider
                     ->label(fn(): string => __('dog/model/general.labels.navigation_group'))
                     ->icon('fas-dog'),
                 NavigationGroup::make()
-                    ->label(fn (): string => __('Owners Management'))
+                    ->label(fn(): string => __('Users Management'))
                     ->icon('fas-user'),
                 NavigationGroup::make()
                     ->label(fn (): string => __('Shows Management'))
@@ -127,6 +127,9 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label(fn(): string => __('dog/kennel/general.labels.navigation_group'))
                     ->icon('heroicon-o-home'),
+                NavigationGroup::make()
+                    ->label(fn(): string => __('Actions and Tasks'))
+                    ->icon('heroicon-o-credit-card'),
                 NavigationGroup::make()
                     ->label(fn (): string => __('Finances Management'))
                     ->icon('heroicon-o-credit-card'),
@@ -151,13 +154,6 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(1),
             ])
             ->navigationItems([
-
-                NavigationItem::make('payments')
-                    ->label(fn (): string => __('Payments'))
-                    ->url(fn (): string => Pages\Dashboard::getUrl())
-                    ->icon('heroicon-o-credit-card')
-                    ->group(fn (): string => __('Finances Management'))
-                    ->sort(90),
 
                 NavigationItem::make('finance-report')
                     ->label(fn (): string => __('Finance Report'))

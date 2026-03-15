@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +51,9 @@ class PrevClub extends Model
     public function breeds(): BelongsToMany
     {
         return $this->belongsToMany(PrevBreed::class, 'breed_club', 'club_id', 'breed_id')
+            ->using(PrevBreedClub::class)
+            ->withPivot('id', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivotNull('deleted_at')
             ->withoutTrashed();
     }
 
@@ -60,7 +64,24 @@ class PrevClub extends Model
 
     public function managers(): BelongsToMany
     {
-        return $this->belongsToMany(PrevUser::class, 'user_club_manager', 'club_id', 'user_id');
+        return $this->belongsToMany(PrevUser::class, 'user_club_manager', 'club_id', 'user_id')
+            ->using(PrevClubManager::class)
+            ->withPivot('id', 'created_at', 'updated_at');
+    }
+
+    public function managerLinks(): HasMany
+    {
+        return $this->hasMany(PrevClubManager::class, 'club_id', 'id');
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(PrevPayment::class, 'club_id', 'id');
+    }
+
+    public function userRequests(): HasMany
+    {
+        return $this->hasMany(PrevUserRequest::class, 'club_id', 'id');
     }
 
     public function members(): BelongsToMany
@@ -74,8 +95,7 @@ class PrevClub extends Model
             ->wherePivot('status', '=', 'active')
             ->wherePivot('expire_date', '>=', now()->format('Y-m-d'))
             ->where(function ($query) {
-                $query->whereNull('club2user.payment_status') // Where 'payment_status' is NULL
-                ->orWhere('club2user.payment_status', 1); // Or 'payment_status' is 1
+                $query->where('club2user.payment_status', 1); // Or 'payment_status' is 1
             })
             ->orderByPivot('expire_date', 'asc');
     }
@@ -93,6 +113,19 @@ class PrevClub extends Model
                 return $parts ? implode(', ', $parts) : '';
             }
         );
+    }
+
+    // get only the prices columns (RegistrationPrice, GeneralReviewFee, DogReviewFee, Breed_NonReg_Price, PerDog_NonReg_Price) values in array with key => column value (label and price)
+    public function pricesArray(): array
+    {
+        return [
+            'registration' => $this->attributes['RegistrationPrice'],
+            'discount_review_main' => $this->attributes['GeneralReviewFee'],
+            'discount_review_per_dog' => $this->attributes['DogReviewFee'],
+            'full_review_main' => $this->attributes['Breed_NonReg_Price'],
+            'full_review_per_dog' => $this->attributes['PerDog_NonReg_Price'],
+            'test' => $this->attributes['TestPrice'],
+        ];
     }
 
     /**

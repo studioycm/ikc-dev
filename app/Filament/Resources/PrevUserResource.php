@@ -29,22 +29,22 @@ class PrevUserResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('Owner');
+        return __('User');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Owners');
+        return __('Users');
     }
 
     public static function getNavigationGroup(): string
     {
-        return __('Owners Management');
+        return __('Users Management');
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('Owners');
+        return __('Users');
     }
 
     protected static ?string $slug = 'prev-users';
