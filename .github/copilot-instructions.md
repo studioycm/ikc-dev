@@ -25,7 +25,7 @@ should be followed closely to enhance the user's satisfaction building Laravel a
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an
 expert with them all. Ensure you abide by these specific packages & versions.
 
-- php - 8.4.16
+- php - 8.4.19
 - filament/filament (FILAMENT) - v3
 - laravel/framework (LARAVEL) - v12
 - laravel/horizon (HORIZON) - v5
