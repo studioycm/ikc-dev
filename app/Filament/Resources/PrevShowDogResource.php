@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\PrevShowDogExporter;
 use App\Filament\Resources\PrevShowDogResource\Pages;
 use App\Models\PrevShowDog;
 use Filament\Forms\Components\DatePicker;
@@ -13,6 +14,8 @@ use Filament\Support\Enums\IconPosition;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -223,7 +226,21 @@ class PrevShowDogResource extends Resource
                 EditAction::make(),
                 ViewAction::make(),
             ])
+            ->headerActions([
+                ExportAction::make()
+                    ->label(__('Export All'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevShowDogExporter::class),
+            ])
             ->bulkActions([
+                ExportBulkAction::make()
+                    ->label(__('Export Selected'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevShowDogExporter::class),
             ])
             ->defaultSort('Shows_Dogs_DB.id', 'desc')
             ->searchOnBlur()

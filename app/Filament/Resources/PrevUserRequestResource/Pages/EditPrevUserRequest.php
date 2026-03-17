@@ -18,7 +18,8 @@ class EditPrevUserRequest extends EditRecord
 
     public function getHeading(): string|Htmlable
     {
-        return __('Edit request:') . ' ' . ($this->getRecord()->topic ?: '#' . $this->getRecord()->id);
+        $topic_label = $this->getRecord()->topic->getLabel();
+        return __('Edit request:') . ' ' . ($topic_label ?? '#' . $this->getRecord()->id);
     }
 
     protected function getHeaderActions(): array

@@ -47,7 +47,7 @@ class LegacyMembershipResolverService
         return !$membership->forbidden
             && ($membership->status === 'active')
             && ($membership->expire_date?->gte(now()))
-            && ($membership->payment_status === null || (int)$membership->payment_status === 1);
+            && ($membership->payment_status === 1);
     }
 
     public function resolveSummaryForDogAndUser(PrevDog $dog, ?int $prevUserId = null): array
@@ -114,7 +114,7 @@ class LegacyMembershipResolverService
             return 'expired';
         }
 
-        if ($membership->payment_status !== null && (int)$membership->payment_status !== 1) {
+        if ((int)$membership->payment_status !== 1) {
             return 'payment_pending';
         }
 
@@ -232,7 +232,7 @@ class LegacyMembershipResolverService
 
     public function eligibleMembershipTypes(
         PrevDog $dog,
-        ?int   $prevUserId = null,
+        ?int $prevUserId = null,
         ?array $strategies = null,
     ): array
     {

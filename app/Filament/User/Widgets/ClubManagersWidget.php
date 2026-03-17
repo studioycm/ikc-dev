@@ -14,14 +14,14 @@ class ClubManagersWidget extends Widget
 
     protected static ?int $sort = 3;
 
-    protected int $grid_columns = 4;
+    protected int $gridColumns = 3;
 
-    public function getClubsWithManagers(): Collection
+    public function getClubs(): Collection
     {
         $prevUserId = auth()->user()?->prevUser?->id;
 
         if (!$prevUserId) {
-            return new Collection();
+            return new Collection;
         }
 
         // Get clubs from user's memberships
@@ -31,46 +31,53 @@ class ClubManagersWidget extends Widget
             ->toArray() ?? [];
 
         if (empty($clubIds)) {
-            return new Collection();
+            return new Collection;
         }
 
-        // Get clubs with their managers
-        // Note: managers relationship returns PrevUser models directly
         return PrevClub::query()
             ->whereIn('id', $clubIds)
             ->with([
-                'managers' => function ($query) {
-                    $query->select('users.id', 'users.first_name', 'users.last_name',
-                        'users.first_name_en', 'users.last_name_en',
-                        'users.mobile_phone', 'users.email');
-                },
+                'managers.skills' => fn($query) => $query->whereIn('skills.id', PrevClub::CLUB_STAFF_SKILL_IDS),
+                'breeds.promoters.skills' => fn($query) => $query->where('skills.id', PrevClub::PROMOTER_SKILL_ID),
             ])
             ->get();
     }
 
-    public function getManagersByRole(): array
+    public function getClubStaffData(): array
     {
-        // This is a simplified version. In a real implementation,
-        // you would have a role field in the user_club_manager pivot table
-        $clubs = $this->getClubsWithManagers();
-        $managersByClub = [];
+        return $this->getClubs()
+            ->mapWithKeys(function (PrevClub $club): array {
+                return [
+                    $club->getKey() => [
+                        'name' => $club->Name,
+                        'email' => $club->Email,
+                        'address' => $club->full_address,
+                        'breeds' => $club->breeds->pluck('BreedName')->filter()->values()->all(),
+                        'staff' => $club->managersWithClubTitles()->map(function ($manager): array {
+                            return [
+                                'name' => $manager->name,
+                                'titles' => $manager->getAttribute('club_titles') ?: [],
+                                'email' => $manager->email,
+                                'mobile_phone' => $manager->normalised_phone ?? $manager->mobile_phone,
+                            ];
+                        })->values()->all(),
+                        'promoters' => $club->promoters()->map(function ($promoter): array {
+                            return [
+                                'name' => $promoter->name,
+                                'titles' => $promoter->getAttribute('club_titles') ?: [],
+                                'email' => $promoter->email,
+                                'mobile_phone' => $promoter->normalised_phone ?? $promoter->mobile_phone,
+                                'breeds' => $promoter->getAttribute('club_breeds') ?: [],
+                            ];
+                        })->values()->all(),
+                    ],
+                ];
+            })
+            ->all();
+    }
 
-        foreach ($clubs as $club) {
-            $managers = $club->managers;
-
-            // Group managers by role (placeholder logic)
-            $managersByClub[$club->id] = [
-                "managers" => [
-                    'chairman' => $managers->take(1),
-                    'secretary' => $managers->slice(1, 1),
-                    'accountant' => $managers->slice(2, 1),
-                    'promoters' => $managers->slice(3),
-                ],
-                "name" => $club->Name,
-                "breeds" => $club->breeds->pluck('BreedName')->toArray(),
-            ];
-        }
-
-        return $managersByClub;
+    public function getGridColumns(): int
+    {
+        return $this->gridColumns;
     }
 }

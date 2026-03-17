@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\PrevShowPaymentExporter;
 use App\Filament\Resources\PrevShowPaymentResource\Pages;
 use App\Models\PrevShowPayment;
 use Filament\Forms\Components\DatePicker;
@@ -13,6 +14,8 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
@@ -161,11 +164,25 @@ class PrevShowPaymentResource extends Resource
                 ForceDeleteAction::make(),
             ])
             ->bulkActions([
+                ExportBulkAction::make()
+                    ->label(__('Export Selected'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevShowPaymentExporter::class),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+                ExportAction::make()
+                    ->label(__('Export All'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevShowPaymentExporter::class),
             ]);
     }
 

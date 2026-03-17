@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\PrevDogImportExporter;
+use App\Filament\Imports\PrevDogImportImporter;
 use App\Filament\Resources\PrevDogImportResource\Pages;
 use App\Models\PrevDogImport;
 use App\Models\PrevUser;
@@ -12,6 +14,9 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Actions\ExportBulkAction;
+use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -132,11 +137,31 @@ class PrevDogImportResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
+                ExportBulkAction::make()
+                    ->label(__('Export Selected'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevDogImportExporter::class),
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+                ImportAction::make()
+                    ->label(__('Import'))
+                    ->icon('fas-file-import')
+                    ->color('gray')
+                    ->iconPosition('after')
+                    ->importer(PrevDogImportImporter::class),
+                ExportAction::make()
+                    ->label(__('Export All'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevDogImportExporter::class),
             ])
             ->defaultSort('created_at', 'desc')
             ->searchOnBlur()

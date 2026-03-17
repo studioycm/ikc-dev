@@ -22,6 +22,8 @@ class PrevSkillUser extends Pivot
         'id' => 'integer',
         'user_id' => 'integer',
         'skill_id' => 'integer',
+        'club_id' => 'integer',
+        'breed_id' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
@@ -35,5 +37,15 @@ class PrevSkillUser extends Pivot
     public function skill(): BelongsTo
     {
         return $this->belongsTo(PrevSkill::class, 'skill_id', 'id');
+    }
+
+    public function club(): BelongsTo
+    {
+        return $this->belongsTo(PrevClub::class, 'club_id', 'id');
+    }
+
+    public function breed(): BelongsTo
+    {
+        return $this->belongsTo(PrevBreed::class, 'breed_id', 'id');
     }
 }

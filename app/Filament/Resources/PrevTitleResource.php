@@ -2,20 +2,23 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\PrevTitleExporter;
+use App\Filament\Imports\PrevTitleImporter;
+
+// use App\Filament\Resources\PrevTitleResource\RelationManagers;
 use App\Filament\Resources\PrevTitleResource\Pages;
-//use App\Filament\Resources\PrevTitleResource\RelationManagers;
 use App\Models\PrevTitle;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Actions\ExportBulkAction;
+use Filament\Tables\Actions\ImportAction;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Tables\Enums\FiltersLayout;
-use App\Filament\Exports\PrevTitleExporter;
-use Filament\Tables\Actions\ExportAction;
-use Filament\Tables\Actions\ExportBulkAction;
 
 class PrevTitleResource extends Resource
 {
@@ -45,10 +48,10 @@ class PrevTitleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-//    public static function getNavigationBadge(): ?string
-//    {
-//        return (string) static::$model::count();
-//    }
+    //    public static function getNavigationBadge(): ?string
+    //    {
+    //        return (string) static::$model::count();
+    //    }
 
     public static function form(Form $form): Form
     {
@@ -75,11 +78,10 @@ class PrevTitleResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-             ->modifyQueryUsing(function (Builder $query) {
-                 return $query
-                 ->withCount('awarding')
-                 ;
-             })
+            ->modifyQueryUsing(function (Builder $query) {
+                return $query
+                    ->withCount('awarding');
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->sortable()
@@ -107,12 +109,12 @@ class PrevTitleResource extends Resource
                     ->label(__('Remark'))
                     ->searchable(isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: false),
-                 Tables\Columns\TextColumn::make('awarding_count')
-                     ->label(__('Awarded'))
-                     ->counts('awarding')
-                     ->numeric()
-                     ->sortable(['awarding_count'])
-                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('awarding_count')
+                    ->label(__('Awarded'))
+                    ->counts('awarding')
+                    ->numeric()
+                    ->sortable(['awarding_count'])
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('CreationDateTime')
                     ->label(__('Create Date'))
                     ->dateTime()
@@ -164,6 +166,12 @@ class PrevTitleResource extends Resource
                 ]),
             ])
             ->headerActions([
+                ImportAction::make()
+                    ->label(__('Import'))
+                    ->icon('fas-file-import')
+                    ->color('gray')
+                    ->iconPosition('after')
+                    ->importer(PrevTitleImporter::class),
                 ExportAction::make()
                     ->label(__('Export All'))
                     ->icon('fas-file-export')
@@ -204,7 +212,6 @@ class PrevTitleResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-                ->withoutGlobalScopes([SoftDeletingScope::class,])
-            ;
+            ->withoutGlobalScopes([SoftDeletingScope::class]);
     }
 }

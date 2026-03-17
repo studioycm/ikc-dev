@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\PrevUserTaskExporter;
 use App\Filament\Resources\PrevUserTaskResource\Pages;
 use App\Models\PrevUser;
 use App\Models\PrevUserTask;
@@ -13,6 +14,8 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -124,11 +127,25 @@ class PrevUserTaskResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
+                ExportBulkAction::make()
+                    ->label(__('Export Selected'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevUserTaskExporter::class),
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+                ExportAction::make()
+                    ->label(__('Export All'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevUserTaskExporter::class),
             ])
             ->defaultSort('due_date_time', 'desc')
             ->searchOnBlur()

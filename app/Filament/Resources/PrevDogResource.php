@@ -7,6 +7,7 @@ use App\Enums\Legacy\LegacyDogSize;
 use App\Enums\Legacy\LegacyDogStatus;
 use App\Enums\Legacy\LegacyPedigreeColor;
 use App\Enums\Legacy\LegacySagirPrefix;
+use App\Filament\Exports\PrevDogExporter;
 use App\Filament\Resources\PrevDogResource\Pages;
 use App\Livewire\Legacy\Pedigree\PedigreeTree;
 use App\Models\PrevBreed;
@@ -41,6 +42,8 @@ use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\IconSize;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
@@ -1454,9 +1457,20 @@ class PrevDogResource extends Resource
 
             ])
             ->headerActions([
-                //
+                ExportAction::make()
+                    ->label(__('Export All'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevDogExporter::class),
             ])
             ->bulkActions([
+                ExportBulkAction::make()
+                    ->label(__('Export Selected'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevDogExporter::class),
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->label(__('Delete'))
@@ -1738,9 +1752,14 @@ class PrevDogResource extends Resource
     {
         return [
             PrevDogResource\RelationManagers\OwnersRelationManager::class,
+            PrevDogResource\RelationManagers\FemaleBreedingsRelationManager::class,
+            PrevDogResource\RelationManagers\MaleBreedingsRelationManager::class,
+            PrevDogResource\RelationManagers\ChildrenRelationManager::class,
             PrevDogResource\RelationManagers\TitlesRelationManager::class,
             PrevDogResource\RelationManagers\HealthRecordsRelationManager::class,
             PrevDogResource\RelationManagers\PrevDogDocumentRelationManager::class,
+            PrevDogResource\RelationManagers\PaymentsRelationManager::class,
+            PrevDogResource\RelationManagers\UserRequestsRelationManager::class,
             PrevDogResource\RelationManagers\ShowDogsRelationManager::class,
         ];
     }

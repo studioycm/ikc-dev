@@ -2,9 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\Legacy\LegacyUserRequestChampionType;
+use App\Enums\Legacy\LegacyUserRequestPaperType;
+use App\Enums\Legacy\LegacyUserRequestTopic;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class PrevUserRequest extends Model
 {
@@ -18,6 +23,7 @@ class PrevUserRequest extends Model
 
     protected $casts = [
         'id' => 'integer',
+        'topic' => LegacyUserRequestTopic::class,
         'club_id' => 'integer',
         'approve_1' => 'boolean',
         'approve_2' => 'boolean',
@@ -32,11 +38,15 @@ class PrevUserRequest extends Model
         'record_date_time' => 'datetime',
         'payment_date_time' => 'datetime',
         'sagirID' => 'integer',
-        'shipping_type_id' => 'integer',
         'IsDone' => 'boolean',
         'DoneByUserID' => 'integer',
         'DoneDate' => 'datetime',
         'owner_id' => 'integer',
+        'agra_city' => 'integer',
+        'shipping_type_id' => 'integer',
+        'shipping' => 'string',
+        'champion_certificate_type' => LegacyUserRequestChampionType::class,
+        'paper_request_type' => LegacyUserRequestPaperType::class,
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
@@ -60,5 +70,19 @@ class PrevUserRequest extends Model
     public function doneBy(): BelongsTo
     {
         return $this->belongsTo(PrevUser::class, 'DoneByUserID', 'id');
+    }
+
+    public function vetAuth(): BelongsTo
+    {
+        return $this->belongsTo(PrevVetAuth::class, 'agra_city', 'id');
+    }
+
+    // attribute accessors for status to lower case writen in new Laravel 12 format:
+    protected function status(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => strtolower($this->attributes['status']),
+            set: fn($value) => Str::title($value),
+        );
     }
 }

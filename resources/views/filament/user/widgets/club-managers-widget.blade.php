@@ -10,16 +10,31 @@
 
         <div class="space-y-8">
             @php
-                $clubsData = $this->getManagersByRole();
+                $clubsData = $this->getClubStaffData();
             @endphp
 
             @forelse($clubsData as $clubID => $clubData)
                 <div class="space-y-4">
-                    {{-- Club Header --}}
                     <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                             {{ $clubData['name'] }}
                         </h3>
+                        <div class="mt-2 flex flex-wrap gap-3 text-sm text-gray-500 dark:text-gray-400">
+                            @if(filled($clubData['email'] ?? null))
+                                <a href="mailto:{{ $clubData['email'] }}"
+                                   class="flex items-center gap-2 hover:underline">
+                                    <x-heroicon-o-envelope class="h-4 w-4"/>
+                                    {{ $clubData['email'] }}
+                                </a>
+                            @endif
+
+                            @if(filled($clubData['address'] ?? null))
+                                <div class="flex items-center gap-2">
+                                    <x-heroicon-o-map-pin class="h-4 w-4"/>
+                                    {{ $clubData['address'] }}
+                                </div>
+                            @endif
+                        </div>
                     </div>
 
                     <div>
@@ -34,161 +49,109 @@
                         </div>
                     </div>
 
-                    {{-- Manager Cards Grid --}}
-                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-{{ $this->grid_columns }} gap-4">
-                        {{-- Chairman --}}
-                        @foreach($clubData['managers']['chairman'] as $manager)
-                            <div
-                                class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm hover:shadow-md transition-shadow">
-                                <div class="flex items-start space-x-3">
-                                    {{-- Info --}}
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                            {{ $manager->name ?? __('Unknown') }}
-                                        </p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                            <span
-                                                class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900 px-2 py-0.5 text-xs font-medium text-blue-800 dark:text-blue-200">
-                                                {{__('Chairman')}}
-                                            </span>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ __('Club Staff') }}</h4>
+                            <div class="mt-3 grid grid-cols-1 gap-4 md:grid-cols-{{ $this->getGridColumns() }}">
+                                @forelse($clubData['staff'] as $staffMember)
+                                    <div
+                                        class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ $staffMember['name'] ?? __('Unknown') }}
                                         </p>
 
-                                        {{-- Contact Info --}}
-                                        <div class="mt-2 space-y-1">
-                                            @if($manager->email)
-                                                <a href="mailto:{{ $manager->email }}"
-                                                   class="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-2">
-                                                    <x-heroicon-o-envelope class="w-3 h-3 mr-1"/>
-                                                    {{ $manager->email }}
+                                        <div class="mt-2 flex flex-wrap gap-2">
+                                            @foreach($staffMember['titles'] ?? [] as $title)
+                                                <span
+                                                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                                    {{ $title }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+
+                                        <div class="mt-3 space-y-1">
+                                            @if(filled($staffMember['email'] ?? null))
+                                                <a href="mailto:{{ $staffMember['email'] }}"
+                                                   class="flex items-center gap-2 text-xs text-blue-600 hover:underline dark:text-blue-400">
+                                                    <x-heroicon-o-envelope class="h-3 w-3"/>
+                                                    {{ $staffMember['email'] }}
                                                 </a>
                                             @endif
 
-                                            @if($manager->mobile_phone)
-                                                <a href="tel:{{ $manager->mobile_phone }}"
-                                                   class="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-2">
-                                                    <x-heroicon-o-phone class="w-3 h-3 mr-1"/>
-                                                    {{ $manager->mobile_phone }}
+                                            @if(filled($staffMember['mobile_phone'] ?? null))
+                                                <a href="tel:{{ $staffMember['mobile_phone'] }}"
+                                                   class="flex items-center gap-2 text-xs text-blue-600 hover:underline dark:text-blue-400">
+                                                    <x-heroicon-o-phone class="h-3 w-3"/>
+                                                    {{ $staffMember['mobile_phone'] }}
                                                 </a>
                                             @endif
                                         </div>
                                     </div>
-                                </div>
+                                @empty
+                                    <div
+                                        class="rounded-lg border border-dashed border-gray-300 p-4 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                                        {{ __('No club staff found.') }}
+                                    </div>
+                                @endforelse
                             </div>
-                        @endforeach
+                        </div>
 
-                        {{-- Secretary --}}
-                        @foreach($clubData['managers']['secretary'] as $manager)
-                            <div
-                                class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm hover:shadow-md transition-shadow">
-                                <div class="flex items-start space-x-3">
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                            {{ $manager->name ?? 'Unknown' }}
-                                        </p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                            <span
-                                                class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900 px-2 py-0.5 text-xs font-medium text-green-800 dark:text-green-200">
-                                                {{__('Secretary')}}
-                                            </span>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ __('Promoters') }}</h4>
+                            <div class="mt-3 grid grid-cols-1 gap-4 md:grid-cols-{{ $this->getGridColumns() }}">
+                                @forelse($clubData['promoters'] as $promoter)
+                                    <div
+                                        class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ $promoter['name'] ?? __('Unknown') }}
                                         </p>
 
-                                        <div class="mt-2 space-y-1">
-                                            @if($manager->email)
-                                                <a href="mailto:{{ $manager->email }}"
-                                                   class="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-2">
-                                                    <x-heroicon-o-envelope class="w-3 h-3 mr-1"/>
-                                                    {{ $manager->email }}
+                                        <div class="mt-2 flex flex-wrap gap-2">
+                                            @foreach($promoter['titles'] ?? [] as $title)
+                                                <span
+                                                    class="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                                    {{ $title }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+
+                                        @if(!empty($promoter['breeds']))
+                                            <div class="mt-2 flex flex-wrap gap-2">
+                                                @foreach($promoter['breeds'] as $breed)
+                                                    <span
+                                                        class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                                                        {{ $breed }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @endif
+
+                                        <div class="mt-3 space-y-1">
+                                            @if(filled($promoter['email'] ?? null))
+                                                <a href="mailto:{{ $promoter['email'] }}"
+                                                   class="flex items-center gap-2 text-xs text-blue-600 hover:underline dark:text-blue-400">
+                                                    <x-heroicon-o-envelope class="h-3 w-3"/>
+                                                    {{ $promoter['email'] }}
                                                 </a>
                                             @endif
 
-                                            @if($manager->mobile_phone)
-                                                <a href="tel:{{ $manager->mobile_phone }}"
-                                                   class="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-2">
-                                                    <x-heroicon-o-phone class="w-3 h-3 mr-1"/>
-                                                    {{ $manager->mobile_phone }}
+                                            @if(filled($promoter['mobile_phone'] ?? null))
+                                                <a href="tel:{{ $promoter['mobile_phone'] }}"
+                                                   class="flex items-center gap-2 text-xs text-blue-600 hover:underline dark:text-blue-400">
+                                                    <x-heroicon-o-phone class="h-3 w-3"/>
+                                                    {{ $promoter['mobile_phone'] }}
                                                 </a>
                                             @endif
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        @endforeach
-
-                        {{-- Accountant --}}
-                        @foreach($clubData['managers']['accountant'] as $manager)
-                            <div
-                                class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm hover:shadow-md transition-shadow">
-                                <div class="flex items-start space-x-3">
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                            {{ $manager->name ?? 'Unknown' }}
-                                        </p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                            <span
-                                                class="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900 px-2 py-0.5 text-xs font-medium text-amber-800 dark:text-amber-200">
-                                                {{__('Accountant')}}
-                                            </span>
-                                        </p>
-
-                                        <div class="mt-2 space-y-1">
-                                            @if($manager->email)
-                                                <a href="mailto:{{ $manager->email }}"
-                                                   class="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-2">
-                                                    <x-heroicon-o-envelope class="w-3 h-3 mr-1"/>
-                                                    {{ $manager->email }}
-                                                </a>
-                                            @endif
-
-                                            @if($manager->mobile_phone)
-                                                <a href="tel:{{ $manager->mobile_phone }}"
-                                                   class="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-2">
-                                                    <x-heroicon-o-phone class="w-3 h-3 mr-1"/>
-                                                    {{ $manager->mobile_phone }}
-                                                </a>
-                                            @endif
-                                        </div>
+                                @empty
+                                    <div
+                                        class="rounded-lg border border-dashed border-gray-300 p-4 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                                        {{ __('No promoters found.') }}
                                     </div>
-                                </div>
+                                @endforelse
                             </div>
-                        @endforeach
-
-                        {{-- Breed Promoters --}}
-                        @foreach($clubData['managers']['promoters'] as $manager)
-                            <div
-                                class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm hover:shadow-md transition-shadow">
-                                <div class="flex items-start space-x-3">
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                            {{ $manager->name ?? 'Unknown' }}
-                                        </p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                            <span
-                                                class="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900 px-2 py-0.5 text-xs font-medium text-purple-800 dark:text-purple-200">
-                                                {{__('Breed Promoter')}}
-                                            </span>
-                                        </p>
-
-                                        <div class="mt-2 space-y-1">
-                                            @if($manager->email)
-                                                <a href="mailto:{{ $manager->email }}"
-                                                   class="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-2">
-                                                    <x-heroicon-o-envelope class="w-3 h-3 mr-1"/>
-                                                    {{ $manager->email }}
-                                                </a>
-                                            @endif
-
-                                            @if($manager->mobile_phone)
-                                                <a href="tel:{{ $manager->mobile_phone }}"
-                                                   class="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-2">
-                                                    <x-heroicon-o-phone class="w-3 h-3 mr-1"/>
-                                                    {{ $manager->mobile_phone }}
-                                                </a>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
+                        </div>
                     </div>
                 </div>
             @empty

@@ -143,6 +143,9 @@ class AdminPanelProvider extends PanelProvider
                     ->label(fn (): string => __('Reports Management'))
                     ->icon('heroicon-o-presentation-chart-line'),
                 NavigationGroup::make()
+                    ->label(fn(): string => __('Legacy Management'))
+                    ->icon('fas-cog'),
+                NavigationGroup::make()
                     ->label(fn (): string => __('Authorisation Management'))
                     ->icon('fas-shield-dog'),
             ])

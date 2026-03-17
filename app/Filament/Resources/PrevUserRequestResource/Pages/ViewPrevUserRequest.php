@@ -12,7 +12,8 @@ class ViewPrevUserRequest extends ViewRecord
 
     public function getTitle(): string
     {
-        return __('Displaying') . ' ' . __('User Request') . ': ' . ($this->record->topic ?: '#' . $this->record->id);
+        $topic_label = $this->getRecord()->topic->getLabel();
+        return __('Displaying') . " " . __('User Request') . ": " . ($topic_label ?? '#' . $this->record->id);
     }
 
     protected function getHeaderActions(): array

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\PrevShowResultExporter;
 // use App\Filament\Resources\PrevDogResource as DogRes;
 // use App\Filament\Resources\PrevShowArenaResource as ArenaRes;
 // use App\Filament\Resources\PrevShowClassResource as ClassRes;
@@ -23,6 +24,8 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -249,7 +252,6 @@ class PrevShowResultResource extends Resource
                                         ->inline()
                                         ->onColor('success')
                                         ->offColor(null),
-
 
                                     Toggle::make('REGCAC')
                                         ->label(__('REGCAC'))
@@ -644,7 +646,21 @@ class PrevShowResultResource extends Resource
                 ViewAction::make()
                     ->modalWidth(MaxWidth::Full),
             ])
+            ->headerActions([
+                ExportAction::make()
+                    ->label(__('Export All'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevShowResultExporter::class),
+            ])
             ->bulkActions([
+                ExportBulkAction::make()
+                    ->label(__('Export Selected'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevShowResultExporter::class),
             ])
             ->defaultSort('DataID', 'desc')
             ->searchOnBlur()

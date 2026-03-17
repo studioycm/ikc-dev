@@ -2,21 +2,21 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\PrevBreedExporter;
+use App\Filament\Imports\PrevBreedImporter;
 use App\Filament\Resources\PrevBreedResource\Pages;
 use App\Models\PrevBreed;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Actions\ExportBulkAction;
+use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
-// use App\Filament\Exports\DogExporter;
-// use App\Filament\Imports\DogImporter;
-// use Filament\Tables\Actions\ExportAction;
-// use Filament\Tables\Actions\ImportAction;
 
 class PrevBreedResource extends Resource
 {
@@ -200,9 +200,29 @@ class PrevBreedResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
+                ExportBulkAction::make()
+                    ->label(__('Export Selected'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevBreedExporter::class),
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+                ImportAction::make()
+                    ->label(__('Import'))
+                    ->icon('fas-file-import')
+                    ->color('gray')
+                    ->iconPosition('after')
+                    ->importer(PrevBreedImporter::class),
+                ExportAction::make()
+                    ->label(__('Export All'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevBreedExporter::class),
             ]);
     }
 
