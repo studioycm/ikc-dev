@@ -57,6 +57,11 @@ class PrevUserRequest extends Model
         return $this->belongsTo(PrevClub::class, 'club_id', 'id');
     }
 
+    public function userByPhone(): BelongsTo
+    {
+        return $this->belongsTo(PrevUser::class, 'mobile_phone', 'mobile_phone');
+    }
+
     public function dog(): BelongsTo
     {
         return $this->belongsTo(PrevDog::class, 'sagirID', 'SagirID');

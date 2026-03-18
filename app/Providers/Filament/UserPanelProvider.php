@@ -2,12 +2,16 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\User\Pages\Dashboard as UserDashboard;
+use App\Filament\User\Pages\DogsDashboard;
+use App\Filament\User\Pages\MembershipsDashboard;
+use App\Filament\User\Pages\PaymentsDashboard;
+use App\Filament\User\Pages\RequestsDashboard;
 use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -52,7 +56,11 @@ class UserPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                UserDashboard::class,
+                DogsDashboard::class,
+                MembershipsDashboard::class,
+                RequestsDashboard::class,
+                PaymentsDashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/User/Widgets'), for: 'App\\Filament\\User\\Widgets')
             ->widgets([

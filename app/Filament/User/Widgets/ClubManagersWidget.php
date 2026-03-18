@@ -14,7 +14,7 @@ class ClubManagersWidget extends Widget
 
     protected static ?int $sort = 3;
 
-    protected int $gridColumns = 3;
+    protected int $gridColumns = 6;
 
     public function getClubs(): Collection
     {

@@ -52,7 +52,7 @@
                     <div class="space-y-4">
                         <div>
                             <h4 class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ __('Club Staff') }}</h4>
-                            <div class="mt-3 grid grid-cols-1 gap-4 md:grid-cols-{{ $this->getGridColumns() }}">
+                            <div class="mt-3 grid gap-4 grid-cols-{{ $this->getGridColumns() }}">
                                 @forelse($clubData['staff'] as $staffMember)
                                     <div
                                         class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
@@ -98,7 +98,7 @@
 
                         <div>
                             <h4 class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ __('Promoters') }}</h4>
-                            <div class="mt-3 grid grid-cols-1 gap-4 md:grid-cols-{{ $this->getGridColumns() }}">
+                            <div class="mt-3 grid gap-4 grid-cols-{{ $this->getGridColumns() }}">
                                 @forelse($clubData['promoters'] as $promoter)
                                     <div
                                         class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
