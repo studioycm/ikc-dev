@@ -86,6 +86,8 @@ class UserPanelProvider extends PanelProvider
                         'color' => 'primary',
                         'icon' => 'fas-user',
                         'prev_user_name' => auth()->user()->prevUser->name,
+                        'prev_user_id' => auth()->user()->prevUser->id,
+                        'prev_user_phone' => auth()->user()->prevUser->normalised_phone,
                     ]);
             }
             );

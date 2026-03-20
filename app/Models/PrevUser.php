@@ -137,6 +137,11 @@ class PrevUser extends Model implements HasName
         return $this->hasMany(PrevUserRequest::class, 'owner_id', 'id');
     }
 
+    public function requestsByPhone(): HasMany
+    {
+        return $this->hasMany(PrevUserRequest::class, 'mobile_phone', 'mobile_phone');
+    }
+
     public function completedRequests(): HasMany
     {
         return $this->hasMany(PrevUserRequest::class, 'DoneByUserID', 'id');
@@ -297,6 +302,21 @@ class PrevUser extends Model implements HasName
             ->pluck('search_label', 'id')
             ->toArray();
     }
+
+//    protected function mobile_phone(): Attribute
+//    {
+//        return Attribute::make(
+//            get: function () {
+//                $mobile = static::normaliseMsisdn($this->attributes['mobile_phone'] ?? null);
+//
+//                if ($mobile !== null) {
+//                    return $mobile;
+//                }
+//
+//                return static::normaliseMsisdn($this->attributes['phone'] ?? null);
+//            }
+//        );
+//    }
 
     /**
      * Clean “mobile_phone” first; if it can’t be normalised,

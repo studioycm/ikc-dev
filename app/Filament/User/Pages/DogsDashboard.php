@@ -15,12 +15,12 @@ class DogsDashboard extends BaseDashboard
 
     public static function getNavigationLabel(): string
     {
-        return __('Dogs');
+        return __('dog/model/general.labels.navigation_label');
     }
 
     public function getTitle(): string
     {
-        return __('Dogs');
+        return __('dog/model/general.labels.plural');
     }
 
     public function getColumns(): int|string|array

@@ -41,11 +41,6 @@ class MembershipOverviewStats extends BaseWidget
                 ->count())
                 ->color('warning')
                 ->url(MembershipsDashboard::getUrl(panel: 'user')),
-            Stat::make(__('Clubs represented'), (clone $membershipsQuery)
-                ->distinct('club_id')
-                ->count('club_id'))
-                ->icon('heroicon-o-user-group')
-                ->url(MembershipsDashboard::getUrl(panel: 'user')),
         ];
     }
 }

@@ -16,6 +16,11 @@ trait InteractsWithCurrentPrevUser
         return $this->getCurrentPrevUser()?->getKey();
     }
 
+    protected function getCurrentPrevUserPhone(): ?int
+    {
+        return $this->getCurrentPrevUser()?->normalised_phone;
+    }
+
     /**
      * @return array<int>
      */

@@ -52,6 +52,8 @@ class PrevUserRequest extends Model
         'deleted_at' => 'datetime',
     ];
 
+//    protected $appends = ['normalized_mobile'];
+
     public function club(): BelongsTo
     {
         return $this->belongsTo(PrevClub::class, 'club_id', 'id');
@@ -90,4 +92,44 @@ class PrevUserRequest extends Model
             set: fn($value) => Str::title($value),
         );
     }
+
+
+    protected function requesterName(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                return $this->attributes['first_name'] . ' ' . $this->attributes['last_name'];
+            }
+        );
+    }
+
+    protected function normalizedMobile(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                return self::normaliseMsisdn($this->attributes['mobile_phone']);
+            }
+        );
+    }
+
+    protected static function normaliseMsisdn(?string $raw): ?string
+    {
+        if ($raw === null || $raw === '') {
+            return null;
+        }
+
+        // 1. keep digits only
+        $digits = preg_replace('/\D+/', '', $raw);
+
+        // 2. strip international prefixes
+        $digits = preg_replace('/^(00972|972)/', '', $digits);
+
+        // 3. guarantee a single leading zero
+        $digits = ltrim($digits, '0');
+        $digits = $digits === '' ? '' : '0' . $digits;
+
+        // 4. final validation
+        return preg_match('/^05\d{8}$/', $digits) ? $digits : null;
+    }
+
 }
