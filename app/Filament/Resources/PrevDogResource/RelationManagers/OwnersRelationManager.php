@@ -16,7 +16,7 @@ class OwnersRelationManager extends RelationManager
 {
     protected static string $relationship = 'owners';
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static ?string $recordTitleAttribute = 'first_name';
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {

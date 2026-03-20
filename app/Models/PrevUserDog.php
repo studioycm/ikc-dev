@@ -38,4 +38,9 @@ class PrevUserDog extends Pivot
     {
         return $this->belongsTo(PrevUser::class, 'user_id', 'id');
     }
+
+    public function oldOwner(): BelongsTo
+    {
+        return $this->belongsTo(PrevUser::class, 'user_id', 'id');
+    }
 }

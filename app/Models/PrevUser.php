@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 
@@ -29,6 +30,7 @@ class PrevUser extends Model implements HasName
      * @var string
      */
     protected $table = 'users';
+
     protected $primaryKey = 'id';
 
     public $timestamps = true;
@@ -67,6 +69,29 @@ class PrevUser extends Model implements HasName
             ->wherePivot('status', 'current');
     }
 
+    public function clubs(): BelongsToMany
+    {
+        return $this->belongsToMany(PrevClub::class, 'club2user', 'user_id', 'club_id', 'id', 'id')
+            ->withTimestamps()
+            ->using(PrevClubUser::class)
+            ->as('membership')
+            ->withPivot('id', 'expire_date', 'type', 'status', 'payment_status', 'forbidden', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivotNull('deleted_at');
+    }
+
+    public function activeMemberships(): BelongsToMany
+    {
+        return $this->clubs()
+            ->wherePivot('expire_date', '>=', now()->format('Y-m-d'))
+            ->wherePivot('forbidden', false)
+            ->WherePivot('payment_status', 1);
+    }
+
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class, 'prev_user_id', 'id');
+    }
+
     public function history_dogs(): HasMany
     {
         return $this->hasMany(PrevDog::class, 'CurrentOwnerId', 'owner_code')
@@ -85,6 +110,80 @@ class PrevUser extends Model implements HasName
     {
         return $this->hasMany(PrevDog::class, 'Breeding_ManagerID', 'id')
             ->where('deleted_at', null);
+    }
+
+    public function dogImports(): HasMany
+    {
+        return $this->hasMany(PrevDogImport::class, 'user_id', 'id');
+    }
+
+    public function ownerFiles(): HasMany
+    {
+        return $this->hasMany(PrevOwnerFile::class, 'owner_id', 'id');
+    }
+
+    public function createdPayments(): HasMany
+    {
+        return $this->hasMany(PrevPayment::class, 'created_by', 'id');
+    }
+
+    public function updatedPayments(): HasMany
+    {
+        return $this->hasMany(PrevPayment::class, 'updated_by', 'id');
+    }
+
+    public function ownedRequests(): HasMany
+    {
+        return $this->hasMany(PrevUserRequest::class, 'owner_id', 'id');
+    }
+
+    public function completedRequests(): HasMany
+    {
+        return $this->hasMany(PrevUserRequest::class, 'DoneByUserID', 'id');
+    }
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(PrevUserActivity::class, 'UserID', 'id');
+    }
+
+    public function createdActivities(): HasMany
+    {
+        return $this->hasMany(PrevUserActivity::class, 'CreatedBy', 'id');
+    }
+
+    public function promotedBreeds(): BelongsToMany
+    {
+        return $this->belongsToMany(PrevBreed::class, 'user2breeds', 'user_id', 'breed_id')
+            ->using(PrevBreedUser::class)
+            ->withPivot('id', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivotNull('deleted_at');
+    }
+
+    public function managedClubs(): BelongsToMany
+    {
+        return $this->belongsToMany(PrevClub::class, 'user_club_manager', 'user_id', 'club_id')
+            ->using(PrevClubManager::class)
+            ->withPivot('id', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivotNull('deleted_at');
+    }
+
+    public function skills(): BelongsToMany
+    {
+        return $this->belongsToMany(PrevSkill::class, 'users_skills', 'user_id', 'skill_id')
+            ->using(PrevSkillUser::class)
+            ->withPivot('id', 'created_at', 'updated_at', 'deleted_at')
+            ->wherePivotNull('deleted_at');
+    }
+
+    public function managedTasks(): HasMany
+    {
+        return $this->hasMany(PrevUserTask::class, 'manager_user_id', 'id');
+    }
+
+    public function relatedTasks(): HasMany
+    {
+        return $this->hasMany(PrevUserTask::class, 'related_to_user_id', 'id');
     }
 
     /**
@@ -255,5 +354,34 @@ class PrevUser extends Model implements HasName
     {
         // prefer explicit email, then owner_email
         return $this->email ?: $this->owner_email ?: null;
+    }
+
+    // get and set address mutator and accessor laravel Attribute
+    public function address(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->addressArray(),
+        );
+    }
+
+    public function buildAddress(): string
+    {
+        $short_address = array_filter($this->addressArray(), fn($value) => !empty($value));
+
+        return implode(', ', $short_address);
+    }
+
+    public function addressArray(): array
+    {
+
+        return [
+            'city' => $this->address_city,
+            'city_en' => $this->address_city_en,
+            'street' => $this->address_street,
+            'street_en' => $this->address_street_en,
+            'street_number' => $this->address_street_number,
+            'house_number' => $this->house_number,
+            'zip' => $this->address_zip,
+        ];
     }
 }

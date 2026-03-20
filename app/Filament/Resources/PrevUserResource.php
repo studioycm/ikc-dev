@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\PrevUserExporter;
 use App\Filament\Resources\PrevUserResource\Pages;
 use App\Models\PrevUser;
 use App\Notifications\UserMessageNotification;
@@ -10,6 +11,8 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters;
@@ -29,22 +32,22 @@ class PrevUserResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('Owner');
+        return __('User');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Owners');
+        return __('Users');
     }
 
     public static function getNavigationGroup(): string
     {
-        return __('Owners Management');
+        return __('Users Management');
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('Owners');
+        return __('Users');
     }
 
     protected static ?string $slug = 'prev-users';
@@ -82,148 +85,204 @@ class PrevUserResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('role_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('first_name')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('last_name')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('first_name_en')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('last_name_en')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\TextInput::make('password')
-                    ->password()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('otp')
-                    ->numeric(),
-                Forms\Components\TextInput::make('mobile_phone')
-                    ->tel()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('phone')
-                    ->tel()
-                    ->maxLength(255),
-                Forms\Components\DatePicker::make('birth_date'),
-                Forms\Components\TextInput::make('address_city')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('address_city_en')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('address_street')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('address_street_en')
-                    ->maxLength(250),
-                Forms\Components\TextInput::make('address_street_number')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('house_number')
-                    ->maxLength(150),
-                Forms\Components\TextInput::make('address_zip')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('country_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('country_code')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('fax')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('social_id_number')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('passport_id')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('profile_photo')
-                    ->maxLength(255),
-                Forms\Components\DateTimePicker::make('last_active_date_time'),
-                Forms\Components\TextInput::make('is_superadmin')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('language_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('status')
-                    ->numeric()
-                    ->default(0),
-                Forms\Components\TextInput::make('record_type')
-                    ->maxLength(50),
-                Forms\Components\TextInput::make('migration_status'),
-                Forms\Components\TextInput::make('data_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('owner_code')
-                    ->numeric(),
-                Forms\Components\TextInput::make('info_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('owner_email')
-                    ->email()
-                    ->maxLength(100),
-                Forms\Components\TextInput::make('sagir_owner_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('is_current_owner')
-                    ->numeric(),
-                Forms\Components\TextInput::make('order_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('new_sid')
-                    ->maxLength(200),
-                Forms\Components\TextInput::make('new_org_data_id')
-                    ->numeric(),
-                Forms\Components\DatePicker::make('new_fill_date'),
-                Forms\Components\TextInput::make('new_filler_ip')
-                    ->maxLength(200),
-                Forms\Components\TextInput::make('club_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('owner_payment_sum')
-                    ->maxLength(200),
-                Forms\Components\TextInput::make('owner_payment_last4')
-                    ->maxLength(200),
-                Forms\Components\TextInput::make('member_status')
-                    ->numeric(),
-                Forms\Components\TextInput::make('special_key')
-                    ->maxLength(4000),
-                Forms\Components\DatePicker::make('expire_date'),
-                Forms\Components\TextInput::make('owner_total_payment')
-                    ->numeric(),
-                Forms\Components\DatePicker::make('start_date'),
-                Forms\Components\TextInput::make('record_source')
-                    ->numeric(),
-                Forms\Components\TextInput::make('is_judge')
-                    ->maxLength(200),
-                Forms\Components\TextInput::make('city_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('private_phone_1')
-                    ->tel()
-                    ->maxLength(200),
-                Forms\Components\TextInput::make('private_phone_2')
-                    ->tel()
-                    ->maxLength(200),
-                Forms\Components\Textarea::make('note')
+                Forms\Components\Tabs::make('prev_user_form_tabs')
+                    ->tabs([
+                        Forms\Components\Tabs\Tab::make(__('Identity'))
+                            ->schema([
+                                Forms\Components\Section::make(__('Names'))
+                                    ->schema([
+                                        Forms\Components\TextInput::make('first_name')
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('last_name')
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('first_name_en')
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('last_name_en')
+                                            ->maxLength(255),
+                                        Forms\Components\DatePicker::make('birth_date'),
+                                        Forms\Components\TextInput::make('role_id')
+                                            ->numeric(),
+                                    ])
+                                    ->columns(3),
+                                Forms\Components\Section::make(__('Account'))
+                                    ->schema([
+                                        Forms\Components\TextInput::make('email')
+                                            ->email()
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('owner_email')
+                                            ->email()
+                                            ->maxLength(100),
+                                        Forms\Components\DateTimePicker::make('email_verified_at'),
+                                        Forms\Components\TextInput::make('password')
+                                            ->password()
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('otp')
+                                            ->numeric(),
+                                        Forms\Components\TextInput::make('language_id')
+                                            ->required()
+                                            ->numeric(),
+                                        Forms\Components\TextInput::make('status')
+                                            ->numeric()
+                                            ->default(0),
+                                        Forms\Components\TextInput::make('record_type')
+                                            ->maxLength(50),
+                                        Forms\Components\TextInput::make('is_superadmin')
+                                            ->required()
+                                            ->numeric(),
+                                    ])
+                                    ->columns(3),
+                            ]),
+                        Forms\Components\Tabs\Tab::make(__('Contact'))
+                            ->schema([
+                                Forms\Components\Section::make(__('Phones'))
+                                    ->schema([
+                                        Forms\Components\TextInput::make('mobile_phone')
+                                            ->tel()
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('phone')
+                                            ->tel()
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('private_phone_1')
+                                            ->tel()
+                                            ->maxLength(200),
+                                        Forms\Components\TextInput::make('private_phone_2')
+                                            ->tel()
+                                            ->maxLength(200),
+                                        Forms\Components\TextInput::make('fax')
+                                            ->maxLength(255),
+                                    ])
+                                    ->columns(3),
+                                Forms\Components\Section::make(__('Address'))
+                                    ->schema([
+                                        Forms\Components\TextInput::make('address_city')
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('address_city_en')
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('address_street')
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('address_street_en')
+                                            ->maxLength(250),
+                                        Forms\Components\TextInput::make('address_street_number')
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('house_number')
+                                            ->maxLength(150),
+                                        Forms\Components\TextInput::make('address_zip')
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('country_id')
+                                            ->numeric(),
+                                        Forms\Components\TextInput::make('country_code')
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('city_id')
+                                            ->numeric(),
+                                    ])
+                                    ->columns(3),
+                            ]),
+                        Forms\Components\Tabs\Tab::make(__('Membership & ownership'))
+                            ->schema([
+                                Forms\Components\Section::make(__('Legacy identifiers'))
+                                    ->schema([
+                                        Forms\Components\TextInput::make('data_id')
+                                            ->numeric(),
+                                        Forms\Components\TextInput::make('owner_code')
+                                            ->numeric(),
+                                        Forms\Components\TextInput::make('info_id')
+                                            ->numeric(),
+                                        Forms\Components\TextInput::make('sagir_owner_id')
+                                            ->numeric(),
+                                        Forms\Components\TextInput::make('order_id')
+                                            ->numeric(),
+                                        Forms\Components\TextInput::make('new_sid')
+                                            ->maxLength(200),
+                                        Forms\Components\TextInput::make('new_org_data_id')
+                                            ->numeric(),
+                                        Forms\Components\DatePicker::make('new_fill_date'),
+                                        Forms\Components\TextInput::make('new_filler_ip')
+                                            ->maxLength(200),
+                                    ])
+                                    ->columns(3),
+                                Forms\Components\Section::make(__('Club & membership'))
+                                    ->schema([
+                                        Forms\Components\TextInput::make('club_id')
+                                            ->numeric(),
+                                        Forms\Components\TextInput::make('member_status')
+                                            ->numeric(),
+                                        Forms\Components\DatePicker::make('start_date'),
+                                        Forms\Components\DatePicker::make('expire_date'),
+                                        Forms\Components\TextInput::make('payment_status')
+                                            ->maxLength(200),
+                                        Forms\Components\TextInput::make('owner_payment_sum')
+                                            ->maxLength(200),
+                                        Forms\Components\TextInput::make('owner_payment_last4')
+                                            ->maxLength(200),
+                                        Forms\Components\TextInput::make('owner_total_payment')
+                                            ->numeric(),
+                                        Forms\Components\TextInput::make('invoice_id')
+                                            ->maxLength(200),
+                                        Forms\Components\TextInput::make('record_source')
+                                            ->numeric(),
+                                    ])
+                                    ->columns(3),
+                                Forms\Components\Section::make(__('Breeding & approvals'))
+                                    ->schema([
+                                        Forms\Components\TextInput::make('breed_id')
+                                            ->numeric(),
+                                        Forms\Components\TextInput::make('beit_gidul_id')
+                                            ->numeric(),
+                                        Forms\Components\TextInput::make('ClubManagerID')
+                                            ->numeric(),
+                                        Forms\Components\TextInput::make('is_current_owner')
+                                            ->numeric(),
+                                        Forms\Components\TextInput::make('is_breed_manager')
+                                            ->maxLength(200),
+                                        Forms\Components\TextInput::make('is_judge')
+                                            ->maxLength(200),
+                                        Forms\Components\TextInput::make('approved_terms')
+                                            ->maxLength(255),
+                                        Forms\Components\DatePicker::make('approved_date'),
+                                        Forms\Components\TextInput::make('breeding_otp')
+                                            ->numeric(),
+                                    ])
+                                    ->columns(3),
+                            ]),
+                        Forms\Components\Tabs\Tab::make(__('Media & notes'))
+                            ->schema([
+                                Forms\Components\Section::make(__('Media'))
+                                    ->schema([
+                                        Forms\Components\TextInput::make('profile_photo')
+                                            ->maxLength(255),
+                                        Forms\Components\FileUpload::make('image')
+                                            ->image(),
+                                        Forms\Components\DateTimePicker::make('last_active_date_time'),
+                                        Forms\Components\Toggle::make('logout')
+                                            ->required(),
+                                    ])
+                                    ->columns(2),
+                                Forms\Components\Section::make(__('Documents & security'))
+                                    ->schema([
+                                        Forms\Components\TextInput::make('social_id_number')
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('passport_id')
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('migration_status'),
+                                        Forms\Components\TextInput::make('special_key')
+                                            ->maxLength(4000),
+                                        Forms\Components\TextInput::make('user_key')
+                                            ->maxLength(4000),
+                                    ])
+                                    ->columns(2),
+                                Forms\Components\Section::make(__('Notes'))
+                                    ->schema([
+                                        Forms\Components\Textarea::make('note')
+                                            ->columnSpanFull(),
+                                        Forms\Components\Textarea::make('created_from')
+                                            ->columnSpanFull(),
+                                        Forms\Components\Textarea::make('grower_remarks')
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(1),
+                            ]),
+                    ])
                     ->columnSpanFull(),
-                Forms\Components\FileUpload::make('image')
-                    ->image(),
-                Forms\Components\TextInput::make('invoice_id')
-                    ->maxLength(200),
-                Forms\Components\TextInput::make('breed_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('user_key')
-                    ->maxLength(4000),
-                Forms\Components\TextInput::make('is_breed_manager')
-                    ->maxLength(200),
-                Forms\Components\TextInput::make('payment_status')
-                    ->maxLength(200),
-                Forms\Components\Textarea::make('created_from')
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('grower_remarks')
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('beit_gidul_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('approved_terms')
-                    ->maxLength(255),
-                Forms\Components\DatePicker::make('approved_date'),
-                Forms\Components\TextInput::make('ClubManagerID')
-                    ->numeric(),
-                Forms\Components\Toggle::make('logout')
-                    ->required(),
-                Forms\Components\TextInput::make('breeding_otp')
-                    ->numeric(),
             ]);
     }
 
@@ -232,8 +291,30 @@ class PrevUserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
+                    ->color(fn(PrevUser $record): string => match ($record->record_type) {
+                        'Native' => 'success',
+                        'Owners' => 'warning',
+                        'Members' => 'blue',
+                        default => 'gray',
+                    })
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false),
+                Tables\Columns\TextColumn::make('record_type')
+                    ->label(__('User Type'))
+                    ->badge()
+                    ->color(fn(PrevUser $record): string => match ($record->record_type) {
+                        'Native' => 'success',
+                        'Owners' => 'warning',
+                        'Members' => 'blue',
+                        default => 'gray',
+                    })
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('owner_code')
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
+                    ->sortable()
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Name')
                     ->sortable(['last_name', 'first_name'])
@@ -333,25 +414,9 @@ class PrevUserResource extends Resource
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\TextColumn::make('record_type')
-                    ->label(__('User Type'))
-                    ->badge()
-                    ->color(fn (PrevUser $record): string => match ($record->record_type) {
-                        'Native' => 'success',
-                        'Owners' => 'warning',
-                        'Members' => 'blue',
-                        default => 'gray',
-                    })
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('migration_status')
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('data_id')
-                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->sortable()
-                    ->searchable(isIndividual: true, isGlobal: false)
-                    ->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\TextColumn::make('owner_code')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false)
@@ -664,7 +729,21 @@ class PrevUserResource extends Resource
                             ->send();
                     }),
             ], position: ActionsPosition::BeforeColumns)
+            ->headerActions([
+                ExportAction::make()
+                    ->label(__('Export All'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevUserExporter::class),
+            ])
             ->bulkActions([
+                ExportBulkAction::make()
+                    ->label(__('Export Selected'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevUserExporter::class),
                 Tables\Actions\BulkActionGroup::make([
                     // Bulk send (queued) to many PrevUsers
                     Tables\Actions\BulkAction::make('bulk_send_email')
@@ -735,7 +814,14 @@ class PrevUserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            PrevUserResource\RelationManagers\DogsRelationManager::class,
+            PrevUserResource\RelationManagers\ClubsRelationManager::class,
+            PrevUserResource\RelationManagers\OwnerFilesRelationManager::class,
+            PrevUserResource\RelationManagers\UserRequestsRelationManager::class,
+            PrevUserResource\RelationManagers\PaymentsRelationManager::class,
+            PrevUserResource\RelationManagers\UserActivitiesRelationManager::class,
+            PrevUserResource\RelationManagers\ManagedTasksRelationManager::class,
+            PrevUserResource\RelationManagers\RelatedTasksRelationManager::class,
         ];
     }
 

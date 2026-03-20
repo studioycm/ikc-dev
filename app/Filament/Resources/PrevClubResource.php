@@ -4,12 +4,21 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PrevClubResource\Pages;
 use App\Filament\Resources\PrevClubResource\RelationManagers\BreedsRelationManager;
+use App\Filament\Resources\PrevClubResource\RelationManagers\ManagersRelationManager;
+use App\Filament\Resources\PrevClubResource\RelationManagers\MembersRelationManager;
+use App\Filament\Resources\PrevClubResource\RelationManagers\PaymentsRelationManager;
+use App\Filament\Resources\PrevClubResource\RelationManagers\PromotersRelationManager;
+use App\Filament\Resources\PrevClubResource\RelationManagers\UserRequestsRelationManager;
 use App\Livewire\Prev\PrevClub\PrevClubBreedsTable;
 use App\Models\PrevClub;
 use App\Models\PrevUser;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Tabs as FormTabs;
+use Filament\Forms\Components\Tabs\Tab as FormTab;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Actions\Action as InfolistAction;
 use Filament\Infolists\Components\Grid as InfolistGrid;
 use Filament\Infolists\Components\Livewire as LivewireEntry;
 use Filament\Infolists\Components\RepeatableEntry;
@@ -19,6 +28,9 @@ use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
+use Filament\Support\Enums\FontWeight;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -70,77 +82,119 @@ class PrevClubResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('DataID')
-                    ->label(__('Previous ID'))
-                    ->numeric(),
-                DatePicker::make('ModificationDateTime')
-                    ->label(__('Modified On')),
-                DatePicker::make('CreationDateTime')
-                    ->label(__('Created On')),
-                TextInput::make('ClubCode')
-                    ->label(__('Club Code'))
-                    ->numeric(),
-                TextInput::make('Name')
-                    ->label(__('Name'))
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('Address')
-                    ->label(__('Address'))
-                    ->maxLength(255),
-                TextInput::make('Street')
-                    ->label(__('Street'))
-                    ->maxLength(255),
-                TextInput::make('Number')
-                    ->label(__('Number'))
-                    ->maxLength(50),
-                TextInput::make('Email')
-                    ->label(__('Email'))
-                    ->email()
-                    ->maxLength(255),
-                TextInput::make('RegistrationPrice')
-                    ->label(__('Registration Price'))
-                    ->numeric(),
-                TextInput::make('GeneralReviewFee')
-                    ->label(__('General Review Fee'))
-                    ->numeric(),
-                TextInput::make('DogReviewFee')
-                    ->label(__('Dog Review Fee'))
-                    ->numeric(),
-                TextInput::make('Breed_NonReg_Price')
-                    ->label(__('Breed NonReg Price'))
-                    ->numeric(),
-                TextInput::make('PerDog_NonReg_Price')
-                    ->label(__('Per Dog NonReg Price'))
-                    ->numeric(),
-                TextInput::make('TestPrice')
-                    ->label(__('Test Price'))
-                    ->numeric(),
-                TextInput::make('Logo')
-                    ->label(__('Logo'))
-                    ->maxLength(500),
-                TextInput::make('ManagerName')
-                    ->label(__('Manager Name'))
-                    ->maxLength(255),
-                TextInput::make('ManagerEmail')
-                    ->label(__('Manager Email'))
-                    ->email()
-                    ->maxLength(255),
-                TextInput::make('ManagerMobile')
-                    ->label(__('Manager Mobile'))
-                    ->tel()
-                    ->maxLength(50),
-                TextInput::make('SpecialKey')
-                    ->label(__('Special Key'))
-                    ->maxLength(4000),
-                TextInput::make('ManagerID')
-                    ->label(__('Manager ID'))
-                    ->numeric(),
-                TextInput::make('EngName')
-                    ->label(__('English Name'))
-                    ->maxLength(255),
-                TextInput::make('status')
-                    ->label(__('Status'))
-                    ->numeric(),
+                FormTabs::make('club_form_tabs')
+                    ->tabs([
+                        FormTab::make(__('General'))
+                            ->schema([
+                                Section::make(__('General details'))
+                                    ->schema([
+                                        TextInput::make('DataID')
+                                            ->label(__('Previous ID'))
+                                            ->numeric(),
+                                        TextInput::make('ClubCode')
+                                            ->label(__('Club Code'))
+                                            ->numeric(),
+                                        TextInput::make('Name')
+                                            ->label(__('Name'))
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('EngName')
+                                            ->label(__('English Name'))
+                                            ->maxLength(255),
+                                        TextInput::make('status')
+                                            ->label(__('Status'))
+                                            ->numeric(),
+                                        TextInput::make('Logo')
+                                            ->label(__('Logo'))
+                                            ->maxLength(500),
+                                    ])
+                                    ->columns(3),
+                                Section::make(__('Contact'))
+                                    ->schema([
+                                        TextInput::make('Email')
+                                            ->label(__('Email Address'))
+                                            ->email() // Enforces email format validation
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->autocomplete('email') // Helps browsers autofill correctly
+                                            ->placeholder('user@example.com')
+                                            ->prefixIcon('heroicon-m-envelope') // Adds a visual indicator inside the input
+                                            ->suffixIcon('heroicon-m-check-circle') // Optional: Visual confirm icon (static or dynamic)
+                                            ->suffixIconColor('success') // Color for the suffix icon
+                                            ->unique(ignoreRecord: true)
+                                            ->helperText('We will never share your email with anyone else.'),
+                                        TextInput::make('Address')
+                                            ->label(__('Address'))
+                                            ->maxLength(255),
+                                        TextInput::make('Street')
+                                            ->label(__('Street'))
+                                            ->maxLength(255),
+                                        TextInput::make('Number')
+                                            ->label(__('Number'))
+                                            ->maxLength(50),
+                                    ])
+                                    ->columns(2),
+                            ]),
+                        FormTab::make(__('Pricing'))
+                            ->schema([
+                                Section::make(__('Club prices'))
+                                    ->schema([
+                                        TextInput::make('RegistrationPrice')
+                                            ->label(__('Registration Price'))
+                                            ->numeric(),
+                                        TextInput::make('GeneralReviewFee')
+                                            ->label(__('General Review Fee'))
+                                            ->numeric(),
+                                        TextInput::make('DogReviewFee')
+                                            ->label(__('Dog Review Fee'))
+                                            ->numeric(),
+                                        TextInput::make('Breed_NonReg_Price')
+                                            ->label(__('Breed NonReg Price'))
+                                            ->numeric(),
+                                        TextInput::make('PerDog_NonReg_Price')
+                                            ->label(__('Per Dog NonReg Price'))
+                                            ->numeric(),
+                                        TextInput::make('TestPrice')
+                                            ->label(__('Test Price'))
+                                            ->numeric(),
+                                    ])
+                                    ->columns(3),
+                            ]),
+                        FormTab::make(__('Management'))
+                            ->schema([
+                                Section::make(__('Manager details'))
+                                    ->schema([
+                                        TextInput::make('ManagerName')
+                                            ->label(__('Manager Name'))
+                                            ->maxLength(255),
+                                        TextInput::make('ManagerEmail')
+                                            ->label(__('Manager Email'))
+                                            ->email()
+                                            ->maxLength(255),
+                                        TextInput::make('ManagerMobile')
+                                            ->label(__('Manager Mobile'))
+                                            ->tel()
+                                            ->maxLength(50),
+                                        TextInput::make('ManagerID')
+                                            ->label(__('Manager ID'))
+                                            ->numeric(),
+                                        TextInput::make('SpecialKey')
+                                            ->label(__('Special Key'))
+                                            ->maxLength(4000)
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(3),
+                                Section::make(__('Timeline'))
+                                    ->schema([
+                                        DatePicker::make('CreationDateTime')
+                                            ->label(__('Created On')),
+                                        DatePicker::make('ModificationDateTime')
+                                            ->label(__('Modified On')),
+                                    ])
+                                    ->columns(2),
+                            ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -163,7 +217,10 @@ class PrevClubResource extends Resource
                     ->withCount(['breeds'])
                     ->selectRaw('clubs.*')
                     ->selectSub($dogsCountSub, 'dogs_count')
-                    ->with(['managers']);
+                    ->with([
+                        'managers.skills' => fn($skillsQuery) => $skillsQuery->whereIn('skills.id', PrevClub::CLUB_STAFF_SKILL_IDS),
+                        'breeds.promoters.skills' => fn($skillsQuery) => $skillsQuery->where('skills.id', PrevClub::PROMOTER_SKILL_ID),
+                    ]);
             })
             ->columns([
                 TextColumn::make('id')
@@ -197,9 +254,32 @@ class PrevClubResource extends Resource
                         })->join(', ');
                     })
                     ->toggleable(),
+                TextColumn::make('manager_titles')
+                    ->label(__('Manager Titles'))
+                    ->state(fn(PrevClub $record): array => $record->managerTitleSummary())
+                    ->listWithLineBreaks()
+                    ->limitList(3)
+                    ->expandableLimitedList()
+                    ->toggleable(),
+                TextColumn::make('promoters')
+                    ->label(__('Promoters'))
+                    ->state(fn(PrevClub $record): array => $record->promoterSummary())
+                    ->listWithLineBreaks()
+                    ->limitList(3)
+                    ->expandableLimitedList()
+                    ->toggleable(),
                 TextColumn::make('Email')
                     ->label(__('Email'))
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->icon('fas-envelope') // Adds an icon next to the text
+                    ->iconColor('primary') // Colors the icon
+                    ->copyable() // Allows one-click copying to clipboard
+                    ->copyMessage(__('filament::components/copyable.messages.copied'))
+                    ->copyMessageDuration(1500)
+                    ->searchable(isIndividual: true, isGlobal: false) // Enables searching by email
+                    ->sortable()
+                    ->weight('medium')
+                    ->color(fn(?string $state) => filled($state) ? 'primary' : 'gray')
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('full_address')
                     ->label(__('Address'))
                     ->wrap()
@@ -268,15 +348,107 @@ class PrevClubResource extends Resource
                 Filter::make('has_managers')
                     ->label(__('Has managers'))
                     ->query(fn (Builder $q): Builder => $q->has('managers')),
+                Filter::make('has_promoters')
+                    ->label(__('Has promoters'))
+                    ->query(fn(Builder $q): Builder => $q->whereHas('breeds.promoters')),
             ])
             ->actions([
+                Action::make('contacts')
+                    ->icon('heroicon-o-user-group')
+                    ->label('')
+                    ->iconButton()
+                    ->tooltip(__('Club contacts'))
+                    ->infolist([
+                        InfolistSection::make(__('Club contact'))
+                            ->schema([
+                                TextEntry::make('Email')
+                                    ->label(__('Club Email'))
+                                    ->state(fn(PrevClub $record): ?string => $record->Email)
+                                    ->copyable()
+                                    ->copyMessage(__('filament::components/copyable.messages.copied'))
+                                    ->copyMessageDuration(1500),
+                                TextEntry::make('full_address')
+                                    ->label(__('Club Address'))
+                                    ->state(fn(PrevClub $record): string => $record->full_address)
+                                    ->copyable()
+                                    ->copyMessage(__('filament::components/copyable.messages.copied'))
+                                    ->copyMessageDuration(1500),
+                            ])
+                            ->columns(2),
+                        InfolistSection::make(__('Related users'))
+                            ->schema([
+                                RepeatableEntry::make('contact_directory')
+                                    ->state(fn(PrevClub $record): array => $record->contactDirectoryRows()->all())
+                                    ->schema([
+                                        TextEntry::make('role_type')
+                                            ->label(__('Relation'))
+                                            ->badge(),
+                                        TextEntry::make('name')
+                                            ->label(__('Name')),
+                                        TextEntry::make('titles')
+                                            ->label(__('Titles')),
+                                        TextEntry::make('breeds')
+                                            ->label(__('Breeds')),
+                                        TextEntry::make('email')
+                                            ->label(__('Email'))
+                                            ->copyable()
+                                            ->copyMessage(__('filament::components/copyable.messages.copied'))
+                                            ->copyMessageDuration(1500),
+                                        TextEntry::make('mobile_phone')
+                                            ->label(__('Mobile Phone'))
+                                            ->copyable()
+                                            ->copyMessage(__('filament::components/copyable.messages.copied'))
+                                            ->copyMessageDuration(1500),
+                                    ])
+                                    ->columns(2)
+                                    ->grid(2),
+                            ]),
+                    ])
+                    ->modalHeading(fn(PrevClub $record): string => __('Club contacts: :club', ['club' => $record->Name]))
+                    ->modalSubmitAction(false),
+                Action::make('emails')
+                    ->icon('heroicon-o-envelope')
+                    ->label('')
+                    ->iconButton()
+                    ->tooltip(__('Club emails'))
+                    ->infolist([
+                        InfolistSection::make(__('Emails'))
+                            ->schema([
+                                TextEntry::make('Email')
+                                    ->label(__('Club Email'))
+                                    ->state(fn(PrevClub $record): ?string => $record->Email)
+                                    ->copyable()
+                                    ->copyMessage(__('filament::components/copyable.messages.copied'))
+                                    ->copyMessageDuration(1500),
+                                RepeatableEntry::make('email_directory')
+                                    ->state(fn(PrevClub $record): array => $record->emailDirectoryRows()->all())
+                                    ->schema([
+                                        TextEntry::make('role_type')
+                                            ->label(__('Relation'))
+                                            ->badge(),
+                                        TextEntry::make('name')
+                                            ->label(__('Name')),
+                                        TextEntry::make('titles')
+                                            ->label(__('Titles')),
+                                        TextEntry::make('email')
+                                            ->label(__('Email'))
+                                            ->copyable()
+                                            ->copyMessage(__('filament::components/copyable.messages.copied'))
+                                            ->copyMessageDuration(1500),
+                                    ])
+                                    ->columns(2)
+                                    ->grid(2),
+                            ]),
+                    ])
+                    ->modalHeading(fn(PrevClub $record): string => __('Club emails: :club', ['club' => $record->Name]))
+                    ->modalSubmitAction(false),
                 ViewAction::make()->label(__('View')),
                 EditAction::make()->label(__('Edit')),
-                DeleteAction::make()->label(__('Delete')),
+                //                DeleteAction::make()->label(__('Delete')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->label(__('Delete Selected')),
+                    //                    DeleteBulkAction::make()->label(__('Delete Selected')),
                 ]),
             ])
             ->recordUrl(false);
@@ -310,7 +482,20 @@ class PrevClubResource extends Resource
                                     ->state(fn (PrevClub $record): int => (int) $record->totalDogsCount()),
                                 TextEntry::make('Email')
                                     ->label(__('Email'))
-                                    ->state(fn (PrevClub $record): string => (string) ($record->Email ?? '')),
+                                    ->icon('fas-copy')
+                                    ->iconColor('primary')
+                                    ->copyable() // Essential for copying the email quickly
+                                    ->copyMessage(__('Email address copied to clipboard'))
+                                    ->weight(FontWeight::Bold)
+                                    ->color('gray')
+                                    ->placeholder(__('No email provided')) // Better than an empty string
+                                    ->suffixAction(
+                                        InfolistAction::make('send_email')
+                                            ->icon('fas-paper-plane')
+                                            ->color('success')
+                                            ->url(fn(TextEntry $component) => "mailto:{$component->getState()}")
+                                            ->visible(fn(TextEntry $component) => filled($component->getState()))
+                                    ),
                                 TextEntry::make('full_address')
                                     ->label(__('Address'))
                                     ->state(fn (PrevClub $record): string => (string) ($record->full_address ?? '')),
@@ -322,8 +507,8 @@ class PrevClubResource extends Resource
                                             ->label('')
                                             ->hiddenLabel()
                                             ->size(TextEntry\TextEntrySize::Large)
-                                            ->weight(\Filament\Support\Enums\FontWeight::Bold)
-                                            ->color(\Filament\Support\Colors\Color::Blue)
+                                            ->weight(FontWeight::Bold)
+                                            ->color(Color::Blue)
                                             ->columnSpan(1)
                                             ->formatStateUsing(fn ($state, ?PrevUser $manager = null) => $manager?->full_name ?? $state),
                                         TextEntry::make('normalised_phone')
@@ -398,6 +583,11 @@ class PrevClubResource extends Resource
     public static function getRelations(): array
     {
         return [
+            MembersRelationManager::class,
+            PaymentsRelationManager::class,
+            UserRequestsRelationManager::class,
+            ManagersRelationManager::class,
+            PromotersRelationManager::class,
             BreedsRelationManager::class,
         ];
     }

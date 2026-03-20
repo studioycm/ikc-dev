@@ -27,3 +27,8 @@ yarn-error.log
 /docs
 /public/css/filament/admin/
 /app/Console/Commands/LegacyResearch
+/.vscode/
+/.junie/
+/.ai/
+/.claude/
+/.gemini/

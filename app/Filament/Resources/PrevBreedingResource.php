@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\Legacy\LegacyDogGender;
+use App\Filament\Exports\PrevBreedingExporter;
 use App\Filament\Resources\PrevBreedingResource\Pages;
 use App\Models\PrevBreeding;
 use App\Models\PrevDog;
@@ -28,6 +29,8 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
@@ -164,6 +167,7 @@ class PrevBreedingResource extends Resource
                                         ->label(__('DNA Test'))
                                         ->content(function (Get $get): string {
                                             $dna = $get('female_dna_state');
+
                                             return filled($dna) ? (string)$dna : '---';
                                         }),
 
@@ -197,18 +201,21 @@ class PrevBreedingResource extends Resource
                                         ->label(__('Age'))
                                         ->content(function (Get $get): string {
                                             $age = $get('male_age_state');
+
                                             return filled($age) ? (string)$age : '---';
                                         }),
                                     Placeholder::make('male_breedings_count')
                                         ->label(__('Breeding Count'))
                                         ->content(function (Get $get): string {
                                             $count = $get('male_breedings_count_state');
+
                                             return filled($count) ? (string)$count : '---';
                                         }),
                                     Placeholder::make('male_dna')
                                         ->label(__('DNA Test'))
                                         ->content(function (Get $get): string {
                                             $dna = $get('male_dna_state');
+
                                             return filled($dna) ? (string)$dna : '---';
                                         }),
 
@@ -577,7 +584,21 @@ class PrevBreedingResource extends Resource
                 RestoreAction::make(),
                 ForceDeleteAction::make(),
             ])
+            ->headerActions([
+                ExportAction::make()
+                    ->label(__('Export All'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevBreedingExporter::class),
+            ])
             ->bulkActions([
+                ExportBulkAction::make()
+                    ->label(__('Export Selected'))
+                    ->icon('fas-file-export')
+                    ->color('primary')
+                    ->iconPosition('after')
+                    ->exporter(PrevBreedingExporter::class),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     RestoreBulkAction::make(),
@@ -593,6 +614,14 @@ class PrevBreedingResource extends Resource
             'index' => Pages\ListPrevBreedings::route('/'),
             'create' => Pages\CreatePrevBreeding::route('/create'),
             'edit' => Pages\EditPrevBreeding::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            PrevBreedingResource\RelationManagers\PuppiesRelationManager::class,
+            PrevBreedingResource\RelationManagers\TasksRelationManager::class,
         ];
     }
 
@@ -621,9 +650,9 @@ class PrevBreedingResource extends Resource
             $record = $component->getSelectedRecord();
         }
         if ($record) {
-            $set('female_breedings_count_state', $record?->female_breedings_count ?? __("Missing"));
-            $set('female_age_state', $record?->age_years ?? __("Missing"));
-            $set('female_dna_state', $record?->DnaID ?? __("Missing"));
+            $set('female_breedings_count_state', $record?->female_breedings_count ?? __('Missing'));
+            $set('female_age_state', $record?->age_years ?? __('Missing'));
+            $set('female_dna_state', $record?->DnaID ?? __('Missing'));
         } else {
             $set('female_breedings_count_state', $get('SagirId'));
             $set('female_age_state', null);
@@ -637,6 +666,7 @@ class PrevBreedingResource extends Resource
             $set('male_breedings_count_state', null);
             $set('male_age_state', null);
             $set('male_dna_state', null);
+
             return;
         }
         if ($component === null) {
@@ -646,9 +676,9 @@ class PrevBreedingResource extends Resource
             $record = $component->getSelectedRecord();
         }
         if ($record) {
-            $set('male_breedings_count_state', $record?->male_breedings_count ?? __("Missing"));
-            $set('male_age_state', $record?->age_years ?? __("Missing"));
-            $set('male_dna_state', $record?->DnaID ?? __("Missing"));
+            $set('male_breedings_count_state', $record?->male_breedings_count ?? __('Missing'));
+            $set('male_age_state', $record?->age_years ?? __('Missing'));
+            $set('male_dna_state', $record?->DnaID ?? __('Missing'));
         } else {
             $set('male_breedings_count_state', $get('MaleSagirId'));
         }

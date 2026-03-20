@@ -2,6 +2,6 @@
 
 return [
 
-    'title' => 'לוח ראשי',
+    'title' => __('Dashboard'),
 
 ];

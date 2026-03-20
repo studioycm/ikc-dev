@@ -13,6 +13,11 @@ class ViewPrevClub extends ViewRecord
     // Let Filament handle the layout and page rendering.
     protected static string $view = 'filament.resources.prev-club.view';
 
+    public function hasCombinedRelationManagerTabsWithContent(): bool
+    {
+        return true;
+    }
+
     protected function getViewData(): array
     {
         $club = $this->getRecord();
@@ -20,7 +25,7 @@ class ViewPrevClub extends ViewRecord
         \assert($club instanceof PrevClub);
 
         return [
-            'record'   => $club,
+            'record' => $club,
             'infolist' => PrevClubResource::getInfolistForRecord($club),
             'resource' => static::getResource(),
         ];

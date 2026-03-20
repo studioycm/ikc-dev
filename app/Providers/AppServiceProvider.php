@@ -41,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
         FilamentView::registerRenderHook(
             PanelsRenderHook::SCRIPTS_AFTER,
             fn (): string => new HtmlString('
-        <script>document.addEventListener("scroll-to-top", () => window.scrollTo(0, 0))</script>
+                <script>document.addEventListener("scroll-to-top", () => window.scrollTo(0, 0))</script>
             '),
         );
     }

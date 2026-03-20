@@ -2,12 +2,14 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\User\Pages\Dashboard as UserDashboard;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Pages;
@@ -22,6 +24,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Spatie\Permission\Middleware\RoleMiddleware;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -48,7 +51,7 @@ class AdminPanelProvider extends PanelProvider
             // ->databaseNotificationsPolling('60s')
             ->maxContentWidth(MaxWidth::Full)
             ->colors([
-                //'primary' => Color::hex('#5566aa'),
+                // 'primary' => Color::hex('#5566aa'),
                 'pink' => Color::Pink,
                 'purple' => Color::Purple,
                 'indigo' => Color::Indigo,
@@ -79,6 +82,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                RoleMiddleware::class . ':super_admin|admin',
             ])
             ->plugins([
                 FilamentShieldPlugin::make()
@@ -109,7 +113,7 @@ class AdminPanelProvider extends PanelProvider
                     ->label(fn(): string => __('dog/model/general.labels.navigation_group'))
                     ->icon('fas-dog'),
                 NavigationGroup::make()
-                    ->label(fn (): string => __('Owners Management'))
+                    ->label(fn(): string => __('Users Management'))
                     ->icon('fas-user'),
                 NavigationGroup::make()
                     ->label(fn (): string => __('Shows Management'))
@@ -124,6 +128,9 @@ class AdminPanelProvider extends PanelProvider
                     ->label(fn(): string => __('dog/kennel/general.labels.navigation_group'))
                     ->icon('heroicon-o-home'),
                 NavigationGroup::make()
+                    ->label(fn(): string => __('Actions and Tasks'))
+                    ->icon('heroicon-o-credit-card'),
+                NavigationGroup::make()
                     ->label(fn (): string => __('Finances Management'))
                     ->icon('heroicon-o-credit-card'),
                 NavigationGroup::make()
@@ -136,16 +143,20 @@ class AdminPanelProvider extends PanelProvider
                     ->label(fn (): string => __('Reports Management'))
                     ->icon('heroicon-o-presentation-chart-line'),
                 NavigationGroup::make()
+                    ->label(fn(): string => __('Legacy Management'))
+                    ->icon('fas-cog'),
+                NavigationGroup::make()
                     ->label(fn (): string => __('Authorisation Management'))
                     ->icon('fas-shield-dog'),
             ])
+            ->userMenuItems([
+                MenuItem::make('user_panel')
+                    ->label(fn(): string => __('User Panel'))
+                    ->url(fn() => UserDashboard::getUrl(panel: 'user'))
+                    ->icon('fas-house-user')
+                    ->sort(1),
+            ])
             ->navigationItems([
-                NavigationItem::make('payments')
-                    ->label(fn (): string => __('Payments'))
-                    ->url(fn (): string => Pages\Dashboard::getUrl())
-                    ->icon('heroicon-o-credit-card')
-                    ->group(fn (): string => __('Finances Management'))
-                    ->sort(90),
 
                 NavigationItem::make('finance-report')
                     ->label(fn (): string => __('Finance Report'))

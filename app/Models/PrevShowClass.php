@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Awobaz\Compoships\Compoships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PrevShowClass extends Model
 {
+    use Compoships;
+
     protected $connection = 'mysql_prev';
 
     /**
@@ -61,6 +64,6 @@ class PrevShowClass extends Model
 
     public function showDogs(): HasMany
     {
-        return $this->hasMany(PrevShowDog::class, 'ClassID', 'DataID');
+        return $this->hasMany(PrevShowDog::class, ['ClassID', 'ShowID'], ['DataID', 'ShowID']);
     }
 }
