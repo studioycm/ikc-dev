@@ -41,6 +41,12 @@ class MembershipOverviewStats extends BaseWidget
                 ->count())
                 ->color('warning')
                 ->url(MembershipsDashboard::getUrl(panel: 'user')),
+            Stat::make(__('Expired'), (clone $membershipsQuery)
+                ->whereNull('deleted_at')
+                ->where('expire_date', '<', now())
+                ->count())
+                ->color('danger')
+                ->url(MembershipsDashboard::getUrl(panel: 'user')),
         ];
     }
 }
