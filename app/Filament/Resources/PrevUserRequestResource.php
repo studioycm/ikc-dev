@@ -221,7 +221,7 @@ class PrevUserRequestResource extends Resource
                     ->label(__('User by Phone'))
                     ->description(fn(PrevUserRequest $record) => $record->userByPhone?->mobile_phone)
                     ->sortable(['first_name', 'last_name'])
-                    ->searchable(['users.first_name', 'users.last_name', 'users.first_name_en', 'users.last_name_en', 'users.mobile_phone', 'users.email'], isIndividual: true, isGlobal: false)
+                    ->searchable(['users.first_name', 'users.last_name', 'users.first_name_en', 'users.last_name_en', 'users.mobile_phone'], isIndividual: true, isGlobal: false)
                     ->toggleable(),
                 TextColumn::make('dog.SagirID')
                     ->label(__('dog/model/general.labels.singular'))
@@ -237,7 +237,7 @@ class PrevUserRequestResource extends Resource
                 TextColumn::make('owner.name')
                     ->label(__('Owner'))
                     ->sortable(['users.last_name', 'users.first_name'])
-                    ->searchable(['users.first_name', 'users.last_name', 'users.first_name_en', 'users.last_name_en', 'users.mobile_phone', 'users.email'], isIndividual: true, isGlobal: false)
+                    ->searchable(['users.first_name', 'users.last_name', 'users.first_name_en', 'users.last_name_en', 'users.mobile_phone'], isIndividual: true, isGlobal: false)
                     ->toggleable(),
                 TextColumn::make('total_amount')
                     ->label(__('Amount'))
@@ -281,7 +281,7 @@ class PrevUserRequestResource extends Resource
                 TextColumn::make('doneBy.name')
                     ->label(__('Done By'))
                     ->sortable(['users.first_name', 'users.last_name'])
-                    ->searchable(['users.first_name', 'users.last_name', 'users.first_name_en', 'users.last_name_en', 'users.mobile_phone', 'users.email'], isIndividual: true, isGlobal: false)
+                    ->searchable(['users.first_name', 'users.last_name', 'users.first_name_en', 'users.last_name_en', 'users.mobile_phone'], isIndividual: true, isGlobal: false)
                     ->toggleable(),
                 TextColumn::make('DoneDate')
                     ->label(__('Done Date'))

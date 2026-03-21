@@ -4,17 +4,20 @@
         "codex",
         "copilot",
         "gemini",
-        "phpstorm"
+        "junie"
     ],
-    "editors": [
-        "claude_code",
-        "codex",
-        "gemini",
-        "phpstorm",
-        "vscode"
-    ],
-    "guidelines": [
+    "guidelines": true,
+    "herd_mcp": true,
+    "mcp": true,
+    "nightwatch_mcp": false,
+    "packages": [
         "filament/filament"
     ],
-    "herd_mcp": true
+    "sail": false,
+    "skills": [
+        "configuring-horizon",
+        "pest-testing",
+        "tailwindcss-development",
+        "technical-debt-manager-php-laravel"
+    ]
 }

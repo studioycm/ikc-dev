@@ -20,14 +20,16 @@ class PaymentHistoryTable extends BaseWidget
     public function table(Table $table): Table
     {
         $prevUserId = $this->getCurrentPrevUserId();
+        $prevUserPhone = $this->getCurrentPrevUserPhone();
 
         return $table
             ->query(
                 PrevPayment::query()
                     ->when(
-                        blank($prevUserId),
+                        blank($prevUserId) && blank($prevUserPhone),
                         fn($query) => $query->whereRaw('1 = 0'),
-                        fn($query) => $query->where('created_by', $prevUserId)
+                        fn($query) => $query->where('mobile_phone', 'like', '%' . $prevUserPhone . '%')
+                            ->orWhere('created_by', $prevUserId)
                     )
                     ->with(['club:id,Name', 'breed:id,BreedName', 'dog:id,SagirID,Heb_Name,Eng_Name'])
                     ->orderByDesc('payment_date_time')
@@ -59,7 +61,7 @@ class PaymentHistoryTable extends BaseWidget
                     ->description(fn(PrevPayment $record): ?string => $record->dog?->full_name)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('payment_date_time')
-                    ->label(__('Paid At'))
+                    ->label(__('Paid at'))
                     ->dateTime()
                     ->sortable(),
             ])
