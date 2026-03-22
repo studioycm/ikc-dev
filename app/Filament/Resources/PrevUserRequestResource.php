@@ -104,7 +104,7 @@ class PrevUserRequestResource extends Resource
                         Forms\Components\TextInput::make('payment_by')->label(__('Payment By'))->maxLength(255),
                         Forms\Components\TextInput::make('payment_incerments')->label(__('Payment Increments'))->numeric()->minValue(0),
                         Forms\Components\TextInput::make('total_amount')
-                            ->label(__('Total Amount'))
+                            ->label(__('Cost'))
                             ->numeric()
                             ->minValue(0),
                         Forms\Components\TextInput::make('payment_approval_id')->label(__('Payment Approval Number'))->maxLength(255),
@@ -168,24 +168,27 @@ class PrevUserRequestResource extends Resource
                     ->badge()
                     ->description(function ($state, PrevUserRequest $record): ?string {
                         if ($state === null) {
-                            return __('Topic') . " " . __('Missing');
+                            return __('Topic') . ' ' . __('Missing');
                         }
 
                         return match ($state->value) {
                             'pedigree_paper_request' => $record->paper_request_type
                                 ? $record->paper_request_type->getLabel()
-                                : __('Pedigree Type') . " " . __('Missing'),
+                                : __('Pedigree Type') . ' ' . __('Missing'),
 
                             'champion_diploma_request' => $record->champion_certificate_type
                                 ? $record->champion_certificate_type->getLabel()
-                                : __('Champion Certificate') . " " . __('Missing'),
+                                : __('Champion Certificate') . ' ' . __('Missing'),
 
                             'Payment of pelvic / elbow photo decoding' => $record->total_amount
                                 ? Number::currency($record->total_amount, in: 'ILS', locale: 'he_IL', precision: 0)
-                                : __('Price') . " " . __('Missing'),
+                                : __('Price') . ' ' . __('Missing'),
                             'agra_form' => $record->vetAuth
-                                ? $record->vetAuth->name . " (" . $record->vetAuth->vet_email . ")"
-                                : __('Veterinarian Authority') . " " . __('Missing'),
+                                ? $record->vetAuth->name . ' (' . $record->vetAuth->vet_email . ')'
+                                : __('Veterinarian Authority') . ' ' . __('Missing'),
+                            'young_rider_registration' => $record->kids_name
+                                ? $record->kids_name . ($record->class ? ' | ' . $record->class : '') . ($record->birth_date ? ' (' . $record->birth_date->format('Y-m-d') . ')' : '')
+                                : __("Kid's Name") . ' ' . __('Missing'),
                             default => '',
                         };
                     })
@@ -204,7 +207,7 @@ class PrevUserRequestResource extends Resource
                     ->label(__('Veterinarian Authority'))
                     ->sortable()
                     ->searchable(['agra_cities.name', 'agra_cities.vet_email'], isIndividual: true, isGlobal: false)
-                    ->description(fn(PrevUserRequest $record): ?string => $record->vetAuth?->vet_email ?? __('Missing') . " " . __('Email'))
+                    ->description(fn(PrevUserRequest $record): ?string => $record->vetAuth?->vet_email ?? __('Missing') . ' ' . __('Email'))
                     ->toggleable(),
                 TextColumn::make('club.Name')
                     ->label(__('Club'))
@@ -213,7 +216,7 @@ class PrevUserRequestResource extends Resource
                     ->toggleable(),
                 TextColumn::make('requester_name')
                     ->label(__('User Name'))
-                    ->description(fn(PrevUserRequest $record): string => $record->mobile_phone ?? $record->email ?? __('Missing') . " " . __('Phone'))
+                    ->description(fn(PrevUserRequest $record): string => $record->mobile_phone ?? $record->email ?? __('Missing') . ' ' . __('Phone'))
                     ->searchable(['public_registration.first_name', 'public_registration.last_name'], isIndividual: true, isGlobal: false)
                     ->sortable(['public_registration.first_name', 'public_registration.last_name'])
                     ->toggleable(),
@@ -240,7 +243,7 @@ class PrevUserRequestResource extends Resource
                     ->searchable(['users.first_name', 'users.last_name', 'users.first_name_en', 'users.last_name_en', 'users.mobile_phone'], isIndividual: true, isGlobal: false)
                     ->toggleable(),
                 TextColumn::make('total_amount')
-                    ->label(__('Amount'))
+                    ->label(__('Cost'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: ',')
                     ->money(currency: 'ILS')
                     ->sortable()
@@ -360,59 +363,17 @@ class PrevUserRequestResource extends Resource
             ])
             ->defaultSort('record_date_time', 'desc')
             ->searchOnBlur()
-            ->striped();
+            ->striped()
+            ->actionsPosition(Tables\Enums\ActionsPosition::BeforeColumns);
     }
 
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
+            ->columns(4)
             ->schema([
-                Section::make(__('Requester details'))
-                    ->schema([
-                        TextEntry::make('first_name')->label(__('First Name'))
-                            ->inlineLabel(),
-                        TextEntry::make('last_name')->label(__('Last Name'))
-                            ->inlineLabel(),
-                        TextEntry::make('email')->label(__('Email'))
-                            ->inlineLabel(),
-                        TextEntry::make('normalized_mobile')->label(__('Mobile Phone'))
-                            ->copyable()
-                            ->copyableState(fn(PrevUserRequest $record) => $record->normalizedMobile)
-                            ->copyMessage(__('filament::components/copyable.messages.copied'))
-                            ->copyMessageDuration(1500)
-                            ->inlineLabel(),
-                        TextEntry::make('full_address')->label(__('Full Address'))
-                            ->inlineLabel(),
-                        TextEntry::make('street')->label(__('Street'))
-                            ->inlineLabel(),
-                        TextEntry::make('number')->label(__('Number'))
-                            ->inlineLabel(),
-                        TextEntry::make('city')->label(__('City'))
-                            ->inlineLabel(),
-                        Section::make(__('User by Phone'))
-                            ->schema([
-                                TextEntry::make('userByPhone.full_name')->label(__('Name'))
-                                    ->inlineLabel(),
-                                TextEntry::make('userByPhone.email')->label(__('Email'))
-                                    ->copyable(fn(PrevUserRequest $record) => $record->userByPhone?->email ? true : false)
-                                    ->copyableState(fn(PrevUserRequest $record) => $record->userByPhone?->email)
-                                    ->copyMessage(__('filament::components/copyable.messages.copied'))
-                                    ->copyMessageDuration(1500)
-                                    ->inlineLabel(),
-                                TextEntry::make('normalized_mobile')->label(__('Mobile Phone'))
-                                    ->copyable()
-                                    ->copyableState(fn(PrevUserRequest $record) => $record->normalizedMobile)
-                                    ->copyMessage(__('filament::components/copyable.messages.copied'))
-                                    ->copyMessageDuration(1500)
-                                    ->inlineLabel(),
-                                TextEntry::make('userByPhone.address')->label(__('Full Address'))
-                                    ->inlineLabel(),
-                            ])
-                            ->hidden(fn(PrevUserRequest $record) => $record->mobile_phone === null || $record->mobile_phone === '')
-                            ->columns(4),
-                    ])
-                    ->columns(4),
                 Section::make(__('Request details'))
+                    ->columnSpan(1)
                     ->schema([
                         TextEntry::make('topic')
                             ->label(__('Topic'))
@@ -421,16 +382,21 @@ class PrevUserRequestResource extends Resource
                         TextEntry::make('champion_certificate_type')
                             ->label(__('Certificate Type'))
                             ->badge()
+                            ->hidden(fn(PrevUserRequest $record) => $record->champion_certificate_type === null)
                             ->inlineLabel(),
                         TextEntry::make('paper_request_type')
                             ->label(__('Paper Request Type'))
                             ->badge()
+                            ->hidden(fn(PrevUserRequest $record) => $record->paper_request_type === null)
                             ->inlineLabel(),
                         TextEntry::make('shipping')->label(__('Shipping'))
+                            ->visible(fn(PrevUserRequest $record) => filled($record->shipping))
                             ->inlineLabel(),
                         TextEntry::make('shipping_type_id')->label(__('Shipping Type'))
+                            ->visible(fn(PrevUserRequest $record) => filled($record->shipping_type_id))
                             ->inlineLabel(),
                         TextEntry::make('club.Name')->label(__('Club'))
+                            ->hidden(fn(PrevUserRequest $record) => $record->club === null)
                             ->inlineLabel(),
                         TextEntry::make('vetAuth.name')->label(__('Veterinarian Authority'))
                             ->tooltip(fn(PrevUserRequest $record) => $record->vetAuth?->vet_email)
@@ -438,45 +404,51 @@ class PrevUserRequestResource extends Resource
                             ->copyableState(fn(PrevUserRequest $record) => $record->vetAuth?->vet_email)
                             ->copyMessage(__('filament::components/copyable.messages.copied'))
                             ->copyMessageDuration(1500)
+                            ->hidden(fn(PrevUserRequest $record) => $record->vetAuth === null)
                             ->inlineLabel(),
-                        TextEntry::make('status')->label(__('Status'))->badge()
+                        TextEntry::make('kids_name')
+                            ->label(__("Kid's Name"))
+                            ->formatStateUsing(fn($state, PrevUserRequest $record) => $state . ($record->class ? ' | ' . $record->class : '') . ($record->birth_date ? ' (' . $record->birth_date->format('Y-m-d') . ')' : ''))
+                            ->visible(fn(PrevUserRequest $record) => filled($record->kids_name))
                             ->inlineLabel(),
                         TextEntry::make('total_amount')
-                            ->label(__('Amount'))
+                            ->label(__('Cost'))
                             ->numeric(decimalPlaces: 0, thousandsSeparator: ',')
                             ->money('ILS', 0, 'he_IL')
                             ->inlineLabel(),
+                        TextEntry::make('status')->label(__('Status'))->badge()
+                            ->inlineLabel(),
+                        TextEntry::make('payment_by')->label(__('Payment Type'))
+                            ->visible(fn(PrevUserRequest $record) => filled($record->payment_by))
+                            ->inlineLabel(),
                         TextEntry::make('payment_approval_id')->label(__('Payment Approval Number'))
                             ->inlineLabel(),
-                        TextEntry::make('last_4_digits')->label(__('Last 4 Digits'))
-                            ->inlineLabel(),
-                        TextEntry::make('payment_date_time')->label(__('Payment Date'))->dateTime()
-                            ->inlineLabel(),
-                        TextEntry::make('record_date_time')->label(__('Recorded at'))->dateTime()
-                            ->inlineLabel(),
-                        IconEntry::make('IsDone')->label(__('Is Done'))->boolean()
-                            ->inlineLabel(),
-                        TextEntry::make('DoneDate')->label(__('Done Date'))->dateTime()->placeholder('-')
-                            ->inlineLabel(),
-                        TextEntry::make('doneBy.name')->label(__('Done By'))
-                            ->inlineLabel(),
-                        TextEntry::make('created_at')->label(__('Created at'))
-                            ->dateTime()
-                            ->inlineLabel(),
-                        TextEntry::make('updated_at')->label(__('Updated at'))
-                            ->dateTime()
-                            ->inlineLabel(),
-                        TextEntry::make('deleted_at')->label(__('Deleted at'))
-                            ->dateTime()
-                            ->placeholder('-')
-                            ->inlineLabel(),
-
                     ])
-                    ->columns(4),
-                Section::make(__('Dog and Owner'))
+                    ->columns(1),
+                Section::make(__('Requester details'))
+                    ->columnSpan(1)
                     ->schema([
+                        TextEntry::make('requesterName')->label(__('Name'))
+                            ->inlineLabel(),
+                        TextEntry::make('normalized_mobile')->label(__('Mobile Phone'))
+                            ->copyable()
+                            ->copyableState(fn(PrevUserRequest $record) => $record->normalizedMobile)
+                            ->copyMessage(__('filament::components/copyable.messages.copied'))
+                            ->copyMessageDuration(1500)
+                            ->inlineLabel(),
+                        TextEntry::make('email')->label(__('Email'))
+                            ->inlineLabel(),
+                        TextEntry::make('full_address')->label(__('Full Address'))
+                            ->inlineLabel()
+                            ->columnSpanFull(),
+                        TextEntry::make('other_address')
+                            ->label(fn() => __('City') . ', ' . __('Street') . ', ' . __('Number'))
+                            ->state(fn(PrevUserRequest $record): string => ($record->city ?? '-') . ', ' . ($record->street ?? '-') . ', ' . ($record->number ?? '-'))
+                            ->inlineLabel()
+                            ->columnSpanFull(),
                         TextEntry::make('dog.full_name')->label(__('dog/model/general.labels.singular'))
-                            ->tooltip(fn(PrevUserRequest $record) => $record->sagirID)
+                            ->tooltip(fn(PrevUserRequest $record) => __('Copy Sagir ') . $record->sagirID)
+                            ->formatStateUsing(fn(PrevUserRequest $record) => $record->dog->full_name . ' / ' . $record->sagirID)
                             ->copyable()
                             ->copyableState(fn(PrevUserRequest $record) => $record->sagirID)
                             ->copyMessage(__('filament::components/copyable.messages.copied'))
@@ -495,7 +467,55 @@ class PrevUserRequestResource extends Resource
                             ->copyMessageDuration(1500)
                             ->inlineLabel(),
                     ])
-                    ->columns(4),
+                    ->columns(1),
+                Section::make(__('User by Phone'))
+                    ->columnSpan(1)
+                    ->schema([
+                        TextEntry::make('userByPhone.full_name')->label(__('Name'))
+                            ->inlineLabel(),
+                        TextEntry::make('normalized_mobile')->label(__('Mobile Phone'))
+                            ->copyable()
+                            ->copyableState(fn(PrevUserRequest $record) => $record->normalizedMobile)
+                            ->copyMessage(__('filament::components/copyable.messages.copied'))
+                            ->copyMessageDuration(1500)
+                            ->inlineLabel(),
+                        TextEntry::make('userByPhone.email')->label(__('Email'))
+                            ->copyable(fn(PrevUserRequest $record) => $record->userByPhone?->email ? true : false)
+                            ->copyableState(fn(PrevUserRequest $record) => $record->userByPhone?->email)
+                            ->copyMessage(__('filament::components/copyable.messages.copied'))
+                            ->copyMessageDuration(1500)
+                            ->inlineLabel(),
+                        TextEntry::make('userByPhone.address')->label(__('Full Address'))
+                            ->inlineLabel()
+                            ->columnSpanFull(),
+                    ])
+                    ->hidden(fn(PrevUserRequest $record) => $record->mobile_phone === null || $record->mobile_phone === '')
+                    ->columns(1),
+                Section::make(__('Dates'))
+                    ->columnSpan(1)
+                    ->schema([
+                        TextEntry::make('payment_date_time')->label(__('Payment Date'))->dateTime()
+                            ->inlineLabel(),
+                        TextEntry::make('record_date_time')->label(__('Recorded at'))->dateTime()
+                            ->inlineLabel(),
+                        TextEntry::make('created_at')->label(__('Created at'))
+                            ->dateTime()
+                            ->inlineLabel(),
+                        TextEntry::make('updated_at')->label(__('Updated at'))
+                            ->dateTime()
+                            ->inlineLabel(),
+                        TextEntry::make('deleted_at')->label(__('Deleted at'))
+                            ->dateTime()
+                            ->hidden(fn(PrevUserRequest $record) => $record->deleted_at === null)
+                            ->inlineLabel(),
+                        IconEntry::make('IsDone')->label(__('Is Done'))->boolean()
+                            ->inlineLabel(),
+                        TextEntry::make('doneBy.name')->label(__('Done By'))
+                            ->inlineLabel(),
+                        TextEntry::make('DoneDate')->label(__('Done Date'))->dateTime()->placeholder('-')
+                            ->inlineLabel(),
+                    ])
+                    ->columns(1),
             ]);
     }
 

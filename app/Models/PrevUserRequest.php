@@ -93,6 +93,19 @@ class PrevUserRequest extends Model
         );
     }
 
+    protected function class(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                return match ($this->attributes['class']) {
+                    'beginners_class' => __('Beginners Class'),
+                    'under_13' => __('Under 13'),
+                    'over_13' => __('Over 13'),
+                };
+            },
+        );
+    }
+
 
     protected function requesterName(): Attribute
     {

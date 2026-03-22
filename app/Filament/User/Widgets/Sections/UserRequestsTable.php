@@ -79,7 +79,7 @@ class UserRequestsTable extends BaseWidget
                     ->searchable(['DogsDB.SagirID', 'DogsDB.eng_name', 'DogsDB.heb_name'], isIndividual: true, isGlobal: false)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('total_amount')
-                    ->label(__('Amount'))
+                    ->label(__('Cost'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: ',')
                     ->money(currency: 'ILS')
                     ->sortable()
@@ -152,7 +152,7 @@ class UserRequestsTable extends BaseWidget
                                 TextEntry::make('club.Name')->label(__('Club')),
                                 TextEntry::make('dog.SagirID')->label(__('dog/model/general.labels.singular')),
                                 TextEntry::make('dog.full_name')->label(__('Dog name')),
-                                TextEntry::make('total_amount')->label(__('Amount'))->money(currency: 'ILS'),
+                                TextEntry::make('total_amount')->label(__('Cost'))->money(currency: 'ILS'),
                                 TextEntry::make('payment_date_time')->label(__('Payment Date'))->dateTime(),
                                 TextEntry::make('vetAuth.name')->label(__('Veterinarian Authority')),
                                 TextEntry::make('vetAuth.vet_email')->label(__('Authority Email')),

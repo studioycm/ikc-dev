@@ -62,7 +62,7 @@ class PrevPaymentResource extends Resource
                             ->label(__('Topic'))
                             ->maxLength(255),
                         Forms\Components\TextInput::make('amount')
-                            ->label(__('Amount'))
+                            ->label(__('Cost'))
                             ->numeric()
                             ->minValue(0)
                             ->required(),
@@ -152,7 +152,7 @@ class PrevPaymentResource extends Resource
                     ->searchable()
                     ->toggleable(),
                 TextColumn::make('amount')
-                    ->label(__('Amount'))
+                    ->label(__('Cost'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 TextColumn::make('club.Name')
@@ -234,7 +234,7 @@ class PrevPaymentResource extends Resource
                         TextEntry::make('payment_topic')->label(__('Topic')),
                         TextEntry::make('desc')->label(__('Description')),
                         TextEntry::make('amount')
-                            ->label(__('Amount'))
+                            ->label(__('Cost'))
                             ->numeric(decimalPlaces: 0, thousandsSeparator: ''),
                         TextEntry::make('payment_date_time')->label(__('Payment Date Time'))->dateTime(),
                         TextEntry::make('last4_digits')->label(__('Last 4 Digits')),

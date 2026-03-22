@@ -47,7 +47,7 @@ class PaymentHistoryTable extends BaseWidget
                     ->wrap()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->label(__('Amount'))
+                    ->label(__('Cost'))
                     ->money(currency: 'ILS')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('club.Name')
@@ -73,7 +73,7 @@ class PaymentHistoryTable extends BaseWidget
                             ->schema([
                                 TextEntry::make('approval_number')->label(__('Approval Number')),
                                 TextEntry::make('desc')->label(__('Description')),
-                                TextEntry::make('amount')->label(__('Amount'))->money(currency: 'ILS'),
+                                TextEntry::make('amount')->label(__('Cost'))->money(currency: 'ILS'),
                                 TextEntry::make('payment_date_time')->label(__('Paid At'))->dateTime(),
                                 TextEntry::make('club.Name')->label(__('Club')),
                                 TextEntry::make('breed.BreedName')->label(__('Breed')),

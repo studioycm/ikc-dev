@@ -42,7 +42,7 @@ class PaymentsRelationManager extends RelationManager
                     ->label(__('Club'))
                     ->toggleable(),
                 TextColumn::make('amount')
-                    ->label(__('Amount'))
+                    ->label(__('Cost'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 TextColumn::make('payment_date_time')
