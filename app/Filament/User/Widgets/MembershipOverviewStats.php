@@ -24,7 +24,9 @@ class MembershipOverviewStats extends BaseWidget
             ->when(
                 blank($prevUserId),
                 fn($query) => $query->whereRaw('1 = 0'),
-                fn($query) => $query->where('user_id', $prevUserId)
+                function ($query) use ($prevUserId) {
+                    $query->where('user_id', $prevUserId);
+                }
             );
 
         return [

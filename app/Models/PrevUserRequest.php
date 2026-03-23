@@ -101,6 +101,7 @@ class PrevUserRequest extends Model
                     'beginners_class' => __('Beginners Class'),
                     'under_13' => __('Under 13'),
                     'over_13' => __('Over 13'),
+                    default => __('Unknown'),
                 };
             },
         );

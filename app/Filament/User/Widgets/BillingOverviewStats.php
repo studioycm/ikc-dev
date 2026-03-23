@@ -27,15 +27,19 @@ class BillingOverviewStats extends BaseWidget
             ->when(
                 blank($prevUserId) && blank($prevUserPhone),
                 fn($query) => $query->whereRaw('1 = 0'),
-                fn($query) => $query->where('owner_id', $prevUserId)
-                    ->orWhere('mobile_phone', 'like', '%' . $prevUserPhone . '%')
+                function ($query) use ($prevUserId, $prevUserPhone) {
+                    $query->where('owner_id', $prevUserId)
+                        ->orWhere('mobile_phone', 'like', '%' . $prevUserPhone . '%');
+                },
             );
 
         $paymentsQuery = PrevPayment::query()
             ->when(
                 blank($prevUserId),
                 fn($query) => $query->whereRaw('1 = 0'),
-                fn($query) => $query->where('created_by', '=', $prevUserId)
+                function ($query) use ($prevUserId) {
+                    $query->where('created_by', '=', $prevUserId);
+                },
             );
 
         return [
