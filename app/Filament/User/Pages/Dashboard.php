@@ -3,8 +3,10 @@
 namespace App\Filament\User\Pages;
 
 use App\Filament\User\Widgets\BillingOverviewStats;
+use App\Filament\User\Widgets\BreedingOverviewStats;
 use App\Filament\User\Widgets\DogsOverviewStats;
 use App\Filament\User\Widgets\MembershipOverviewStats;
+use App\Filament\User\Widgets\ShowsOverviewStats;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
@@ -42,6 +44,8 @@ class Dashboard extends BaseDashboard
             DogsOverviewStats::class,
             MembershipOverviewStats::class,
             BillingOverviewStats::class,
+            BreedingOverviewStats::class,
+            ShowsOverviewStats::class,
         ];
     }
 }

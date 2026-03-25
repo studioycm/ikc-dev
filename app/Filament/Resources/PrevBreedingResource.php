@@ -386,21 +386,25 @@ class PrevBreedingResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                $query->with(['female', 'male', 'createdBy', 'breedinghouse'])
+                    ->withCount('puppies');
+            })
             ->columns([
 
                 // Relationships (Using 'female' and 'male' relations from Breeding model)
-                TextColumn::make('female.Eng_Name')
-                    ->label('Mother (Dam)')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('female.full_name')
+                    ->label(__('Mother (Dam)'))
+                    ->searchable(['Heb_Name', 'Eng_Name', 'SagirID'], isIndividual: true, isGlobal: false)
+                    ->sortable(['SagirID']),
 
-                TextColumn::make('male.Eng_Name')
-                    ->label('Father (Sire)')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('male.full_name')
+                    ->label(__('Father (Sire)'))
+                    ->searchable(['Heb_Name', 'Eng_Name', 'SagirID'], isIndividual: true, isGlobal: false)
+                    ->sortable(['SagirID']),
 
                 TextColumn::make('BreddingDate')
-                    ->label('Breeding Date')
+                    ->label(__('Breeding Date'))
                     ->date()
                     ->sortable(),
 
@@ -486,6 +490,11 @@ class PrevBreedingResource extends Resource
                     ->numeric()
                     ->toggleable(isToggledHiddenByDefault: true),
 
+                TextColumn::make('puppies_count')
+                    ->label('Puppies')
+                    ->numeric()
+                    ->sortable(),
+
                 // Status & Dates
                 TextColumn::make('review_type')
                     ->badge()
@@ -554,15 +563,15 @@ class PrevBreedingResource extends Resource
 
                 TextColumn::make('responsiable_owner')
                     ->label('Responsible Owner')
-                    ->searchable()
+                    ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('createdBy.name')
-                    ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en'])
+                    ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en'], isIndividual: true, isGlobal: false)
                     ->sortable(['last_name', 'first_name']),
 
                 TextColumn::make('breedinghouse.name')
-                    ->searchable(['HebName', 'EngName', 'GidulCode'])
+                    ->searchable(['HebName', 'EngName', 'GidulCode'], isIndividual: true, isGlobal: false)
                     ->sortable(['HebName']),
 
                 TextColumn::make('created_at')
@@ -605,6 +614,7 @@ class PrevBreedingResource extends Resource
                     ForceDeleteBulkAction::make(),
                 ]),
             ])
+            ->searchOnBlur()
             ->defaultSort('created_at', 'desc');
     }
 
@@ -645,7 +655,7 @@ class PrevBreedingResource extends Resource
 
         if ($component === null) {
             $record = PrevDog::query()->where('SagirID', $get('SagirId'))
-                ->with('femaleBreedings');
+                ->with('femaleBreedings')->get()->first();
         } else {
             $record = $component->getSelectedRecord();
         }
@@ -671,7 +681,7 @@ class PrevBreedingResource extends Resource
         }
         if ($component === null) {
             $record = PrevDog::query()->where('SagirID', $get('MaleSagirId'))
-                ->with('maleBreedings');
+                ->with('maleBreedings')->get()->first();
         } else {
             $record = $component->getSelectedRecord();
         }

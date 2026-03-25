@@ -602,17 +602,7 @@ class PrevUserResource extends Resource
                             ->default('all'),
                     ])
                     ->query(function (Builder $query, array $data) {
-                        if (empty($data['record_type']) || $data['record_type'] === 'all') {
-                            return $query;
-                        }
-
-                        return match ($data['record_type']) {
-                            'all' => $query,
-                            'Native' => $query->where('record_type', 'Native'),
-                            'Owners' => $query->where('record_type', 'Owners'),
-                            'Members' => $query->where('record_type', 'Members'),
-                            'without' => $query->whereNull('record_type'),
-                        };
+                        return $query->whereRecordType($data['record_type'] ?? null);
                     }),
                 Filters\Filter::make('created_at')
                     ->form([

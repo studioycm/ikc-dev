@@ -5,6 +5,7 @@ namespace App\Filament\User\Widgets\Sections;
 use App\Enums\Legacy\LegacyUserRequestTopic;
 use App\Filament\User\Widgets\Concerns\InteractsWithCurrentPrevUser;
 use App\Models\PrevUserRequest;
+use App\Services\Legacy\PrevUserService;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
@@ -21,20 +22,13 @@ class UserRequestsTable extends BaseWidget
 
     public function table(Table $table): Table
     {
-        $prevUserId = $this->getCurrentPrevUserId();
-        $prevUserMobilePhone = $this->getPrevUserMobilePhone();
+        $prevUser = $this->getCurrentPrevUser();
+        $prevUserService = app(PrevUserService::class);
 
         return $table
             ->query(
-                PrevUserRequest::query()
-                    ->when(
-                        blank($prevUserId) && blank($prevUserMobilePhone),
-                        fn($query) => $query->whereRaw('1 = 0'),
-                        fn($query) => $query->where('mobile_phone', 'like', '%' . $prevUserMobilePhone . '%')
-                            ->orWhere('owner_id', $prevUserId)
-                    )
+                $prevUserService->constrainRequestQueryToPrevUser(PrevUserRequest::query(), $prevUser)
                     ->with(['club:id,Name', 'dog:id,SagirID,Heb_Name,Eng_Name', 'vetAuth:id,name,vet_email'])
-                    ->orderByDesc('updated_at')
             )
             ->columns([
                 Tables\Columns\TextColumn::make('id')
@@ -45,24 +39,24 @@ class UserRequestsTable extends BaseWidget
                     ->badge()
                     ->description(function ($state, PrevUserRequest $record): ?string {
                         if ($state === null) {
-                            return __('Topic') . " " . __('Missing');
+                            return __('Topic') . ' ' . __('Missing');
                         }
 
                         return match ($state->value) {
                             'pedigree_paper_request' => $record->paper_request_type
                                 ? $record->paper_request_type->getLabel()
-                                : __('Pedigree Type') . " " . __('Missing'),
+                                : __('Pedigree Type') . ' ' . __('Missing'),
 
                             'champion_diploma_request' => $record->champion_certificate_type
                                 ? $record->champion_certificate_type->getLabel()
-                                : __('Champion Certificate') . " " . __('Missing'),
+                                : __('Champion Certificate') . ' ' . __('Missing'),
 
                             'Payment of pelvic / elbow photo decoding' => $record->total_amount
                                 ? Number::currency($record->total_amount, in: 'ILS', locale: 'he_IL', precision: 0)
-                                : __('Price') . " " . __('Missing'),
+                                : __('Price') . ' ' . __('Missing'),
                             'agra_form' => $record->vetAuth
-                                ? $record->vetAuth->name . " (" . $record->vetAuth->vet_email . ")"
-                                : __('Veterinarian Authority') . " " . __('Missing'),
+                                ? $record->vetAuth->name . ' (' . $record->vetAuth->vet_email . ')'
+                                : __('Veterinarian Authority') . ' ' . __('Missing'),
                             default => '',
                         };
                     })
@@ -75,7 +69,7 @@ class UserRequestsTable extends BaseWidget
                 Tables\Columns\TextColumn::make('dog.SagirID')
                     ->label(__('dog/model/general.labels.singular'))
                     ->description(fn(PrevUserRequest $record): ?string => $record->dog?->full_name)
-                    ->sortable()
+                    ->sortable(['DogsDB.SagirID'])
                     ->searchable(['DogsDB.SagirID', 'DogsDB.eng_name', 'DogsDB.heb_name'], isIndividual: true, isGlobal: false)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('total_amount')
@@ -168,10 +162,5 @@ class UserRequestsTable extends BaseWidget
             ->emptyStateHeading(__('No Requests Found'))
             ->emptyStateDescription(__('Your submitted registration and paperwork requests will appear here.'))
             ->emptyStateIcon('heroicon-o-document-text');
-    }
-
-    private function getPrevUserMobilePhone()
-    {
-        return auth()->user()?->prevUser?->mobile_phone;
     }
 }

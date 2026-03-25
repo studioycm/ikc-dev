@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PrevDogResource\RelationManagers;
 
+use App\Enums\Legacy\LegacyDogGender;
 use App\Filament\Resources\PrevBreedingResource;
 use App\Models\PrevBreeding;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -18,7 +19,12 @@ class MaleBreedingsRelationManager extends RelationManager
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return __('Male Breedings');
+        return __('Breedings');
+    }
+
+    public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
+    {
+        return $ownerRecord->GenderID === LegacyDogGender::Male;
     }
 
     public function table(Table $table): Table

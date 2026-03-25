@@ -34,7 +34,6 @@ Define supervisors in `config/horizon.php`. The `environments` array merges into
 whole supervisor block:
 
 <!-- Supervisor Config -->
-
 ```php
 'defaults' => [
     'supervisor-1' => [
@@ -62,7 +61,6 @@ whole supervisor block:
 Restrict access in `App\Providers\HorizonServiceProvider`:
 
 <!-- Dashboard Gate -->
-
 ```php
 protected function gate(): void
 {

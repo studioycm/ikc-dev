@@ -27,7 +27,6 @@ All tests must be written using Pest. Use `php artisan make:test --pest {name}`.
 ### Basic Test Structure
 
 <!-- Basic Pest Test Example -->
-
 ```php
 it('is true', function () {
     expect(true)->toBeTrue();
@@ -45,7 +44,6 @@ it('is true', function () {
 Use specific assertions (`assertSuccessful()`, `assertNotFound()`) instead of `assertStatus()`:
 
 <!-- Pest Response Assertion -->
-
 ```php
 it('returns all', function () {
     $this->postJson('/api/docs', [])->assertSuccessful();
@@ -67,7 +65,6 @@ Import mock function before use: `use function Pest\Laravel\mock;`
 Use datasets for repetitive tests (validation rules, etc.):
 
 <!-- Pest Dataset Example -->
-
 ```php
 it('has emails', function (string $email) {
     expect($email)->not->toBeEmpty();
@@ -84,7 +81,6 @@ it('has emails', function (string $email) {
 Pest 3 includes architecture testing to enforce code conventions:
 
 <!-- Architecture Test Example -->
-
 ```php
 arch('controllers')
     ->expect('App\Http\Controllers')

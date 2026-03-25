@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Legacy\LegacyUserRequestChampionType;
 use App\Enums\Legacy\LegacyUserRequestPaperType;
 use App\Enums\Legacy\LegacyUserRequestTopic;
+use App\Services\Legacy\PrevUserService;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -52,7 +53,7 @@ class PrevUserRequest extends Model
         'deleted_at' => 'datetime',
     ];
 
-//    protected $appends = ['normalized_mobile'];
+    //    protected $appends = ['normalized_mobile'];
 
     public function club(): BelongsTo
     {
@@ -107,7 +108,6 @@ class PrevUserRequest extends Model
         );
     }
 
-
     protected function requesterName(): Attribute
     {
         return Attribute::make(
@@ -121,29 +121,21 @@ class PrevUserRequest extends Model
     {
         return Attribute::make(
             get: function () {
-                return self::normaliseMsisdn($this->attributes['mobile_phone']);
+                return PrevUserService::normalisePhone($this->attributes['mobile_phone'] ?? null);
             }
         );
     }
 
-    protected static function normaliseMsisdn(?string $raw): ?string
+    public function resolvedPrevUser(): ?PrevUser
     {
-        if ($raw === null || $raw === '') {
-            return null;
+        if ($this->relationLoaded('resolvedPrevUser')) {
+            return $this->getRelation('resolvedPrevUser');
         }
 
-        // 1. keep digits only
-        $digits = preg_replace('/\D+/', '', $raw);
+        $resolvedPrevUser = app(PrevUserService::class)->resolveFromRequest($this);
 
-        // 2. strip international prefixes
-        $digits = preg_replace('/^(00972|972)/', '', $digits);
+        $this->setRelation('resolvedPrevUser', $resolvedPrevUser);
 
-        // 3. guarantee a single leading zero
-        $digits = ltrim($digits, '0');
-        $digits = $digits === '' ? '' : '0' . $digits;
-
-        // 4. final validation
-        return preg_match('/^05\d{8}$/', $digits) ? $digits : null;
+        return $resolvedPrevUser;
     }
-
 }

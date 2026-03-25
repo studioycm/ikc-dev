@@ -215,7 +215,9 @@ class PrevBreedingRelatedDogResource extends Resource
                     RestoreBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc')
+            ->searchOnBlur();
     }
 
     public static function getPages(): array

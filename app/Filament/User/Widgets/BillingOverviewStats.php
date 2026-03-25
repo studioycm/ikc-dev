@@ -7,6 +7,7 @@ use App\Filament\User\Pages\RequestsDashboard;
 use App\Filament\User\Widgets\Concerns\InteractsWithCurrentPrevUser;
 use App\Models\PrevPayment;
 use App\Models\PrevUserRequest;
+use App\Services\Legacy\PrevUserService;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -20,18 +21,10 @@ class BillingOverviewStats extends BaseWidget
 
     protected function getStats(): array
     {
-        $prevUserId = $this->getCurrentPrevUserId();
-        $prevUserPhone = $this->getCurrentPrevUserPhone();
-        $phoneRemoveLeadingZero = preg_replace('/^0/', '', $prevUserPhone);
-        $requestsQuery = PrevUserRequest::query()
-            ->when(
-                blank($prevUserId) && blank($prevUserPhone),
-                fn($query) => $query->whereRaw('1 = 0'),
-                function ($query) use ($prevUserId, $prevUserPhone) {
-                    $query->where('owner_id', $prevUserId)
-                        ->orWhere('mobile_phone', 'like', '%' . $prevUserPhone . '%');
-                },
-            );
+        $prevUser = $this->getCurrentPrevUser();
+        $prevUserId = $prevUser?->getKey();
+        $requestsQuery = app(PrevUserService::class)
+            ->constrainRequestQueryToPrevUser(PrevUserRequest::query(), $prevUser);
 
         $paymentsQuery = PrevPayment::query()
             ->when(

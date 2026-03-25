@@ -152,7 +152,7 @@ class PrevUserRequestResource extends Resource
     {
         return $table
             ->modifyQueryUsing(fn($query) => $query->with(
-                ['userByPhone', 'owner', 'dog', 'doneBy', 'club', 'vetAuth']
+                ['owner', 'dog', 'doneBy', 'club', 'vetAuth']
             ))
             ->defaultSort('updated_at', 'desc')
             ->columns([
@@ -160,6 +160,7 @@ class PrevUserRequestResource extends Resource
                     ->label(__('ID'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
+                    ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(),
                 TextColumn::make('topic')
                     ->label(__('Topic'))
@@ -220,11 +221,10 @@ class PrevUserRequestResource extends Resource
                     ->searchable(['public_registration.first_name', 'public_registration.last_name'], isIndividual: true, isGlobal: false)
                     ->sortable(['public_registration.first_name', 'public_registration.last_name'])
                     ->toggleable(),
-                TextColumn::make('userByPhone.name')
-                    ->label(__('User by Phone'))
-                    ->description(fn(PrevUserRequest $record) => $record->userByPhone?->mobile_phone)
-                    ->sortable(['first_name', 'last_name'])
-                    ->searchable(['users.first_name', 'users.last_name', 'users.first_name_en', 'users.last_name_en', 'users.mobile_phone'], isIndividual: true, isGlobal: false)
+                TextColumn::make('resolved_prev_user')
+                    ->label(__('Resolved User'))
+                    ->state(fn(PrevUserRequest $record): ?string => $record->resolvedPrevUser()?->name)
+                    ->description(fn(PrevUserRequest $record): ?string => $record->resolvedPrevUser()?->mobile_phone ?? $record->resolvedPrevUser()?->phone ?? $record->resolvedPrevUser()?->email)
                     ->toggleable(),
                 TextColumn::make('dog.SagirID')
                     ->label(__('dog/model/general.labels.singular'))
@@ -468,28 +468,38 @@ class PrevUserRequestResource extends Resource
                             ->inlineLabel(),
                     ])
                     ->columns(1),
-                Section::make(__('User by Phone'))
+                Section::make(__('Resolved User'))
                     ->columnSpan(1)
                     ->schema([
-                        TextEntry::make('userByPhone.full_name')->label(__('Name'))
+                        TextEntry::make('resolved_prev_user_id')->label(__('ID'))
+                            ->state(fn(PrevUserRequest $record): ?int => $record->resolvedPrevUser()?->id)
                             ->inlineLabel(),
-                        TextEntry::make('normalized_mobile')->label(__('Mobile Phone'))
+                        TextEntry::make('resolved_prev_user_name')->label(__('Name'))
+                            ->state(fn(PrevUserRequest $record): ?string => $record->resolvedPrevUser()?->full_name)
+                            ->inlineLabel(),
+                        TextEntry::make('resolved_prev_user_phone')->label(__('Phone'))
+                            ->state(fn(PrevUserRequest $record): ?string => $record->resolvedPrevUser()?->mobile_phone ?? $record->resolvedPrevUser()?->phone)
                             ->copyable()
-                            ->copyableState(fn(PrevUserRequest $record) => $record->normalizedMobile)
+                            ->copyableState(fn(PrevUserRequest $record) => $record->resolvedPrevUser()?->mobile_phone ?? $record->resolvedPrevUser()?->phone)
                             ->copyMessage(__('filament::components/copyable.messages.copied'))
                             ->copyMessageDuration(1500)
                             ->inlineLabel(),
-                        TextEntry::make('userByPhone.email')->label(__('Email'))
-                            ->copyable(fn(PrevUserRequest $record) => $record->userByPhone?->email ? true : false)
-                            ->copyableState(fn(PrevUserRequest $record) => $record->userByPhone?->email)
+                        TextEntry::make('resolved_prev_user_record_type')->label(__('Record Type'))
+                            ->state(fn(PrevUserRequest $record): ?string => $record->resolvedPrevUser()?->record_type)
+                            ->inlineLabel(),
+                        TextEntry::make('resolved_prev_user_email')->label(__('Email'))
+                            ->state(fn(PrevUserRequest $record): ?string => $record->resolvedPrevUser()?->email)
+                            ->copyable(fn(PrevUserRequest $record) => $record->resolvedPrevUser()?->email ? true : false)
+                            ->copyableState(fn(PrevUserRequest $record) => $record->resolvedPrevUser()?->email)
                             ->copyMessage(__('filament::components/copyable.messages.copied'))
                             ->copyMessageDuration(1500)
                             ->inlineLabel(),
-                        TextEntry::make('userByPhone.address')->label(__('Full Address'))
+                        TextEntry::make('resolved_prev_user_address')->label(__('Full Address'))
+                            ->state(fn(PrevUserRequest $record): ?string => $record->resolvedPrevUser()?->buildAddress())
                             ->inlineLabel()
                             ->columnSpanFull(),
                     ])
-                    ->hidden(fn(PrevUserRequest $record) => $record->mobile_phone === null || $record->mobile_phone === '')
+                    ->hidden(fn(PrevUserRequest $record) => $record->resolvedPrevUser() === null)
                     ->columns(1),
                 Section::make(__('Dates'))
                     ->columnSpan(1)
