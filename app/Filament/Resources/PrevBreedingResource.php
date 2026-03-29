@@ -7,8 +7,6 @@ use App\Filament\Exports\PrevBreedingExporter;
 use App\Filament\Resources\PrevBreedingResource\Pages;
 use App\Models\PrevBreeding;
 use App\Models\PrevDog;
-use Filament\Forms\Components\Actions;
-use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
@@ -75,6 +73,8 @@ class PrevBreedingResource extends Resource
     {
         return $form
             ->schema([
+                Hidden::make('created_by')
+                    ->default(fn($operation, $record) => auth()->id()),
                 Wizard::make([
                     Step::make('inquiry')
                         ->label(__('Inquiry'))
@@ -223,21 +223,6 @@ class PrevBreedingResource extends Resource
                                     // options: "כן מוחלט / לא מוחלט /  נדרש מידע משלים / נדרשת בדיקה"
 
                                 ]),
-                            Actions::make([
-                                Action::make('save_litter_report')
-                                    ->label(__('Save Litter Report'))
-                                    ->color('success')
-                                    ->action(function () {
-                                        // Your custom logic here
-                                    }),
-                                Action::make('delete_litter_report')
-                                    ->label(__('Delete Litter Report'))
-                                    ->disabled()
-                                    ->color('danger')
-                                    ->action(function () {
-                                    }),
-                            ])
-                                ->alignCenter(),
                         ])
                         ->columns(1),
 
@@ -256,12 +241,6 @@ class PrevBreedingResource extends Resource
                                 ->label(__('Beit Gidul'))
                                 ->relationship('breedinghouse', 'HebName')
                                 ->searchable(['HebName', 'EngName', 'GidulCode']),
-
-                            Select::make('created_by')
-                                ->label(__('Breeder'))
-                                ->relationship('createdBy', 'first_name')
-                                ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en']),
-
                         ])
                         ->columns(3),
 
