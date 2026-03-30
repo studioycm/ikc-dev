@@ -119,7 +119,7 @@
                                             <div class="mt-2 flex flex-wrap gap-2">
                                                 @foreach($promoter['breeds'] as $breed)
                                                     <span
-                                                        class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                                                        class="inline-flex items-center rounded-md bg-gray-300 px-2 py-1 text-xs font-medium text-gray-600 dark:bg-gray-600 dark:text-gray-300">
                                                         {{ $breed }}
                                                     </span>
                                                 @endforeach

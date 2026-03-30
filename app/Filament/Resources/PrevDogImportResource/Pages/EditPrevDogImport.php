@@ -16,7 +16,7 @@ class EditPrevDogImport extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 
-    public function getHeading(): string|Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Edit imported dog:') . ' ' . ($this->getRecord()->dog_name ?: '#' . $this->getRecord()->id);
     }

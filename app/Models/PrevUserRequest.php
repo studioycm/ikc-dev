@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Legacy\LegacyUserRequestChampionType;
 use App\Enums\Legacy\LegacyUserRequestPaperType;
 use App\Enums\Legacy\LegacyUserRequestTopic;
+use App\Services\Legacy\PrevUserService;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -52,6 +53,8 @@ class PrevUserRequest extends Model
         'deleted_at' => 'datetime',
     ];
 
+    //    protected $appends = ['normalized_mobile'];
+
     public function club(): BelongsTo
     {
         return $this->belongsTo(PrevClub::class, 'club_id', 'id');
@@ -89,5 +92,50 @@ class PrevUserRequest extends Model
             get: fn() => strtolower($this->attributes['status']),
             set: fn($value) => Str::title($value),
         );
+    }
+
+    protected function class(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                return match ($this->attributes['class']) {
+                    'beginners_class' => __('Beginners Class'),
+                    'under_13' => __('Under 13'),
+                    'over_13' => __('Over 13'),
+                    default => __('Unknown'),
+                };
+            },
+        );
+    }
+
+    protected function requesterName(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                return $this->attributes['first_name'] . ' ' . $this->attributes['last_name'];
+            }
+        );
+    }
+
+    protected function normalizedMobile(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                return PrevUserService::normalisePhone($this->attributes['mobile_phone'] ?? null);
+            }
+        );
+    }
+
+    public function resolvedPrevUser(): ?PrevUser
+    {
+        if ($this->relationLoaded('resolvedPrevUser')) {
+            return $this->getRelation('resolvedPrevUser');
+        }
+
+        $resolvedPrevUser = app(PrevUserService::class)->resolveFromRequest($this);
+
+        $this->setRelation('resolvedPrevUser', $resolvedPrevUser);
+
+        return $resolvedPrevUser;
     }
 }

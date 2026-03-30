@@ -50,7 +50,7 @@ class UserRequestsRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('total_amount')
-                    ->label(__('Total Amount'))
+                    ->label(__('Cost'))
                     ->money('NIS', 0, 'he')
                     ->sortable()
                     ->toggleable(),

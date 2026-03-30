@@ -2,8 +2,10 @@
 
 namespace App\Filament\User\Widgets\Sections;
 
+use App\Enums\Legacy\LegacyUserRequestTopic;
 use App\Filament\User\Widgets\Concerns\InteractsWithCurrentPrevUser;
 use App\Models\PrevUserRequest;
+use App\Services\Legacy\PrevUserService;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
@@ -20,19 +22,13 @@ class UserRequestsTable extends BaseWidget
 
     public function table(Table $table): Table
     {
-        $prevUserId = $this->getCurrentPrevUserId();
-        $prevUserMobilePhone = $this->getPrevUserMobilePhone();
+        $prevUser = $this->getCurrentPrevUser();
+        $prevUserService = app(PrevUserService::class);
 
         return $table
             ->query(
-                PrevUserRequest::query()
-                    ->when(
-                        blank($prevUserId),
-                        fn($query) => $query->whereRaw('1 = 0'),
-                        fn($query) => $query->where('mobile_phone', $prevUserMobilePhone)
-                    )
-                    ->with(['club:id,Name', 'dog:id,SagirID,Heb_Name,Eng_Name', 'vetAuth:id,name,vet_email', 'owner:id,first_name,last_name,first_name_en,last_name_en,mobile_phone,email'])
-                    ->orderByDesc('created_at')
+                $prevUserService->constrainRequestQueryToPrevUser(PrevUserRequest::query(), $prevUser)
+                    ->with(['club:id,Name', 'dog:id,SagirID,Heb_Name,Eng_Name', 'vetAuth:id,name,vet_email'])
             )
             ->columns([
                 Tables\Columns\TextColumn::make('id')
@@ -43,21 +39,24 @@ class UserRequestsTable extends BaseWidget
                     ->badge()
                     ->description(function ($state, PrevUserRequest $record): ?string {
                         if ($state === null) {
-                            return __('Topic') . " " . __('Missing');
+                            return __('Topic') . ' ' . __('Missing');
                         }
 
                         return match ($state->value) {
                             'pedigree_paper_request' => $record->paper_request_type
                                 ? $record->paper_request_type->getLabel()
-                                : __('Pedigree Type') . " " . __('Missing'),
+                                : __('Pedigree Type') . ' ' . __('Missing'),
 
                             'champion_diploma_request' => $record->champion_certificate_type
                                 ? $record->champion_certificate_type->getLabel()
-                                : __('Champion Certificate') . " " . __('Missing'),
+                                : __('Champion Certificate') . ' ' . __('Missing'),
 
                             'Payment of pelvic / elbow photo decoding' => $record->total_amount
                                 ? Number::currency($record->total_amount, in: 'ILS', locale: 'he_IL', precision: 0)
-                                : __('Price') . " " . __('Missing'),
+                                : __('Price') . ' ' . __('Missing'),
+                            'agra_form' => $record->vetAuth
+                                ? $record->vetAuth->name . ' (' . $record->vetAuth->vet_email . ')'
+                                : __('Veterinarian Authority') . ' ' . __('Missing'),
                             default => '',
                         };
                     })
@@ -68,13 +67,20 @@ class UserRequestsTable extends BaseWidget
                     ->searchable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('dog.SagirID')
-                    ->label(__('Dog'))
+                    ->label(__('dog/model/general.labels.singular'))
                     ->description(fn(PrevUserRequest $record): ?string => $record->dog?->full_name)
-                    ->sortable()
+                    ->sortable(['DogsDB.SagirID'])
+                    ->searchable(['DogsDB.SagirID', 'DogsDB.eng_name', 'DogsDB.heb_name'], isIndividual: true, isGlobal: false)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('total_amount')
-                    ->label(__('Amount'))
+                    ->label(__('Cost'))
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: ',')
                     ->money(currency: 'ILS')
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('payment_date_time')
+                    ->label(__('Payment Date'))
+                    ->dateTime()
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('status')
@@ -90,19 +96,44 @@ class UserRequestsTable extends BaseWidget
                         'payment done' => __('Payment Done'),
                         default => $state,
                     })
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('payment_date_time')
-                    ->label(__('Payment Date'))
-                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('record_date_time')
+                    ->label(__('Recorded at'))
+                    ->date()
+                    ->sortable()
                     ->toggleable(),
                 Tables\Columns\IconColumn::make('IsDone')
                     ->label(__('Done'))
                     ->boolean()
-                    ->sortable(),
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('DoneDate')
+                    ->label(__('Done Date'))
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Requested'))
                     ->dateTime()
                     ->sortable(),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('status')
+                    ->label(__('Status'))
+                    ->options([
+                        'pending payment' => __('Pending Payment'),
+                        'payment done' => __('Payment Done'),
+                    ]),
+                Tables\Filters\SelectFilter::make('club')
+                    ->label(__('Club'))
+                    ->relationship('club', 'Name')
+                    ->searchable(['Name', 'EngName'])
+                    ->multiple()
+                    ->preload(),
+                Tables\Filters\SelectFilter::make('topic')
+                    ->label(__('Topic'))
+                    ->options(LegacyUserRequestTopic::class)
+                    ->multiple(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
@@ -113,12 +144,12 @@ class UserRequestsTable extends BaseWidget
                                 TextEntry::make('topic')->label(__('Topic')),
                                 TextEntry::make('status')->label(__('Status')),
                                 TextEntry::make('club.Name')->label(__('Club')),
-                                TextEntry::make('dog.SagirID')->label(__('Dog')),
-                                TextEntry::make('dog.full_name')->label(__('Dog Name')),
-                                TextEntry::make('total_amount')->label(__('Amount'))->money(currency: 'ILS'),
+                                TextEntry::make('dog.SagirID')->label(__('dog/model/general.labels.singular')),
+                                TextEntry::make('dog.full_name')->label(__('Dog name')),
+                                TextEntry::make('total_amount')->label(__('Cost'))->money(currency: 'ILS'),
                                 TextEntry::make('payment_date_time')->label(__('Payment Date'))->dateTime(),
-                                TextEntry::make('vetAuth.name')->label(__('Vet Auth')),
-                                TextEntry::make('vetAuth.vet_email')->label(__('Vet Email')),
+                                TextEntry::make('vetAuth.name')->label(__('Veterinarian Authority')),
+                                TextEntry::make('vetAuth.vet_email')->label(__('Authority Email')),
                             ])
                             ->columns(2),
                     ])),
@@ -131,10 +162,5 @@ class UserRequestsTable extends BaseWidget
             ->emptyStateHeading(__('No Requests Found'))
             ->emptyStateDescription(__('Your submitted registration and paperwork requests will appear here.'))
             ->emptyStateIcon('heroicon-o-document-text');
-    }
-
-    private function getPrevUserMobilePhone()
-    {
-        return auth()->user()?->prevUser?->mobile_phone;
     }
 }

@@ -16,6 +16,11 @@ trait InteractsWithCurrentPrevUser
         return $this->getCurrentPrevUser()?->getKey();
     }
 
+    protected function getCurrentPrevUserPhone(): ?int
+    {
+        return $this->getCurrentPrevUser()?->normalised_phone;
+    }
+
     /**
      * @return array<int>
      */
@@ -29,5 +34,50 @@ trait InteractsWithCurrentPrevUser
             ->filter()
             ->values()
             ->all() ?? [];
+    }
+
+    /**
+     * @return array<int>
+     */
+    protected function getCurrentPrevUserDogSagirIds(): array
+    {
+        $prevUser = $this->getCurrentPrevUser();
+
+        if ($prevUser === null) {
+            return [];
+        }
+
+        $prevUser->loadMissing('dogs:SagirID', 'history_dogs:SagirID');
+
+        return $prevUser->dogs
+            ->pluck('SagirID')
+            ->merge($prevUser->history_dogs->pluck('SagirID'))
+            ->filter()
+            ->map(static fn(mixed $sagirId): int => (int)$sagirId)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int>
+     */
+    protected function getCurrentPrevUserBreedingHouseIds(): array
+    {
+        $prevUser = $this->getCurrentPrevUser();
+
+        if ($prevUser === null) {
+            return [];
+        }
+
+        $prevUser->loadMissing('prevBreedingHouses:id');
+
+        return $prevUser->prevBreedingHouses
+            ->pluck('id')
+            ->filter()
+            ->map(static fn(mixed $id): int => (int)$id)
+            ->unique()
+            ->values()
+            ->all();
     }
 }

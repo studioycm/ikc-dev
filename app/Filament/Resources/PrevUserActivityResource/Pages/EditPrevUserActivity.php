@@ -16,7 +16,7 @@ class EditPrevUserActivity extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 
-    public function getHeading(): string|Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Edit activity:') . ' ' . ($this->getRecord()->Activity_Type ?: '#' . $this->getRecord()->id);
     }

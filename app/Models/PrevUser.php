@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use App\Builders\PrevUserBuilder;
+use App\Services\Legacy\PrevUserService;
 use Filament\Models\Contracts\HasName;
+use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 
+#[UseEloquentBuilder(PrevUserBuilder::class)]
 class PrevUser extends Model implements HasName
 {
     use Notifiable;
@@ -135,6 +139,11 @@ class PrevUser extends Model implements HasName
     public function ownedRequests(): HasMany
     {
         return $this->hasMany(PrevUserRequest::class, 'owner_id', 'id');
+    }
+
+    public function requestsByPhone(): HasMany
+    {
+        return $this->hasMany(PrevUserRequest::class, 'mobile_phone', 'mobile_phone');
     }
 
     public function completedRequests(): HasMany
@@ -280,6 +289,21 @@ class PrevUser extends Model implements HasName
         return $q;
     }
 
+    public function scopeNativeRecords(Builder $query): Builder
+    {
+        return $query->where('record_type', 'Native');
+    }
+
+    public function scopeOwnerRecords(Builder $query): Builder
+    {
+        return $query->where('record_type', 'Owners');
+    }
+
+    public function scopeMemberRecords(Builder $query): Builder
+    {
+        return $query->where('record_type', 'Members');
+    }
+
     /* ------------- “prepared query” helper for selects ---------- */
 
     /** Return id => label pairs for a Select component */
@@ -298,6 +322,21 @@ class PrevUser extends Model implements HasName
             ->toArray();
     }
 
+    //    protected function mobile_phone(): Attribute
+    //    {
+    //        return Attribute::make(
+    //            get: function () {
+    //                $mobile = static::normaliseMsisdn($this->attributes['mobile_phone'] ?? null);
+    //
+    //                if ($mobile !== null) {
+    //                    return $mobile;
+    //                }
+    //
+    //                return static::normaliseMsisdn($this->attributes['phone'] ?? null);
+    //            }
+    //        );
+    //    }
+
     /**
      * Clean “mobile_phone” first; if it can’t be normalised,
      * try “phone”.  Returns null when both fail.
@@ -306,13 +345,13 @@ class PrevUser extends Model implements HasName
     {
         return Attribute::make(
             get: function () {
-                $mobile = static::normaliseMsisdn($this->attributes['mobile_phone'] ?? null);
+                $mobile = PrevUserService::normalisePhone($this->attributes['mobile_phone'] ?? null);
 
                 if ($mobile !== null) {
                     return $mobile;
                 }
 
-                return static::normaliseMsisdn($this->attributes['phone'] ?? null);
+                return PrevUserService::normalisePhone($this->attributes['phone'] ?? null);
             }
         );
     }
@@ -329,22 +368,7 @@ class PrevUser extends Model implements HasName
      */
     protected static function normaliseMsisdn(?string $raw): ?string
     {
-        if ($raw === null || $raw === '') {
-            return null;
-        }
-
-        // 1. keep digits only
-        $digits = preg_replace('/\D+/', '', $raw);
-
-        // 2. strip international prefixes
-        $digits = preg_replace('/^(00972|972)/', '', $digits);
-
-        // 3. guarantee a single leading zero
-        $digits = ltrim($digits, '0');
-        $digits = $digits === '' ? '' : '0'.$digits;
-
-        // 4. final validation
-        return preg_match('/^05\d{8}$/', $digits) ? $digits : null;
+        return PrevUserService::normalisePhone($raw);
     }
 
     /**

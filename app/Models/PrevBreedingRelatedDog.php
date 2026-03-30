@@ -86,6 +86,9 @@ class PrevBreedingRelatedDog extends Model
     protected function casts(): array
     {
         return [
+            'sagir_id' => 'integer',
+            'is_dead' => 'boolean',
+            'breeding_id' => 'integer',
             'hair' => 'integer',
             'is_submit' => 'boolean',
         ];

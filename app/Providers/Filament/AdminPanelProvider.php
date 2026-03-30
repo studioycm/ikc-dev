@@ -34,7 +34,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandName('IKC System')
+            ->brandName(__('IKC System'))
             ->font('Assistant', provider: GoogleFontProvider::class)
             ->sidebarWidth('18rem')
             ->sidebarCollapsibleOnDesktop()

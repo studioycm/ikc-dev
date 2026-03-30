@@ -46,7 +46,7 @@ class PaymentsRelationManager extends RelationManager
                     ->description(fn(PrevPayment $record): ?string => $record->dog?->full_name)
                     ->toggleable(),
                 TextColumn::make('amount')
-                    ->label(__('Amount'))
+                    ->label(__('Cost'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 TextColumn::make('updatedBy.name')

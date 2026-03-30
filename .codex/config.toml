@@ -1,0 +1,13 @@
+
+[mcp_servers.laravel-boost]
+command = "php"
+args = ["artisan", "boost:mcp"]
+cwd = "D:\\0-Dev\\Herd\\ikc-dev"
+
+[mcp_servers.herd]
+command = "php"
+args = ["C:/Users/user-pc/.config/herd/bin/herd-mcp.phar"]
+cwd = "D:\\0-Dev\\Herd\\ikc-dev"
+
+[mcp_servers.herd.env]
+SITE_PATH = "D:\\0-Dev\\Herd\\ikc-dev"

@@ -62,7 +62,7 @@ class PrevPaymentResource extends Resource
                             ->label(__('Topic'))
                             ->maxLength(255),
                         Forms\Components\TextInput::make('amount')
-                            ->label(__('Amount'))
+                            ->label(__('Cost'))
                             ->numeric()
                             ->minValue(0)
                             ->required(),
@@ -131,22 +131,28 @@ class PrevPaymentResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                return $query
+                    ->with(['club', 'breed', 'dog', 'createdBy', 'updatedBy']);
+            })
             ->columns([
                 TextColumn::make('id')
                     ->label(__('ID'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('approval_number')
                     ->label(__('Approval Number'))
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('desc')
                     ->label(__('Description'))
                     ->wrap()
                     ->searchable()
                     ->toggleable(),
                 TextColumn::make('amount')
-                    ->label(__('Amount'))
+                    ->label(__('Cost'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 TextColumn::make('club.Name')
@@ -158,24 +164,24 @@ class PrevPaymentResource extends Resource
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(),
                 TextColumn::make('dog.SagirID')
-                    ->label(__('Dog'))
+                    ->label(__('dog/model/general.labels.singular'))
                     ->description(fn(PrevPayment $record): ?string => $record->dog?->full_name)
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(),
                 TextColumn::make('payment_date_time')
-                    ->label(__('Paid At'))
+                    ->label(__('Paid at'))
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('createdBy.name')
                     ->label(__('Created By'))
-                    ->sortable(['last_name', 'first_name'])
-                    ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en'], isIndividual: true, isGlobal: false)
+                    ->sortable(['users.last_name', 'users.first_name'])
+                    ->searchable(['users.first_name', 'users.last_name', 'users.first_name_en', 'users.last_name_en', 'users.mobile_phone'], isIndividual: true, isGlobal: false)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updatedBy.name')
                     ->label(__('Updated By'))
-                    ->sortable(['last_name', 'first_name'])
-                    ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en'], isIndividual: true, isGlobal: false)
+                    ->sortable(['users.last_name', 'users.first_name'])
+                    ->searchable(['users.first_name', 'users.last_name', 'users.first_name_en', 'users.last_name_en', 'users.mobile_phone'], isIndividual: true, isGlobal: false)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('deleted_at')
                     ->label(__('Deleted At'))
@@ -184,6 +190,7 @@ class PrevPaymentResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
@@ -227,7 +234,7 @@ class PrevPaymentResource extends Resource
                         TextEntry::make('payment_topic')->label(__('Topic')),
                         TextEntry::make('desc')->label(__('Description')),
                         TextEntry::make('amount')
-                            ->label(__('Amount'))
+                            ->label(__('Cost'))
                             ->numeric(decimalPlaces: 0, thousandsSeparator: ''),
                         TextEntry::make('payment_date_time')->label(__('Payment Date Time'))->dateTime(),
                         TextEntry::make('last4_digits')->label(__('Last 4 Digits')),

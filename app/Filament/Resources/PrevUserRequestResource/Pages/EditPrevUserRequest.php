@@ -16,7 +16,7 @@ class EditPrevUserRequest extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 
-    public function getHeading(): string|Htmlable
+    public function getTitle(): string|Htmlable
     {
         $topic_label = $this->getRecord()->topic->getLabel();
         return __('Edit request:') . ' ' . ($topic_label ?? '#' . $this->getRecord()->id);

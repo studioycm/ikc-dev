@@ -16,7 +16,7 @@ class EditPrevSkillUser extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 
-    public function getHeading(): string|Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Edit user skill:') . ' #' . $this->getRecord()->id;
     }

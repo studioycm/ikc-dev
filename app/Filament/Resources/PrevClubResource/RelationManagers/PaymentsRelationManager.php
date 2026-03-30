@@ -39,7 +39,7 @@ class PaymentsRelationManager extends RelationManager
                     ->wrap()
                     ->toggleable(),
                 TextColumn::make('amount')
-                    ->label(__('Amount'))
+                    ->label(__('Cost'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable(),
                 TextColumn::make('dog.SagirID')

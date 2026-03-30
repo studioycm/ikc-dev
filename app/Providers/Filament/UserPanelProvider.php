@@ -2,11 +2,13 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\User\Pages\BreedingActivityDashboard;
 use App\Filament\User\Pages\Dashboard as UserDashboard;
 use App\Filament\User\Pages\DogsDashboard;
 use App\Filament\User\Pages\MembershipsDashboard;
 use App\Filament\User\Pages\PaymentsDashboard;
 use App\Filament\User\Pages\RequestsDashboard;
+use App\Filament\User\Pages\ShowsDashboard;
 use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -61,6 +63,8 @@ class UserPanelProvider extends PanelProvider
                 MembershipsDashboard::class,
                 RequestsDashboard::class,
                 PaymentsDashboard::class,
+                BreedingActivityDashboard::class,
+                ShowsDashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/User/Widgets'), for: 'App\\Filament\\User\\Widgets')
             ->widgets([
@@ -86,6 +90,8 @@ class UserPanelProvider extends PanelProvider
                         'color' => 'primary',
                         'icon' => 'fas-user',
                         'prev_user_name' => auth()->user()->prevUser->name,
+                        'prev_user_id' => auth()->user()->prevUser->id,
+                        'prev_user_phone' => auth()->user()->prevUser->normalised_phone,
                     ]);
             }
             );

@@ -24,7 +24,9 @@ class MembershipOverviewStats extends BaseWidget
             ->when(
                 blank($prevUserId),
                 fn($query) => $query->whereRaw('1 = 0'),
-                fn($query) => $query->where('user_id', $prevUserId)
+                function ($query) use ($prevUserId) {
+                    $query->where('user_id', $prevUserId);
+                }
             );
 
         return [
@@ -41,10 +43,11 @@ class MembershipOverviewStats extends BaseWidget
                 ->count())
                 ->color('warning')
                 ->url(MembershipsDashboard::getUrl(panel: 'user')),
-            Stat::make(__('Clubs represented'), (clone $membershipsQuery)
-                ->distinct('club_id')
-                ->count('club_id'))
-                ->icon('heroicon-o-user-group')
+            Stat::make(__('Expired'), (clone $membershipsQuery)
+                ->whereNull('deleted_at')
+                ->where('expire_date', '<', now())
+                ->count())
+                ->color('danger')
                 ->url(MembershipsDashboard::getUrl(panel: 'user')),
         ];
     }

@@ -136,7 +136,7 @@ class UserResource extends Resource
                     ->searchable(query: function (Builder $query, string $search): Builder {
                         // Step A: Search the Legacy DB first
                         // We reuse the 'searchName' scope you already have in PrevUser model!
-                        $matchingLegacyIds = PrevUser::searchName($search)
+                        $matchingLegacyIds = PrevUser::query()->searchName($search)
                             ->pluck('id')
                             ->toArray(); // Important: convert to array for whereIn
 

@@ -216,7 +216,7 @@ class UserClubMembershipsTable extends BaseWidget
                             ])
                             ->required(),
                         TextInput::make('amount')
-                            ->label(__('Total Amount'))
+                            ->label(__('Cost'))
                             ->prefix('₪')
                             ->numeric()
                             ->default(500)

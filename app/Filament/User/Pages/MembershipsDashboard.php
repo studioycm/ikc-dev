@@ -16,12 +16,12 @@ class MembershipsDashboard extends BaseDashboard
 
     public static function getNavigationLabel(): string
     {
-        return __('Memberships & Clubs');
+        return __('Membership');
     }
 
     public function getTitle(): string
     {
-        return __('Memberships & Clubs');
+        return __('Membership');
     }
 
     public function getColumns(): int|string|array

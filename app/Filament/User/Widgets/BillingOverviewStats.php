@@ -7,6 +7,7 @@ use App\Filament\User\Pages\RequestsDashboard;
 use App\Filament\User\Widgets\Concerns\InteractsWithCurrentPrevUser;
 use App\Models\PrevPayment;
 use App\Models\PrevUserRequest;
+use App\Services\Legacy\PrevUserService;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -20,20 +21,18 @@ class BillingOverviewStats extends BaseWidget
 
     protected function getStats(): array
     {
-        $prevUserId = $this->getCurrentPrevUserId();
-
-        $requestsQuery = PrevUserRequest::query()
-            ->when(
-                blank($prevUserId),
-                fn($query) => $query->whereRaw('1 = 0'),
-                fn($query) => $query->where('owner_id', $prevUserId)
-            );
+        $prevUser = $this->getCurrentPrevUser();
+        $prevUserId = $prevUser?->getKey();
+        $requestsQuery = app(PrevUserService::class)
+            ->constrainRequestQueryToPrevUser(PrevUserRequest::query(), $prevUser);
 
         $paymentsQuery = PrevPayment::query()
             ->when(
                 blank($prevUserId),
                 fn($query) => $query->whereRaw('1 = 0'),
-                fn($query) => $query->where('created_by', $prevUserId)
+                function ($query) use ($prevUserId) {
+                    $query->where('created_by', '=', $prevUserId);
+                },
             );
 
         return [
@@ -45,6 +44,14 @@ class BillingOverviewStats extends BaseWidget
                 ->count())
                 ->color('warning')
                 ->url(RequestsDashboard::getUrl(panel: 'user')),
+            Stat::make(__('Requests'), (clone $requestsQuery)
+                ->count())
+                ->color('warning')
+                ->url(RequestsDashboard::getUrl(panel: 'user')),
+            Stat::make(__('Payments'), (clone $paymentsQuery)
+                ->count())
+                ->color('success')
+                ->url(PaymentsDashboard::getUrl(panel: 'user')),
             Stat::make(__('Payments this year'), (clone $paymentsQuery)
                 ->whereYear('payment_date_time', now()->year)
                 ->count())
@@ -52,6 +59,11 @@ class BillingOverviewStats extends BaseWidget
                 ->url(PaymentsDashboard::getUrl(panel: 'user')),
             Stat::make(__('Paid this year'), number_format((float)((clone $paymentsQuery)
                 ->whereYear('payment_date_time', now()->year)
+                ->sum('amount')), 0))
+                ->description(__('ILS'))
+                ->icon('heroicon-o-banknotes')
+                ->url(PaymentsDashboard::getUrl(panel: 'user')),
+            Stat::make(__('Paid Total'), number_format((float)((clone $paymentsQuery)
                 ->sum('amount')), 0))
                 ->description(__('ILS'))
                 ->icon('heroicon-o-banknotes')

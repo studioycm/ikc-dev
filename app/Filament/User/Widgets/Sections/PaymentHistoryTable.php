@@ -20,14 +20,16 @@ class PaymentHistoryTable extends BaseWidget
     public function table(Table $table): Table
     {
         $prevUserId = $this->getCurrentPrevUserId();
+        $prevUserEmail = $this->getCurrentPrevUser()->email;
 
         return $table
             ->query(
                 PrevPayment::query()
                     ->when(
-                        blank($prevUserId),
+                        blank($prevUserId) && blank($prevUserEmail),
                         fn($query) => $query->whereRaw('1 = 0'),
-                        fn($query) => $query->where('created_by', $prevUserId)
+                        fn($query) => $query->where('email', '=', $prevUserEmail)
+                            ->orWhere('created_by', $prevUserId)
                     )
                     ->with(['club:id,Name', 'breed:id,BreedName', 'dog:id,SagirID,Heb_Name,Eng_Name'])
                     ->orderByDesc('payment_date_time')
@@ -45,7 +47,7 @@ class PaymentHistoryTable extends BaseWidget
                     ->wrap()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->label(__('Amount'))
+                    ->label(__('Cost'))
                     ->money(currency: 'ILS')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('club.Name')
@@ -59,7 +61,7 @@ class PaymentHistoryTable extends BaseWidget
                     ->description(fn(PrevPayment $record): ?string => $record->dog?->full_name)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('payment_date_time')
-                    ->label(__('Paid At'))
+                    ->label(__('Paid at'))
                     ->dateTime()
                     ->sortable(),
             ])
@@ -71,7 +73,7 @@ class PaymentHistoryTable extends BaseWidget
                             ->schema([
                                 TextEntry::make('approval_number')->label(__('Approval Number')),
                                 TextEntry::make('desc')->label(__('Description')),
-                                TextEntry::make('amount')->label(__('Amount'))->money(currency: 'ILS'),
+                                TextEntry::make('amount')->label(__('Cost'))->money(currency: 'ILS'),
                                 TextEntry::make('payment_date_time')->label(__('Paid At'))->dateTime(),
                                 TextEntry::make('club.Name')->label(__('Club')),
                                 TextEntry::make('breed.BreedName')->label(__('Breed')),
