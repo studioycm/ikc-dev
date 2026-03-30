@@ -70,7 +70,7 @@
     $nextOutside = $isRtl ? '-left-4' : '-right-4';
 @endphp
 
-<div class="relative h-full">
+<div class="fi-pedigree-tree relative h-full">
     @if ($node['generation'] >= 1)
         <div
             class="pointer-events-none absolute top-1/2 z-0 h-px w-4 -translate-y-1/2 bg-gray-300/90 dark:bg-white/15 {{ $previousOutside }}"></div>
@@ -87,7 +87,7 @@
 
     @if ($node['is_placeholder'])
         <div
-            class="relative z-10 h-full rounded-xl border border-dashed border-gray-200 bg-gray-50/70 dark:border-white/10 dark:bg-white/5">
+            class="fi-pedigree-node-card fi-pedigree-node-placeholder relative z-10 h-full rounded-xl border border-dashed border-gray-200 bg-gray-50/70 dark:border-white/10 dark:bg-white/5">
             @if ($showPlaceholders)
                 <div
                     class="flex h-full items-center justify-center px-3 text-center text-[11px] font-medium text-gray-400 dark:text-gray-500">
@@ -96,8 +96,9 @@
             @endif
         </div>
         @else
-        <div class="relative z-10 h-full rounded-xl border shadow-sm {{ $cardClasses }} {{ $paddingClasses }}">
-            <div class="grid h-full content-start gap-2.5">
+            <div
+                class="fi-pedigree-node-card relative z-10 h-full rounded-xl border shadow-sm {{ $cardClasses }} {{ $paddingClasses }}">
+                <div class="fi-pedigree-node-content sticky grid h-full content-start gap-2.5">
                 <div class="flex items-start justify-between gap-2">
                     <span
                         class="inline-flex items-center rounded-full px-2 py-0.5 font-semibold {{ $badgeClasses }} {{ $fontMap['badge'] }}">
