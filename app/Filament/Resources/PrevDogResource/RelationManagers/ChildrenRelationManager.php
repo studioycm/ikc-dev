@@ -56,20 +56,20 @@ class ChildrenRelationManager extends RelationManager
                 'lg' => 6,
             ])
             ->defaultSort('BirthDate', 'desc')
-            ->defaultGroup('partner')
+            ->defaultGroup('birth_date')
             ->groups([
+                Group::make('birth_date')
+                    ->label(__('Birth Date'))
+                    ->titlePrefixedWithLabel(false)
+                    ->getTitleFromRecordUsing(fn(PrevDog $record) => "{$record->BirthDate->format('Y-m-d')} | " . ($this->parentGenderMale() ? "{$record->mother->full_name} ({$record->mother->SagirID})" : "{$record->father->full_name} ({$record->father->SagirID})"))
+//                    ->getDescriptionFromRecordUsing(fn(PrevDog $record) => $record->BirthDate->format('Y-m-d'))
+                    ->collapsible()
+                    ->column('BirthDate'),
                 Group::make('partner')
                     ->label(fn(): string => $this->parentGenderMale() ? __('Dam') : __('Sire'))
                     ->getTitleFromRecordUsing(fn(PrevDog $record) => $this->parentGenderMale() ? "{$record->mother->full_name} ({$record->mother->SagirID})" : "{$record->father->full_name} ({$record->father->SagirID})")
-                    ->getDescriptionFromRecordUsing(fn(PrevDog $record) => $record->BirthDate->format('Y-m-d'))
                     ->collapsible()
                     ->column($this->parentColumn()),
-                Group::make('birth_date')
-                    ->label(__('Birth Date'))
-                    ->getTitleFromRecordUsing(fn(PrevDog $record) => $record->BirthDate->format('Y-m-d'))
-                    ->getDescriptionFromRecordUsing(fn(PrevDog $record) => $this->parentGenderMale() ? "{$record->mother->full_name} ({$record->mother->SagirID})" : "{$record->father->full_name} ({$record->father->SagirID})")
-                    ->collapsible()
-                    ->column('BirthDate'),
             ])
             ->columns([
                 Stack::make([
