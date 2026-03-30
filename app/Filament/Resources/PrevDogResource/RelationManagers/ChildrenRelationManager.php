@@ -7,6 +7,7 @@ use App\Models\PrevDog;
 use Filament\Infolists\Infolist;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
@@ -39,6 +40,10 @@ class ChildrenRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->contentGrid([
+                'md' => 2,
+                'lg' => 6,
+            ])
             ->defaultSort('BirthDate', 'desc')
             ->defaultGroup('mother')
             ->groups([
@@ -56,47 +61,46 @@ class ChildrenRelationManager extends RelationManager
                     ->column('BirthDate'),
             ])
             ->columns([
-                TextColumn::make('SagirID')
-                    ->label(__('Sagir'))
-                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('full_name')
-                    ->label(__('Name'))
-                    ->searchable(['Heb_Name', 'Eng_Name'])
-                    ->wrap(),
-                TextColumn::make('parent_role')
-                    ->label(__('Parent'))
-                    ->state(function (PrevDog $record): string {
-                        $ownerSagirId = $this->getOwnerRecord()->SagirID;
+                Stack::make([
+                    TextColumn::make('SagirID')
+                        ->label(__('Sagir'))
+                        ->numeric(decimalPlaces: 0, thousandsSeparator: '')
+                        ->searchable(),
+                    TextColumn::make('full_name')
+                        ->label(__('Name'))
+                        ->searchable(['Heb_Name', 'Eng_Name'])
+                        ->wrap(),
+                    TextColumn::make('parent_role')
+                        ->label(__('Parent'))
+                        ->state(function (PrevDog $record): string {
+                            $ownerSagirId = $this->getOwnerRecord()->SagirID;
 
-                        return $record->FatherSAGIR === $ownerSagirId ? __('Father') : __('Mother');
-                    })
-                    ->badge()
-                    ->toggleable(),
-                TextColumn::make('parenthood_partner')
-                    ->label(__('Partner'))
-                    ->state(function (PrevDog $record): ?string {
-                        $ownerSagirId = $this->getOwnerRecord()->SagirID;
+                            return $record->FatherSAGIR === $ownerSagirId ? __('Father') : __('Mother');
+                        })
+                        ->badge()
+                        ->toggleable(),
+                    TextColumn::make('parenthood_partner')
+                        ->label(__('Partner'))
+                        ->state(function (PrevDog $record): ?string {
+                            $ownerSagirId = $this->getOwnerRecord()->SagirID;
 
-                        return $record->FatherSAGIR === $ownerSagirId
-                            ? $record->mother?->full_name
-                            : $record->father?->full_name;
-                    })
-                    ->toggleable(),
-                TextColumn::make('BirthDate')
-                    ->label(__('Birth Date'))
-                    ->date()
-                    ->sortable()
-                    ->toggleable(),
-                TextColumn::make('breed.BreedName')
-                    ->label(__('Breed'))
-                    ->toggleable(),
+                            return $record->FatherSAGIR === $ownerSagirId
+                                ? $record->mother?->full_name
+                                : $record->father?->full_name;
+                        })
+                        ->toggleable(),
+                    TextColumn::make('BirthDate')
+                        ->label(__('Birth Date'))
+                        ->date()
+                        ->toggleable(),
+                    TextColumn::make('breed.BreedName')
+                        ->label(__('Breed'))
+                        ->toggleable(),
+                ])->space(3),
             ])
             ->headerActions([])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->label(__('View Child'))
                     ->modalWidth('7xl'),
             ])
             ->bulkActions([]);
