@@ -4,9 +4,11 @@ namespace App\Filament\Resources\PrevDogResource\RelationManagers;
 
 use App\Filament\Resources\PrevDogResource;
 use App\Models\PrevDog;
+use Filament\Infolists\Infolist;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -38,25 +40,42 @@ class ChildrenRelationManager extends RelationManager
     {
         return $table
             ->defaultSort('BirthDate', 'desc')
+            ->defaultGroup('mother')
+            ->groups([
+                Group::make('mother')
+                    ->label(__('Dam'))
+                    ->getTitleFromRecordUsing(fn(PrevDog $record) => $record->mother->full_name)
+                    ->getDescriptionFromRecordUsing(fn(PrevDog $record) => $record->BirthDate->format('Y-m-d'))
+                    ->collapsible()
+                    ->column('MotherSAGIR'),
+                Group::make('birth_date')
+                    ->label(__('Birth Date'))
+                    ->getTitleFromRecordUsing(fn(PrevDog $record) => $record->BirthDate->format('Y-m-d'))
+                    ->getDescriptionFromRecordUsing(fn(PrevDog $record) => $record->mother->full_name)
+                    ->collapsible()
+                    ->column('BirthDate'),
+            ])
             ->columns([
                 TextColumn::make('SagirID')
                     ->label(__('Sagir'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('full_name')
-                    ->label(__('Child'))
+                    ->label(__('Name'))
                     ->searchable(['Heb_Name', 'Eng_Name'])
                     ->wrap(),
                 TextColumn::make('parent_role')
-                    ->label(__('Parent Role'))
+                    ->label(__('Parent'))
                     ->state(function (PrevDog $record): string {
                         $ownerSagirId = $this->getOwnerRecord()->SagirID;
 
                         return $record->FatherSAGIR === $ownerSagirId ? __('Father') : __('Mother');
                     })
-                    ->badge(),
+                    ->badge()
+                    ->toggleable(),
                 TextColumn::make('parenthood_partner')
-                    ->label(__('Parenthood Partner'))
+                    ->label(__('Partner'))
                     ->state(function (PrevDog $record): ?string {
                         $ownerSagirId = $this->getOwnerRecord()->SagirID;
 
@@ -68,7 +87,8 @@ class ChildrenRelationManager extends RelationManager
                 TextColumn::make('BirthDate')
                     ->label(__('Birth Date'))
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('breed.BreedName')
                     ->label(__('Breed'))
                     ->toggleable(),
@@ -77,9 +97,13 @@ class ChildrenRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->label(__('View Child'))
-                    ->url(fn(PrevDog $record): string => PrevDogResource::getUrl('edit', ['record' => $record]))
-                    ->openUrlInNewTab(),
+                    ->modalWidth('7xl'),
             ])
             ->bulkActions([]);
+    }
+
+    public function infolist(Infolist $infolist): Infolist
+    {
+        return PrevDogResource::infolist($infolist);
     }
 }
