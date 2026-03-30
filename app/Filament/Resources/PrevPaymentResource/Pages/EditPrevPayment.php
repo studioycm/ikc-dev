@@ -16,7 +16,7 @@ class EditPrevPayment extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 
-    public function getHeading(): string|Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Edit payment:') . ' ' . ($this->getRecord()->approval_number ?: '#' . $this->getRecord()->id);
     }

@@ -12,7 +12,7 @@ class ViewPrevDog extends ViewRecord
 
     public function getTitle(): string
     {
-        return __('Displaying') . " " . __('dog/model/general.labels.singular') . ': ' . $this->record->full_name;
+        return __('Displaying') . " " . __('dog/model/general.labels.singular') . ': ' . $this->record->full_name . ' #' . $this->record->SagirID;
     }
 
     protected function getHeaderActions(): array

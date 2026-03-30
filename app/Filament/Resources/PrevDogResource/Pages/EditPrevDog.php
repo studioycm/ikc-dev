@@ -16,7 +16,7 @@ class EditPrevDog extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 
-    public function getHeading(): string|Htmlable
+    public function getTitle(): string|Htmlable
     {
         $dog = $this->getRecord();
 

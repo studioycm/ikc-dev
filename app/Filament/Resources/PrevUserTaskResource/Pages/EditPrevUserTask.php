@@ -16,7 +16,7 @@ class EditPrevUserTask extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 
-    public function getHeading(): string|Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Edit task:') . ' ' . ($this->getRecord()->task_name ?: '#' . $this->getRecord()->id);
     }

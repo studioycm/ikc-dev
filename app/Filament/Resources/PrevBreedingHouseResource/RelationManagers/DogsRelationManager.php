@@ -7,6 +7,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class DogsRelationManager extends RelationManager
 {
@@ -14,7 +15,7 @@ class DogsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'full_name';
 
-    public static function getTitle(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): string
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
         return __('dog/model/general.labels.plural');
     }
