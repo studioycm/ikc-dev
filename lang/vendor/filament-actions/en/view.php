@@ -4,16 +4,16 @@ return [
 
     'single' => [
 
-        'label' => 'תצוגה',
+        'label' => 'View',
 
         'modal' => [
 
-            'heading' => 'מציג :label',
+            'heading' => 'View :label',
 
             'actions' => [
 
                 'close' => [
-                    'label' => 'סגור',
+                    'label' => 'Close',
                 ],
 
             ],
