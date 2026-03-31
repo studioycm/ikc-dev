@@ -33,7 +33,7 @@ class ChildrenRelationManager extends RelationManager
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return __('Children');
+        return __('Descendents');
     }
 
     protected function getTableQuery(): Builder
