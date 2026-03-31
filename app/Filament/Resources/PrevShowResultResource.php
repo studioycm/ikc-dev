@@ -3,10 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Exports\PrevShowResultExporter;
-// use App\Filament\Resources\PrevDogResource as DogRes;
-// use App\Filament\Resources\PrevShowArenaResource as ArenaRes;
-// use App\Filament\Resources\PrevShowClassResource as ClassRes;
-// use App\Filament\Resources\PrevShowResource as ShowRes;
 use App\Filament\Resources\PrevShowResultResource\Pages;
 use App\Models\PrevShowResult;
 use Filament\Forms\Components\Grid;
@@ -31,6 +27,11 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+
+// use App\Filament\Resources\PrevDogResource as DogRes;
+// use App\Filament\Resources\PrevShowArenaResource as ArenaRes;
+// use App\Filament\Resources\PrevShowClassResource as ClassRes;
+// use App\Filament\Resources\PrevShowResource as ShowRes;
 
 class PrevShowResultResource extends Resource
 {
@@ -143,7 +144,7 @@ class PrevShowResultResource extends Resource
                                         ->content(fn(PrevShowResult $record): int => $record->ShowOrderID),
 
                                     TextInput::make('ShowID')
-                                        ->label(__('Show ID'))
+                                        ->label(__('Show'))
                                         ->integer(),
 
                                     TextInput::make('MainArenaID')

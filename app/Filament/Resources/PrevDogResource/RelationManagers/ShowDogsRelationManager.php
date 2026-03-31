@@ -29,7 +29,7 @@ class ShowDogsRelationManager extends RelationManager
             })
             ->columns([
                 TextColumn::make('ShowID')
-                    ->label(__('Show ID'))
+                    ->label(__('Show'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false),

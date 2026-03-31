@@ -541,7 +541,7 @@ class PrevBreedingResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('responsiable_owner')
-                    ->label('Responsible Owner')
+                    ->label(__('Responsible owner'))
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(isToggledHiddenByDefault: true),
 

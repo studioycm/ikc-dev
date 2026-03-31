@@ -40,7 +40,7 @@ class TitlesRelationManager extends RelationManager
                     ->date()
                     ->label(__('Event Date')),
                 Tables\Columns\TextColumn::make('awarding.ShowID')
-                    ->label(__('Show ID'))
+                    ->label(__('Show'))
                     ->url(fn($state) => $state ? PrevShowResource::getUrl('view', ['record' => $state]) : null)
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('awarding.created_at')
@@ -69,7 +69,7 @@ class TitlesRelationManager extends RelationManager
                         Forms\Components\TextInput::make('EventPlace')->label(__('Event Place'))->maxLength(255),
                         Forms\Components\TextInput::make('EventName')->label(__('Event Name'))->maxLength(255),
                         Forms\Components\DatePicker::make('EventDate')->label(__('Event Date')),
-                        Forms\Components\TextInput::make('ShowID')->label(__('Show ID'))->numeric(),
+                        Forms\Components\TextInput::make('ShowID')->label(__('Show'))->numeric(),
                     ]),
             ])
             ->actions([
@@ -79,7 +79,7 @@ class TitlesRelationManager extends RelationManager
                         Forms\Components\TextInput::make('EventPlace')->label(__('Event Place'))->maxLength(255),
                         Forms\Components\TextInput::make('EventName')->label(__('Event Name'))->maxLength(255),
                         Forms\Components\DatePicker::make('EventDate')->label(__('Event Date')),
-                        Forms\Components\TextInput::make('ShowID')->label(__('Show ID'))->numeric(),
+                        Forms\Components\TextInput::make('ShowID')->label(__('Show'))->numeric(),
                     ]),
                 Tables\Actions\DetachAction::make()
                     ->label(__('Detach')),

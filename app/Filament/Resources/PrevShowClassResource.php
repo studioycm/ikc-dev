@@ -196,7 +196,7 @@ class PrevShowClassResource extends Resource
                             TextEntry::make('ClassName')->label(__('Class Name')),
                             TextEntry::make('GenderID')->label(__('Gender')),
                             TextEntry::make('BreedID')->label(__('Breed (code)')),
-                            TextEntry::make('ShowID')->label(__('Show ID')),
+                            TextEntry::make('ShowID')->label(__('Show')),
                             TextEntry::make('ShowArenaID')->label(__('Arena ID')),
                         ]),
                     ]),
