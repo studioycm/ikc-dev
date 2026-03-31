@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Builders\PrevUserBuilder;
+use App\Enums\Legacy\LegacyUserRecordType;
 use App\Services\Legacy\PrevUserService;
 use Filament\Models\Contracts\HasName;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
@@ -53,6 +54,7 @@ class PrevUser extends Model implements HasName
         'member_status' => 'integer',
         'owner_total_payment' => 'integer',
         'record_source' => 'integer',
+        'record_type' => LegacyUserRecordType::class,
         'city_id' => 'integer',
         'breed_id' => 'integer',
         'beit_gidul_id' => 'integer',
@@ -262,7 +264,7 @@ class PrevUser extends Model implements HasName
     protected function searchLabel(): Attribute
     {
         return Attribute::make(
-            get: fn() => collect([$this->full_name, $this->mobile_phone, $this->email])
+            get: fn() => collect([$this->full_name, $this->normalised_phone, $this->email, "({$this->id})"])
                 ->filter()
                 ->join(' | ')
         );
@@ -307,9 +309,10 @@ class PrevUser extends Model implements HasName
     /* ------------- “prepared query” helper for selects ---------- */
 
     /** Return id => label pairs for a Select component */
-    public static function selectOptions(?string $search = null, int $limit = 30): array
+    public static function selectOptions(?string $search = null, int $limit = 50): array
     {
         return static::query()
+            ->native()
             ->searchName($search)
             ->orderByRaw("
                 COALESCE(NULLIF(first_name, ''), first_name_en) ASC,
@@ -317,7 +320,7 @@ class PrevUser extends Model implements HasName
             ")
             ->limit($limit)
             ->get(['id', 'first_name', 'last_name',
-                'first_name_en', 'last_name_en', 'mobile_phone'])
+                'first_name_en', 'last_name_en', 'mobile_phone', 'email', 'phone'])
             ->pluck('search_label', 'id')
             ->toArray();
     }

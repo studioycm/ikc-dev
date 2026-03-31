@@ -162,6 +162,26 @@ class PrevUserRequestResource extends Resource
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(),
+                TextColumn::make('request_status')
+                    ->label(__('Status'))
+                    ->state(fn(PrevUserRequest $record): string => $record->IsDone ? __('Done') : __('Pending'))
+                    ->badge()
+                    ->color(fn(string $state, PrevUserRequest $record): string => $record->IsDone ? 'success' : 'warning'),
+                TextColumn::make('status')
+                    ->label(__('Payment Status'))
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'pending payment' => 'warning',
+                        'payment done' => 'success',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'pending payment' => __('Pending Payment'),
+                        'payment done' => __('Payment Done'),
+                        default => $state,
+                    })
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('topic')
                     ->label(__('Topic'))
                     ->searchable(isIndividual: true, isGlobal: false)
@@ -256,21 +276,6 @@ class PrevUserRequestResource extends Resource
                 TextColumn::make('payment_approval_id')
                     ->label(__('Payment Approval Number'))
                     ->searchable(isIndividual: true, isGlobal: false)
-                    ->toggleable(),
-                TextColumn::make('status')
-                    ->label(__('Status'))
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'pending payment' => 'warning',
-                        'payment done' => 'success',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'pending payment' => __('Pending Payment'),
-                        'payment done' => __('Payment Done'),
-                        default => $state,
-                    })
-                    ->sortable()
                     ->toggleable(),
                 TextColumn::make('record_date_time')
                     ->label(__('Recorded at'))
