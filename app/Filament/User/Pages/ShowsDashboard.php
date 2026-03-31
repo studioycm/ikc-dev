@@ -16,12 +16,12 @@ class ShowsDashboard extends BaseDashboard
 
     public static function getNavigationLabel(): string
     {
-        return __('Shows & Results');
+        return __('Shows');
     }
 
     public function getTitle(): string
     {
-        return __('Shows & Results');
+        return __('Shows');
     }
 
     public function getColumns(): int|string|array

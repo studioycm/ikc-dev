@@ -16,12 +16,12 @@ class BreedingActivityDashboard extends BaseDashboard
 
     public static function getNavigationLabel(): string
     {
-        return __('Breeding Activity');
+        return __('Previous Litters');
     }
 
     public function getTitle(): string
     {
-        return __('Breeding Activity');
+        return __('Previous Litters');
     }
 
     public function getColumns(): int|string|array

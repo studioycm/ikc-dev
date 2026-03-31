@@ -41,14 +41,21 @@ class BreedingInquiryResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
+    protected static ?string $navigationLabel = 'Breeding Inquiry';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('New Litters');
+    }
+
     public static function getModelLabel(): string
     {
-        return __('Breeding Inquiry');
+        return __('New Litter');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Breeding Inquiries');
+        return __('New Litters');
     }
 
     public static function getEloquentQuery(): Builder

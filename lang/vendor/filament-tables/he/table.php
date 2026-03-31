@@ -7,7 +7,14 @@ return [
     ],
 
     'columns' => [
+        'actions' => [
+            'label' => 'פעולה|פעולות',
+        ],
         'text' => [
+            'actions' => [
+                'collapse_list' => 'הצג :count פחות',
+                'expand_list' => 'הצג :count נוספים',
+            ],
             'more_list_items' => 'ו-:count פריטים נוספים',
         ],
     ],
@@ -18,6 +25,9 @@ return [
         ],
         'bulk_select_record' => [
             'label' => 'בחר/בטל בחירה לפעולות המרובות לפריט :key.',
+        ],
+        'bulk_select_group' => [
+            'label' => 'בחר/בטל בחירה לקבוצה :title עבור פעולות מרובות.',
         ],
         'search' => [
             'label' => 'חיפוש',
@@ -74,6 +84,9 @@ return [
 
     'filters' => [
         'actions' => [
+            'apply' => [
+                'label' => 'החל סננים',
+            ],
             'remove' => [
                 'label' => 'הסר סנן',
             ],
