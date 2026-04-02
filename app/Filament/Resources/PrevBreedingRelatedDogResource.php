@@ -99,11 +99,11 @@ class PrevBreedingRelatedDogResource extends Resource
                 Checkbox::make('is_submit'),
 
                 Placeholder::make('created_at')
-                    ->label('Created Date')
+                    ->label(__('Created Date'))
                     ->content(fn(?PrevBreedingRelatedDog $record): string => $record?->created_at?->diffForHumans() ?? '-'),
 
                 Placeholder::make('updated_at')
-                    ->label('Last Modified Date')
+                    ->label(__('Last Modified Date'))
                     ->content(fn(?PrevBreedingRelatedDog $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
             ]);
     }
@@ -170,7 +170,7 @@ class PrevBreedingRelatedDogResource extends Resource
                 TextColumn::make('colorName.ColorNameHE')
                     ->label(__('Color'))
                     ->description(function (PrevBreedingRelatedDog $record): string {
-                        return ($record->color_name?->id ?? "-") . " | " . ($record->color_name?->ColorNameEN ?? "~");
+                        return ($record->color_name?->id ?? '-') . ' | ' . ($record->color_name?->ColorNameEN ?? '~');
                     }, position: 'under')
                     ->sortable(['ColorNameHE'])
                     ->searchable(['ColorNameHE', 'ColorNameEN', 'OldCode'], isIndividual: true, isGlobal: false)
@@ -236,5 +236,4 @@ class PrevBreedingRelatedDogResource extends Resource
                 SoftDeletingScope::class,
             ]);
     }
-
 }

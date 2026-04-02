@@ -78,11 +78,11 @@ class PrevShowResultResource extends Resource
                                             ->content(fn(PrevShowResult $record): string => $record->DataID),
 
                                         Placeholder::make('created_at')
-                                            ->label('Created Date')
+                                            ->label(__('Created Date'))
                                             ->content(fn(?PrevShowResult $record): string => $record?->created_at?->diffForHumans() ?? '-'),
 
                                         Placeholder::make('updated_at')
-                                            ->label('Last Modified Date')
+                                            ->label(__('Last Modified Date'))
                                             ->content(fn(?PrevShowResult $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
 
                                         Placeholder::make('ModificationDateTime')

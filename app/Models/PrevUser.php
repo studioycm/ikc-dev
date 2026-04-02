@@ -312,7 +312,7 @@ class PrevUser extends Model implements HasName
     public static function selectOptions(?string $search = null, int $limit = 50): array
     {
         return static::query()
-            ->native()
+            ->nativeRecords()
             ->searchName($search)
             ->orderByRaw("
                 COALESCE(NULLIF(first_name, ''), first_name_en) ASC,

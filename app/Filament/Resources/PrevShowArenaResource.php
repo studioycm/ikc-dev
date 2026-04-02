@@ -86,11 +86,11 @@ class PrevShowArenaResource extends Resource
                     ->integer(),
 
                 Placeholder::make('created_at')
-                    ->label('Created Date')
+                    ->label(__('Created Date'))
                     ->content(fn(?PrevShowArena $record): string => $record?->created_at?->diffForHumans() ?? '-'),
 
                 Placeholder::make('updated_at')
-                    ->label('Last Modified Date')
+                    ->label(__('Last Modified Date'))
                     ->content(fn(?PrevShowArena $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
             ]);
     }
@@ -109,7 +109,7 @@ class PrevShowArenaResource extends Resource
                             TextEntry::make('show.location')->label(__('Show location')),
                         ]),
                         InfolistGrid::make(4)->schema([
-                            TextEntry::make('id')->label('ID'),
+                            TextEntry::make('id')->label(__('ID')),
                             TextEntry::make('GroupName')->label(__('Name')),
                             TextEntry::make('ArenaType')->label(__('Type')),
                             TextEntry::make('judges')

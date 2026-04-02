@@ -1717,30 +1717,32 @@ class PrevDogResource extends Resource
                     ]),
 
                     /***** 7. Metadata *****/
-                    Tab::make('Metadata')->schema([
-                        InfolistGrid::make(5)->schema([
-                            TextEntry::make('id')->label(__('ID')),
-                            IconEntry::make('not_relevant')->label(__('Not Relevant')),
-                            IconEntry::make('encoding')->label(__('Encoding Issue')),
+                    Tab::make('Metadata')
+                        ->label(__('common.labels.metadata'))
+                        ->schema([
+                            InfolistGrid::make(5)->schema([
+                                TextEntry::make('id')->label(__('ID')),
+                                IconEntry::make('not_relevant')->label(__('Not Relevant')),
+                                IconEntry::make('encoding')->label(__('Encoding Issue')),
+                            ]),
+                            InfolistGrid::make(5)->schema([
+                                TextEntry::make('CreationDateTime')
+                                    ->label(__('Created On'))
+                                    ->date(),
+                                TextEntry::make('ModificationDateTime')
+                                    ->label(__('Modified On'))
+                                    ->date(),
+                                TextEntry::make('created_at')
+                                    ->label(__('Created At'))
+                                    ->date(),
+                                TextEntry::make('updated_at')
+                                    ->label(__('Updated At'))
+                                    ->date(),
+                                TextEntry::make('deleted_at')
+                                    ->label(__('Deleted At'))
+                                    ->date(),
+                            ]),
                         ]),
-                        InfolistGrid::make(5)->schema([
-                            TextEntry::make('CreationDateTime')
-                                ->label(__('Created On'))
-                                ->date(),
-                            TextEntry::make('ModificationDateTime')
-                                ->label(__('Modified On'))
-                                ->date(),
-                            TextEntry::make('created_at')
-                                ->label(__('Created At'))
-                                ->date(),
-                            TextEntry::make('updated_at')
-                                ->label(__('Updated At'))
-                                ->date(),
-                            TextEntry::make('deleted_at')
-                                ->label(__('Deleted At'))
-                                ->date(),
-                        ]),
-                    ]),
                 ])
                     ->columnSpanFull()
                     ->persistTabInQueryString(),

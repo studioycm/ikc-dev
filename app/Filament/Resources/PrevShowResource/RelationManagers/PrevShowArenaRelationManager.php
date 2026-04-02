@@ -8,12 +8,13 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class PrevShowArenaRelationManager extends RelationManager
 {
     protected static string $relationship = 'arenas';
 
-    public static function getTitle(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): string
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
         return __('Arenas');
     }
@@ -25,11 +26,11 @@ class PrevShowArenaRelationManager extends RelationManager
                 Forms\Components\TextInput::make('GroupName')
                     ->required()
                     ->maxLength(255)
-                    ->label('Name'),
+                    ->label(__('Name')),
                 Forms\Components\TextInput::make('OrderID')
                     ->required()
                     ->numeric()
-                    ->label('Order'),
+                    ->label(__('Order')),
             ]);
     }
 
@@ -41,13 +42,13 @@ class PrevShowArenaRelationManager extends RelationManager
                     ->with(['judges']);
             })
             ->columns([
-                Tables\Columns\TextColumn::make('id')->label('ID')->toggleable(),
-                Tables\Columns\TextColumn::make('GroupName')->label('Name')->toggleable(),
+                Tables\Columns\TextColumn::make('id')->label(__('ID'))->toggleable(),
+                Tables\Columns\TextColumn::make('GroupName')->label(__('Name'))->toggleable(),
                 Tables\Columns\TextColumn::make('judges.JudgeNameHE')
-                    ->label('Judges')
+                    ->label(__('Judges'))
                     ->separator('; ')
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('OrderID')->label('Order')->numeric()->toggleable(),
+                Tables\Columns\TextColumn::make('OrderID')->label(__('Order'))->numeric()->toggleable(),
             ])
             ->headerActions([])
             ->actions([

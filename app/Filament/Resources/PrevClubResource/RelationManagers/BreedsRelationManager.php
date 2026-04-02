@@ -22,9 +22,9 @@ class BreedsRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                TextColumn::make('id')->label('ID')->numeric(decimalPlaces: 0, thousandsSeparator: '')->sortable(),
-                TextColumn::make('BreedName')->label('Hebrew Name')->searchable()->sortable(),
-                TextColumn::make('BreedNameEN')->label('English Name')->searchable()->sortable(),
+                TextColumn::make('id')->label(__('ID'))->numeric(decimalPlaces: 0, thousandsSeparator: '')->sortable(),
+                TextColumn::make('BreedName')->label(__('Hebrew Name'))->searchable()->sortable(),
+                TextColumn::make('BreedNameEN')->label(__('English Name'))->searchable()->sortable(),
                 TextColumn::make('BreedCode')->numeric(decimalPlaces: 0, thousandsSeparator: '')->sortable(),
             ])
             ->headerActions([])

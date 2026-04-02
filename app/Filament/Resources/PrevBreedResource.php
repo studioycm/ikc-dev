@@ -92,19 +92,19 @@ class PrevBreedResource extends Resource
             })
             ->columns([
                 Tables\Columns\TextColumn::make('id')
-                    ->label('ID')
+                    ->label(__('ID'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('BreedName')
-                    ->label('Hebrew Name')
+                    ->label(__('Hebrew Name'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('BreedNameEN')
-                    ->label('English Name')
+                    ->label(__('English Name'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('BreedCode')
-                    ->label('Breed Code')
+                    ->label(__('Breed Code'))
                     ->numeric()
                     ->sortable()
                     ->searchable(isGlobal: false, isIndividual: true),
@@ -115,21 +115,21 @@ class PrevBreedResource extends Resource
                     ->sortable(['dogs_count'])
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('FCICODE')
-                    ->label('FCI Code')
+                    ->label(__('FCI Code'))
                     ->sortable()
                     ->searchable(isGlobal: false, isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('fci_group')
-                    ->label('FCI Group')
+                    ->label(__('FCI Group'))
                     ->sortable()
                     ->searchable(isGlobal: false, isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('Status')
+                    ->label(__('Status'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('DataID')
-                    ->label('Previous ID')
+                    ->label(__('Previous ID'))
                     ->numeric()
                     ->sortable()
                     ->searchable(isGlobal: false, isIndividual: true)
@@ -143,7 +143,7 @@ class PrevBreedResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('GroupID')
-                    ->label('Previous GroupID')
+                    ->label(__('Previous GroupID'))
                     ->numeric()
                     ->sortable()
                     ->searchable(isGlobal: false, isIndividual: true)

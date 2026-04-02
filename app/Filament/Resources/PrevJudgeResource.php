@@ -178,7 +178,7 @@ class PrevJudgeResource extends Resource
                     ->infolist(function (Infolist $infolist): Infolist {
                         return $infolist->schema([
                             Tabs::make('Judge Record')->tabs([
-                                Tab::make('General')->schema([
+                                Tab::make(__('General'))->schema([
                                     InfolistGrid::make(4)->schema([
                                         TextEntry::make('DataID')->label(__('DataID')),
                                         TextEntry::make('JudgeNameHE')->label(__('Name Hebrew')),
@@ -192,13 +192,13 @@ class PrevJudgeResource extends Resource
                                         TextEntry::make('breeds_names_he')->label(__('Breeds (HE)')),
                                         TextEntry::make('breeds_names_en')->label(__('Breeds (EN)')),
                                     ]),
-                                ])->label('General'),
-                                Tab::make('Metadata')->schema([
+                                ])->label(__('General')),
+                                Tab::make('metadata')->schema([
                                     InfolistGrid::make(4)->schema([
                                         TextEntry::make('CreationDateTime')->label(__('Created On'))->date(),
                                         TextEntry::make('ModificationDateTime')->label(__('Modified On'))->date(),
                                     ]),
-                                ])->label('Metadata'),
+                                ])->label(__('common.labels.metadata')),
                             ])->columnSpanFull(),
                         ]);
                     }),
@@ -218,7 +218,7 @@ class PrevJudgeResource extends Resource
 
         return $infolist->schema([
             Tabs::make('Judge Record')->tabs([
-                Tab::make('General')->schema([
+                Tab::make(__('General'))->schema([
                     InfolistGrid::make(4)->schema([
                         TextEntry::make('DataID')->label(__('DataID')),
                         TextEntry::make('JudgeNameHE')->label(__('Name Hebrew')),
@@ -232,13 +232,13 @@ class PrevJudgeResource extends Resource
                         TextEntry::make('breeds_names_he')->label(__('Breeds (HE)')),
                         TextEntry::make('breeds_names_en')->label(__('Breeds (EN)')),
                     ]),
-                ])->label('General'),
-                Tab::make('Metadata')->schema([
+                ])->label(__('General')),
+                Tab::make('metadata')->schema([
                     InfolistGrid::make(4)->schema([
                         TextEntry::make('CreationDateTime')->label(__('Created On'))->date(),
                         TextEntry::make('ModificationDateTime')->label(__('Modified On'))->date(),
                     ]),
-                ])->label('Metadata'),
+                ])->label(__('common.labels.metadata')),
             ])->columnSpanFull(),
             //            Tabs::make('Judge Record')->tabs([
             //                Tab::make('General')->schema([

@@ -80,11 +80,11 @@ class PrevHealthResource extends Resource
                 Checkbox::make('show_in_paper'),
 
                 Placeholder::make('created_at')
-                    ->label('Created Date')
+                    ->label(__('Created Date'))
                     ->content(fn(?PrevHealth $record): string => $record?->created_at?->diffForHumans() ?? '-'),
 
                 Placeholder::make('updated_at')
-                    ->label('Last Modified Date')
+                    ->label(__('Last Modified Date'))
                     ->content(fn(?PrevHealth $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
             ]);
     }

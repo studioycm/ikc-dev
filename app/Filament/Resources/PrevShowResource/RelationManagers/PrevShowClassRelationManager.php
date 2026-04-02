@@ -30,13 +30,13 @@ class PrevShowClassRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')->label('ID')->toggleable(),
-                Tables\Columns\TextColumn::make('ClassID')->label('Code')->toggleable(),
-                Tables\Columns\TextColumn::make('ClassName')->label('Class Name')->toggleable(),
-                Tables\Columns\TextColumn::make('show.TitleName')->label('Show')->toggleable(),
-                Tables\Columns\TextColumn::make('arena.GroupName')->label('Arena')->toggleable(),
-                Tables\Columns\TextColumn::make('judge.JudgeNameEN')->label('Judge')->toggleable(),
-                Tables\Columns\TextColumn::make('OrderID')->label('Order')->numeric()->toggleable(),
+                Tables\Columns\TextColumn::make('id')->label(__('ID'))->toggleable(),
+                Tables\Columns\TextColumn::make('ClassID')->label(__('Code'))->toggleable(),
+                Tables\Columns\TextColumn::make('ClassName')->label(__('Class Name'))->toggleable(),
+                Tables\Columns\TextColumn::make('show.TitleName')->label(__('Show'))->toggleable(),
+                Tables\Columns\TextColumn::make('arena.GroupName')->label(__('Arena'))->toggleable(),
+                Tables\Columns\TextColumn::make('judge.JudgeNameEN')->label(__('Judge'))->toggleable(),
+                Tables\Columns\TextColumn::make('OrderID')->label(__('Order'))->numeric()->toggleable(),
             ])
             ->headerActions([])
             ->actions([
