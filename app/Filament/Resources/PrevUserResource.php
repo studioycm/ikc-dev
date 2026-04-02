@@ -593,19 +593,19 @@ class PrevUserResource extends Resource
                                 'Members' => 'danger',
                                 'without' => 'gray',
                             ])
-                            ->default('all'),
+                            ->default('all')
+                            ->grouped(),
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query->whereRecordType($data['record_type'] ?? null);
-                    }),
+                    })
+                    ->columnSpan(2),
                 Filters\Filter::make('created_at')
                     ->form([
-                        Forms\Components\Section::make(__('Created Dates'))
-                            ->columns(2)
-                            ->schema([
+                        Forms\Components\Group::make([
                                 Forms\Components\DatePicker::make('created_at_from')
                                     ->label(__('Created From'))
-                                    ->native(true)
+                                    ->native(false)
                                     ->format('d/m/Y')
                                     ->displayFormat('d/m/Y')
                                     ->locale('he')
@@ -619,7 +619,8 @@ class PrevUserResource extends Resource
                                     ->locale('he')
                                     ->weekStartsOnSunday()
                                     ->closeOnDateSelection(),
-                            ]),
+                        ])
+                            ->columns(2),
                     ])
                     ->query(function (Builder $query, array $data) {
                         if (! empty($data['created_at_from'])) {
@@ -630,17 +631,29 @@ class PrevUserResource extends Resource
                         }
 
                         return $query;
-                    }),
+                    })
+                    ->columnSpan(2),
                 Filters\Filter::make('updated_at')
                     ->form([
-                        Forms\Components\Section::make(__('Updated Dates'))
-                            ->columns(2)
-                            ->schema([
+                        Forms\Components\Group::make([
                                 Forms\Components\DatePicker::make('updated_at_from')
-                                    ->label(__('Updated From')),
+                                    ->label(__('Updated From'))
+                                    ->native(false)
+                                    ->format('d/m/Y')
+                                    ->displayFormat('d/m/Y')
+                                    ->locale('he')
+                                    ->weekStartsOnSunday()
+                                    ->closeOnDateSelection(),
                                 Forms\Components\DatePicker::make('updated_at_to')
-                                    ->label(__('Updated To')),
-                            ]),
+                                    ->label(__('Updated To'))
+                                    ->native(false)
+                                    ->format('d/m/Y')
+                                    ->displayFormat('d/m/Y')
+                                    ->locale('he')
+                                    ->weekStartsOnSunday()
+                                    ->closeOnDateSelection(),
+                        ])
+                            ->columns(2),
                     ])
                     ->query(function (Builder $query, array $data) {
                         if (! empty($data['updated_at_from'])) {
@@ -651,9 +664,10 @@ class PrevUserResource extends Resource
                         }
 
                         return $query;
-                    }),
+                    })
+                    ->columnSpan(2),
             ], layout: FiltersLayout::AboveContentCollapsible)
-            ->filtersFormColumns(4)
+            ->filtersFormColumns(8)
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->iconButton()
