@@ -602,9 +602,12 @@ class PrevUserResource extends Resource
                     ->columnSpan(2),
                 Filters\Filter::make('created_at')
                     ->form([
-                        Forms\Components\Group::make([
+                        Forms\Components\Fieldset::make()
+                            ->label(__('Created'))
+                            ->schema([
                                 Forms\Components\DatePicker::make('created_at_from')
-                                    ->label(__('Created From'))
+                                    ->hiddenLabel()
+                                    ->prefix(__('From'))
                                     ->native(false)
                                     ->format('d/m/Y')
                                     ->displayFormat('d/m/Y')
@@ -612,14 +615,15 @@ class PrevUserResource extends Resource
                                     ->weekStartsOnSunday()
                                     ->closeOnDateSelection(),
                                 Forms\Components\DatePicker::make('created_at_to')
-                                    ->label(__('Created To'))
+                                    ->hiddenLabel()
+                                    ->prefix(__('To'))
                                     ->native(false)
                                     ->format('d/m/Y')
                                     ->displayFormat('d/m/Y')
                                     ->locale('he')
                                     ->weekStartsOnSunday()
                                     ->closeOnDateSelection(),
-                        ])
+                            ])
                             ->columns(2),
                     ])
                     ->query(function (Builder $query, array $data) {
@@ -635,9 +639,12 @@ class PrevUserResource extends Resource
                     ->columnSpan(2),
                 Filters\Filter::make('updated_at')
                     ->form([
-                        Forms\Components\Group::make([
+                        Forms\Components\Fieldset::make()
+                            ->label(__('Updated'))
+                            ->schema([
                                 Forms\Components\DatePicker::make('updated_at_from')
-                                    ->label(__('Updated From'))
+                                    ->hiddenLabel()
+                                    ->prefix(__('From'))
                                     ->native(false)
                                     ->format('d/m/Y')
                                     ->displayFormat('d/m/Y')
@@ -645,7 +652,8 @@ class PrevUserResource extends Resource
                                     ->weekStartsOnSunday()
                                     ->closeOnDateSelection(),
                                 Forms\Components\DatePicker::make('updated_at_to')
-                                    ->label(__('Updated To'))
+                                    ->hiddenLabel()
+                                    ->prefix(__('To'))
                                     ->native(false)
                                     ->format('d/m/Y')
                                     ->displayFormat('d/m/Y')
@@ -666,8 +674,8 @@ class PrevUserResource extends Resource
                         return $query;
                     })
                     ->columnSpan(2),
-            ], layout: FiltersLayout::AboveContentCollapsible)
-            ->filtersFormColumns(8)
+            ], layout: FiltersLayout::AboveContent)
+            ->filtersFormColumns(7)
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->iconButton()
