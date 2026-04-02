@@ -5,7 +5,6 @@
 Extract validation from controllers into dedicated Form Request classes.
 
 Incorrect:
-
 ```php
 public function store(Request $request)
 {
@@ -17,7 +16,6 @@ public function store(Request $request)
 ```
 
 Correct:
-
 ```php
 public function store(StorePostRequest $request)
 {
@@ -43,13 +41,11 @@ Requests first and match whatever notation the project already uses.
 Get only validated data. Never use `$request->all()` for mass operations.
 
 Incorrect:
-
 ```php
 Post::create($request->all());
 ```
 
 Correct:
-
 ```php
 Post::create($request->validated());
 ```

@@ -5,7 +5,6 @@
 Atomic pattern prevents race conditions and removes boilerplate.
 
 Incorrect:
-
 ```php
 $val = Cache::get('stats');
 if (! $val) {
@@ -15,7 +14,6 @@ if (! $val) {
 ```
 
 Correct:
-
 ```php
 $val = Cache::remember('stats', 60, fn () => $this->computeStats());
 ```

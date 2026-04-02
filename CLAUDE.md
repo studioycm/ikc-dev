@@ -57,7 +57,7 @@ domain—don't wait until you're stuck.
   writing or fixing Tailwind utility classes in HTML templates (Blade, JSX, Vue). Skip for backend PHP logic, database
   queries, API routes, JavaScript with no HTML/CSS component, CSS file audits, build tool configuration, and vanilla
   CSS.
-- `technical-debt-manager-php-laravel` — Expert technical debt analyst for PHP/Laravel code health, maintainability, and
+- `techniecal-dbt-manager-php-laravel` — Expert technical debt analyst for PHP/Laravel code health, maintainability, and
   strategic refactoring planning. Use PROACTIVELY when a Laravel codebase shows complexity growth, when planning
   sprints, or when prioritizing engineering work.
 
