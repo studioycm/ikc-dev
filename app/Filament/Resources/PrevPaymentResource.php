@@ -184,7 +184,7 @@ class PrevPaymentResource extends Resource
                     ->searchable(['users.first_name', 'users.last_name', 'users.first_name_en', 'users.last_name_en', 'users.mobile_phone'], isIndividual: true, isGlobal: false)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('deleted_at')
-                    ->label(__('Deleted At'))
+                    ->label(__('Deleted at'))
                     ->since()
                     ->dateTimeTooltip()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -251,7 +251,7 @@ class PrevPaymentResource extends Resource
                         TextEntry::make('dog.full_name')->label(__('Dog')),
                         TextEntry::make('createdBy.name')->label(__('Created By')),
                         TextEntry::make('updatedBy.name')->label(__('Updated By')),
-                        TextEntry::make('deleted_at')->label(__('Deleted At'))->since()->dateTimeTooltip()->placeholder('-'),
+                        TextEntry::make('deleted_at')->label(__('Deleted at'))->since()->dateTimeTooltip()->placeholder('-'),
                     ])
                     ->columns(3),
             ]);

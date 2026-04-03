@@ -15,7 +15,7 @@ class PrevVetAuthExporter extends Exporter
     {
         return [
             ExportColumn::make('id')
-                ->label('ID'),
+                ->label(__('ID')),
             ExportColumn::make('name'),
             ExportColumn::make('vet_email'),
             ExportColumn::make('created_at'),

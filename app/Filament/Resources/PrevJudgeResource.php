@@ -13,11 +13,11 @@ use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -105,12 +105,12 @@ class PrevJudgeResource extends Resource
                 TextColumn::make('JudgeNameHE')
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->sortable()
-                    ->label(__('Name Hebrew')),
+                    ->label(__('common.labels.hebrew_name')),
 
                 TextColumn::make('JudgeNameEN')
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->sortable()
-                    ->label(__('Name English')),
+                    ->label(__('common.labels.english_name')),
 
                 TextColumn::make('Country')
                     ->searchable(isIndividual: true, isGlobal: false)
@@ -134,11 +134,13 @@ class PrevJudgeResource extends Resource
                     ->label(__('Breeds')),
 
                 TextColumn::make('ModificationDateTime')
+                    ->label(__('Modified On'))
                     ->date()
                     ->toggleable()
                     ->sortable(),
 
                 TextColumn::make('CreationDateTime')
+                    ->label(__('Created On'))
                     ->date()
                     ->toggleable()
                     ->sortable(),
@@ -153,7 +155,11 @@ class PrevJudgeResource extends Resource
 
             ])
             ->actions([
-                ViewAction::make()
+                Action::make('view_judge')
+                    ->label(__('common.actions.view'))
+                    ->icon('heroicon-o-eye')
+                    ->modalHeading(__('common.actions.view'))
+                    ->color('grey')
                     // Return a custom-loaded record for the modal (with eager loads and counts)
                     ->record(function (Model $record): Model {
                         /** @var PrevJudge $record */
@@ -176,31 +182,7 @@ class PrevJudgeResource extends Resource
                     })
                     // Build the modal’s infolist
                     ->infolist(function (Infolist $infolist): Infolist {
-                        return $infolist->schema([
-                            Tabs::make('Judge Record')->tabs([
-                                Tab::make(__('General'))->schema([
-                                    InfolistGrid::make(4)->schema([
-                                        TextEntry::make('DataID')->label(__('DataID')),
-                                        TextEntry::make('JudgeNameHE')->label(__('Name Hebrew')),
-                                        TextEntry::make('JudgeNameEN')->label(__('Name English')),
-                                        TextEntry::make('Country')->label(__('Country')),
-                                    ]),
-                                    InfolistGrid::make(4)->schema([
-                                        TextEntry::make('Email')->label(__('Email')),
-                                        TextEntry::make('arenas_count')->label(__('Arenas')),
-                                        TextEntry::make('breeds_count')->label(__('Breeds')),
-                                        TextEntry::make('breeds_names_he')->label(__('Breeds (HE)')),
-                                        TextEntry::make('breeds_names_en')->label(__('Breeds (EN)')),
-                                    ]),
-                                ])->label(__('General')),
-                                Tab::make('metadata')->schema([
-                                    InfolistGrid::make(4)->schema([
-                                        TextEntry::make('CreationDateTime')->label(__('Created On'))->date(),
-                                        TextEntry::make('ModificationDateTime')->label(__('Modified On'))->date(),
-                                    ]),
-                                ])->label(__('common.labels.metadata')),
-                            ])->columnSpanFull(),
-                        ]);
+                        return PrevJudgeResource::infolist($infolist);
                     }),
                 EditAction::make(),
                 DeleteAction::make(),
@@ -218,56 +200,28 @@ class PrevJudgeResource extends Resource
 
         return $infolist->schema([
             Tabs::make('Judge Record')->tabs([
-                Tab::make(__('General'))->schema([
+                Tab::make('general')->schema([
                     InfolistGrid::make(4)->schema([
                         TextEntry::make('DataID')->label(__('DataID')),
-                        TextEntry::make('JudgeNameHE')->label(__('Name Hebrew')),
-                        TextEntry::make('JudgeNameEN')->label(__('Name English')),
+                        TextEntry::make('JudgeNameHE')->label(__('common.labels.hebrew_name')),
+                        TextEntry::make('JudgeNameEN')->label(__('common.labels.english_name')),
                         TextEntry::make('Country')->label(__('Country')),
                     ]),
                     InfolistGrid::make(4)->schema([
                         TextEntry::make('Email')->label(__('Email')),
                         TextEntry::make('arenas_count')->label(__('Arenas')),
                         TextEntry::make('breeds_count')->label(__('Breeds')),
-                        TextEntry::make('breeds_names_he')->label(__('Breeds (HE)')),
-                        TextEntry::make('breeds_names_en')->label(__('Breeds (EN)')),
+                        TextEntry::make('breeds_names_he')->label(fn(): string => __('Breeds') . ' (' . __('common.labels.hebrew') . ')'),
+                        TextEntry::make('breeds_names_en')->label(fn(): string => __('Breeds') . ' (' . __('common.labels.english') . ')'),
                     ]),
                 ])->label(__('General')),
                 Tab::make('metadata')->schema([
                     InfolistGrid::make(4)->schema([
-                        TextEntry::make('CreationDateTime')->label(__('Created On'))->date(),
+                        TextEntry::make('CreationDateTime')->label(__('Created at'))->date(),
                         TextEntry::make('ModificationDateTime')->label(__('Modified On'))->date(),
                     ]),
                 ])->label(__('common.labels.metadata')),
             ])->columnSpanFull(),
-            //            Tabs::make('Judge Record')->tabs([
-            //                Tab::make('General')->schema([
-            //                    InfolistGrid::make(4)->schema([
-            //                        TextEntry::make('DataID')->label(__('DataID')),
-            //                        TextEntry::make('JudgeNameHE')->label(__('Name Hebrew')),
-            //                        TextEntry::make('JudgeNameEN')->label(__('Name English')),
-            //                        TextEntry::make('Country')->label(__('Country')),
-            //                    ]),
-            //                    InfolistGrid::make(4)->schema([
-            //                        TextEntry::make('Email')->label(__('Email')),
-            //                        TextEntry::make('arenas_count')->label(__('Arenas')),
-            //
-            //                        // breeds_count computed from judgedBreeds
-            //                        TextEntry::make('breeds_count')->label(__('Breeds')),
-            //
-            //                        // Names lists
-            //                        TextEntry::make('breeds_names_he')->label(__('Breeds (HE)')),
-            //                        TextEntry::make('breeds_names_en')->label(__('Breeds (EN)')),
-            //                    ]),
-            //
-            //                ])->label('General'),
-            //                Tab::make('Metadata')->schema([
-            //                    InfolistGrid::make(4)->schema([
-            //                        TextEntry::make('CreationDateTime')->label(__('Created On'))->date(),
-            //                        TextEntry::make('ModificationDateTime')->label(__('Modified On'))->date(),
-            //                    ]),
-            //                ])->label('Metadata'),
-            //            ])->columnSpanFull(),
         ]);
     }
 

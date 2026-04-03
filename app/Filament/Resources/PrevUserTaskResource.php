@@ -117,7 +117,7 @@ class PrevUserTaskResource extends Resource
                 TextColumn::make('done_date_time')->label(__('Done'))->dateTime()->sortable()->toggleable(),
                 IconColumn::make('read_status')->label(__('Read'))->boolean(),
                 IconColumn::make('is_editable')->label(__('Editable'))->boolean(),
-                TextColumn::make('deleted_at')->label(__('Deleted At'))->since()->dateTimeTooltip()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('deleted_at')->label(__('Deleted at'))->since()->dateTimeTooltip()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
@@ -178,7 +178,7 @@ class PrevUserTaskResource extends Resource
                         TextEntry::make('managerUser.name')->label(__('Manager User')),
                         TextEntry::make('relatedUser.name')->label(__('Related User')),
                         TextEntry::make('breeding.id')->label(__('Breeding Process'))->formatStateUsing(fn($state): ?string => $state ? '#' . $state : null),
-                        TextEntry::make('deleted_at')->label(__('Deleted At'))->since()->dateTimeTooltip()->placeholder('-'),
+                        TextEntry::make('deleted_at')->label(__('Deleted at'))->since()->dateTimeTooltip()->placeholder('-'),
                     ])
                     ->columns(4),
             ]);

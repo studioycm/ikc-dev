@@ -194,7 +194,7 @@ class PrevDogResource extends Resource
                                             ->label(__('Chip'))
                                             ->maxLength(200),
                                         Forms\Components\TextInput::make('DnaID')
-                                            ->label(__('DNA ID'))
+                                            ->label(__('DNA'))
                                             ->maxLength(200),
                                         Forms\Components\TextInput::make('ImportNumber')
                                             ->label(__('Import Number'))
@@ -407,7 +407,7 @@ class PrevDogResource extends Resource
                                                                 ->unique()
                                                                 ->maxLength(200),
                                                             Forms\Components\TextInput::make('DnaID')
-                                                                ->label(__('DNA ID'))
+                                                                ->label(__('DNA'))
                                                                 ->maxLength(200),
                                                             Forms\Components\TextInput::make('Breeder_Name')
                                                                 ->label(__('Breeder Name'))
@@ -420,7 +420,7 @@ class PrevDogResource extends Resource
                                                                 ->maxLength(1000),
                                                             Forms\Components\TextInput::make('PedigreeNotes')
                                                                 ->label(__('Titles (Pedigree Notes)'))
-                                                                ->helperText('Comma separated'),
+                                                                ->helperText(__('Comma separated')),
                                                             Forms\Components\ToggleButtons::make('GenderID')
                                                                 ->label(__('Gender'))
                                                                 ->grouped()
@@ -513,7 +513,7 @@ class PrevDogResource extends Resource
                                                                 ->unique()
                                                                 ->maxLength(200),
                                                             Forms\Components\TextInput::make('DnaID')
-                                                                ->label(__('DNA ID'))
+                                                                ->label(__('DNA'))
                                                                 ->maxLength(200),
                                                             Forms\Components\TextInput::make('Breeder_Name')
                                                                 ->label(__('Breeder Name'))
@@ -526,7 +526,7 @@ class PrevDogResource extends Resource
                                                                 ->maxLength(1000),
                                                             Forms\Components\TextInput::make('PedigreeNotes')
                                                                 ->label(__('Titles (Pedigree Notes)'))
-                                                                ->helperText('Comma separated'),
+                                                                ->helperText(__('Comma separated')),
                                                             Forms\Components\ToggleButtons::make('GenderID')
                                                                 ->label(__('Gender'))
                                                                 ->grouped()
@@ -838,7 +838,7 @@ class PrevDogResource extends Resource
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('DnaID')
-                    ->label(__('DNA ID'))
+                    ->label(__('DNA'))
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(),
@@ -1193,8 +1193,8 @@ class PrevDogResource extends Resource
                     ->form([
                         Forms\Components\TextInput::make('father_search')
                             ->label(__('Father'))
-                            ->hint('Name \ Sagir')
-                            ->helperText('Search by Hebrew\English Name or Sagir'),
+                            ->hint(__('Name \ Sagir'))
+                            ->helperText(__('Search by Hebrew\English Name or Sagir')),
                     ]),
                 // Combined filter for Mother (searching by Hebrew Name, English Name or SagirID)
                 Filter::make('mother')
@@ -1211,8 +1211,8 @@ class PrevDogResource extends Resource
                     ->form([
                         Forms\Components\TextInput::make('mother_search')
                             ->label(__('Mother'))
-                            ->hint('Name \ Sagir')
-                            ->helperText('Search by Hebrew\English Name or Sagir'),
+                            ->hint(__('Name \ Sagir'))
+                            ->helperText(__('Search by Hebrew\English Name or Sagir')),
                     ]),
                 // create filters to select and search by "owners" (PrevUser many 2 many relationship) fields: first_name, last_name, first_name_en, last_name_en, mobile_phone, id and custom attributes: full_name, name - owners is a relationship, full_name is a custom accessor using: ["first_name", "last_name", "first_name_en", "last_name_en"]
                 Tables\Filters\SelectFilter::make('owners')
@@ -1739,7 +1739,7 @@ class PrevDogResource extends Resource
                                     ->label(__('Updated At'))
                                     ->date(),
                                 TextEntry::make('deleted_at')
-                                    ->label(__('Deleted At'))
+                                    ->label(__('Deleted at'))
                                     ->date(),
                             ]),
                         ]),

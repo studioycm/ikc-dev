@@ -25,7 +25,7 @@ class BreedsRelationManager extends RelationManager
                 TextColumn::make('id')->label(__('ID'))->numeric(decimalPlaces: 0, thousandsSeparator: '')->sortable(),
                 TextColumn::make('BreedName')->label(__('Hebrew Name'))->searchable()->sortable(),
                 TextColumn::make('BreedNameEN')->label(__('English Name'))->searchable()->sortable(),
-                TextColumn::make('BreedCode')->numeric(decimalPlaces: 0, thousandsSeparator: '')->sortable(),
+                TextColumn::make('BreedCode')->label(__('Breed Code'))->numeric(decimalPlaces: 0, thousandsSeparator: '')->sortable(),
             ])
             ->headerActions([])
             ->actions([])

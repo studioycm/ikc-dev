@@ -228,7 +228,7 @@ class ManagePedigree extends Page implements HasForms
                                                 ->unique(PrevDog::class, 'Chip', ignoreRecord: true),
 
                                             Forms\Components\TextInput::make('DnaID')
-                                                ->label(__('DNA ID'))
+                                                ->label(__('DNA'))
                                                 ->live(debounce: 1000)
                                                 ->maxLength(50)
                                                 ->unique(PrevDog::class, 'DnaID', ignoreRecord: true),

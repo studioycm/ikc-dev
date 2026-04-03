@@ -15,27 +15,27 @@ class PrevClubMemberExporter extends Exporter
     {
         return [
             ExportColumn::make('id')
-                ->label('ID'),
+                ->label(__('ID')),
             ExportColumn::make('name')
-                ->label('Member'),
+                ->label(__('Member')),
             ExportColumn::make('email')
-                ->label('Email'),
+                ->label(__('Email')),
             ExportColumn::make('mobile_phone')
-                ->label('Phone'),
+                ->label(__('Phone')),
             ExportColumn::make('membership.type')
-                ->label('Type'),
+                ->label(__('Type')),
             ExportColumn::make('membership.status')
-                ->label('Status'),
+                ->label(__('Status')),
             ExportColumn::make('membership.payment_status')
-                ->label('Payment Status'),
+                ->label(__('Payment Status')),
             ExportColumn::make('membership.forbidden')
-                ->label('Forbidden'),
+                ->label(__('Forbidden')),
             ExportColumn::make('membership.expire_date')
-                ->label('Expires At'),
+                ->label(__('Expires At')),
             ExportColumn::make('membership.created_at')
-                ->label('Attached At'),
+                ->label(__('Attached At')),
             ExportColumn::make('membership.updated_at')
-                ->label('Updated At'),
+                ->label(__('Updated at')),
         ];
     }
 

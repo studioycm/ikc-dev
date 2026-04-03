@@ -15,7 +15,7 @@ class PrevPaymentExporter extends Exporter
     {
         return [
             ExportColumn::make('id')
-                ->label('ID'),
+                ->label(__('ID')),
             ExportColumn::make('desc'),
             ExportColumn::make('amount'),
             ExportColumn::make('approval_number'),

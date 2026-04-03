@@ -11,6 +11,8 @@ return [
         'perfect_from' => 'החל מתאריך שלמות',
         'metadata' => 'נתוני מערכת',
         'code' => 'קוד',
+        'hebrew' => 'עברית',
+        'english' => 'אנגלית',
         'hebrew_name' => 'שם בעברית',
         'english_name' => 'שם באנגלית',
         'breeder_code' => 'קוד מגדל',

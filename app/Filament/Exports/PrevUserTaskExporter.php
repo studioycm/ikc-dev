@@ -15,7 +15,7 @@ class PrevUserTaskExporter extends Exporter
     {
         return [
             ExportColumn::make('id')
-                ->label('ID'),
+                ->label(__('ID')),
             ExportColumn::make('managerUser.id'),
             ExportColumn::make('related_to_user_id'),
             ExportColumn::make('task_name'),

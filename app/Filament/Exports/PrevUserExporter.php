@@ -15,7 +15,7 @@ class PrevUserExporter extends Exporter
     {
         return [
             ExportColumn::make('id')
-                ->label('ID'),
+                ->label(__('ID')),
             ExportColumn::make('role_id'),
             ExportColumn::make('first_name'),
             ExportColumn::make('last_name'),

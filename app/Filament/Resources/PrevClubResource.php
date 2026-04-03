@@ -32,8 +32,6 @@ use Filament\Support\Colors\Color;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
@@ -122,7 +120,7 @@ class PrevClubResource extends Resource
                                             ->suffixIcon('heroicon-m-check-circle') // Optional: Visual confirm icon (static or dynamic)
                                             ->suffixIconColor('success') // Color for the suffix icon
                                             ->unique(ignoreRecord: true)
-                                            ->helperText('We will never share your email with anyone else.'),
+                                            ->helperText(__('We will never share your email with anyone else.')),
                                         TextInput::make('Address')
                                             ->label(__('Address'))
                                             ->maxLength(255),

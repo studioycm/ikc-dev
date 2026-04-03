@@ -121,7 +121,7 @@ class PrevUserRequestResource extends Resource
                 Forms\Components\Section::make(__('Dog and request metadata'))
                     ->schema([
                         Forms\Components\TextInput::make('owner_name')->label(__('Owner Name'))->maxLength(255),
-                        Forms\Components\TextInput::make('dog_name')->label(__('Dog Name'))->maxLength(255),
+                        Forms\Components\TextInput::make('dog_name')->label(__('Dog name'))->maxLength(255),
                         Forms\Components\Select::make('sagirID')
                             ->label(__('Dog Record'))
                             ->relationship('dog', 'SagirID')

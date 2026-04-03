@@ -197,7 +197,7 @@ class ParentsPairForm extends Component implements HasForms
                             ->unique(PrevDog::class, 'Chip', ignoreRecord: true)
                             ->maxLength(200),
                         TextInput::make('DnaID')
-                            ->label(__('DNA ID'))
+                            ->label(__('DNA'))
                             ->unique(PrevDog::class, 'DnaID', ignoreRecord: true)
                             ->maxLength(200),
                         TextInput::make('Breeder_Name')

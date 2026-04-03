@@ -102,7 +102,7 @@ class PrevShowArenaResource extends Resource
                 Tab::make(__('Overview'))
                     ->schema([
                         InfolistGrid::make(4)->schema([
-                            TextEntry::make('show.id')->label('Show'),
+                            TextEntry::make('show.id')->label(__('Show')),
                             TextEntry::make('show.TitleName')->label(__('Show title')),
                             TextEntry::make('show.StartDate')->date()->label(__('Show start date')),
                             TextEntry::make('show.EndDate')->date()->label(__('Show end date')),
