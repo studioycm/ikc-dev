@@ -114,19 +114,55 @@ class PrevDogImportResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')->label(__('ID'))->numeric(decimalPlaces: 0, thousandsSeparator: '')->sortable(),
-                TextColumn::make('dog_name')->label(__('Dog name'))->searchable()->sortable(),
-                TextColumn::make('dog_import_sagir')->label(__('Import Number'))->numeric(decimalPlaces: 0, thousandsSeparator: '')->sortable(),
+                TextColumn::make('id')
+                    ->label(__('ID'))->numeric(decimalPlaces: 0, thousandsSeparator: '')->sortable(),
+                TextColumn::make('dog_name')
+                    ->label(__('Dog name'))
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->sortable(),
+                TextColumn::make('dog_import_sagir')
+                    ->label(__('Import Number'))
+                    ->numeric(decimalPlaces: 0, thousandsSeparator: '')
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->sortable(),
+                TextColumn::make('breed.BreedName')
+                    ->label(__('Breed'))
+                    ->searchable(['BreedName', 'BreedNameEN', 'BreedCode'], isIndividual: true, isGlobal: false)
+                    ->toggleable(),
+                TextColumn::make('color.ColorNameHE')
+                    ->label(__('Color'))
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('dog_gender')
+                    ->label(__('Gender'))
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('dog_chip')
+                    ->label(__('Chip'))
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(),
+                TextColumn::make('dog_tests')
+                    ->label(__('Tests'))
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(),
+                TextColumn::make('dog_titles')
+                    ->label(__('Titles'))
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(),
+                TextColumn::make('dog_type')
+                    ->label(__('Type'))
+                    ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(),
+                TextColumn::make('dog.full_name')
+                    ->label(__('Main Dog'))
+                    ->description(fn(PrevDogImport $record) => $record->dog_sagir_id ?? '-')
+                    ->sortable(['SagirID'])
+                    ->searchable(['SagirID', 'Eng_Name', 'Heb_Name'], isIndividual: true, isGlobal: false)
+                    ->toggleable(),
                 TextColumn::make('user.name')
                     ->label(__('Done By'))
                     ->sortable(['last_name', 'first_name'])
                     ->searchable(['first_name', 'last_name', 'first_name_en', 'last_name_en'], isIndividual: true, isGlobal: false)
                     ->toggleable(),
-                TextColumn::make('dog_breed')->label(__('Breed'))->searchable()->toggleable(),
-                TextColumn::make('dog_gender')->label(__('Gender'))->toggleable(),
-                TextColumn::make('dog_chip')->label(__('Chip'))->toggleable(),
-                TextColumn::make('dog_sagir_id')->label(__('Sagir'))->numeric(decimalPlaces: 0, thousandsSeparator: '')->sortable()->toggleable(),
-                TextColumn::make('created_at')->label(__('Created At'))->dateTime()->sortable(),
+                TextColumn::make('created_at')->label(__('Created At'))->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('deleted_at')->label(__('Deleted at'))->since()->dateTimeTooltip()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
@@ -177,15 +213,15 @@ class PrevDogImportResource extends Resource
                         TextEntry::make('dog_name')->label(__('Dog name')),
                         TextEntry::make('dog_import_sagir')->label(__('Import Number')),
                         TextEntry::make('dog_birth_date')->label(__('Birth Date'))->date()->placeholder('-'),
-                        TextEntry::make('dog_breed')->label(__('Breed')),
+                        TextEntry::make('breed.BreedName')->label(__('Breed')),
                         TextEntry::make('dog_hair_type')->label(__('Hair')),
-                        TextEntry::make('dog_hair_color')->label(__('Color')),
+                        TextEntry::make('color.ColorNameHE')->label(__('Color')),
                         TextEntry::make('dog_gender')->label(__('Gender')),
                         TextEntry::make('dog_sagir_prefix')->label(__('Sagir Prefix')),
                         TextEntry::make('dog_chip')->label(__('Chip')),
                         TextEntry::make('dog_dna')->label(__('DNA')),
                         TextEntry::make('dog_type')->label(__('Dog Type')),
-                        TextEntry::make('dog_sagir_id')->label(__('Sagir')),
+                        TextEntry::make('dog.full_name')->label(__('Main Dog')),
                         TextEntry::make('dog_tests')->label(__('Tests'))->columnSpanFull(),
                         TextEntry::make('dog_titles')->label(__('Titles'))->columnSpanFull(),
                         TextEntry::make('dog_notes')->label(__('Notes'))->columnSpanFull(),
