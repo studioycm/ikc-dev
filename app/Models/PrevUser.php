@@ -75,6 +75,11 @@ class PrevUser extends Model implements HasName
             ->wherePivot('status', 'current');
     }
 
+    public function legacyDog(): HasOne
+    {
+        return $this->hasOne(PrevDog::class, 'SagirID', 'sagir_owner_id');
+    }
+
     public function clubs(): BelongsToMany
     {
         return $this->belongsToMany(PrevClub::class, 'club2user', 'user_id', 'club_id', 'id', 'id')
@@ -388,6 +393,13 @@ class PrevUser extends Model implements HasName
     {
         return Attribute::make(
             get: fn() => $this->addressArray(),
+        );
+    }
+
+    public function fullAddress(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->buildAddress(),
         );
     }
 
