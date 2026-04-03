@@ -8,7 +8,7 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class ShowsDashboard extends BaseDashboard
 {
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 30;
 
     protected static ?string $navigationIcon = 'heroicon-o-trophy';
 

@@ -8,7 +8,7 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class BreedingActivityDashboard extends BaseDashboard
 {
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 50;
 
     protected static ?string $navigationIcon = 'heroicon-o-heart';
 

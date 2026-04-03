@@ -7,7 +7,7 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class PaymentsDashboard extends BaseDashboard
 {
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 80;
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 

@@ -8,7 +8,7 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class MembershipsDashboard extends BaseDashboard
 {
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 60;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 

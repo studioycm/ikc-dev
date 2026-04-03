@@ -7,7 +7,7 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class DogsDashboard extends BaseDashboard
 {
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 20;
 
     protected static ?string $navigationIcon = 'heroicon-o-heart';
 
