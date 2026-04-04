@@ -6,6 +6,7 @@ use App\Filament\User\Widgets\BillingOverviewStats;
 use App\Filament\User\Widgets\BreedingOverviewStats;
 use App\Filament\User\Widgets\DogsOverviewStats;
 use App\Filament\User\Widgets\MembershipOverviewStats;
+use App\Filament\User\Widgets\RequestsOverviewStats;
 use App\Filament\User\Widgets\ShowsOverviewStats;
 use Filament\Pages\Dashboard as BaseDashboard;
 
@@ -33,8 +34,8 @@ class Dashboard extends BaseDashboard
     public function getColumns(): int|string|array
     {
         return [
-            'md' => 2,
-            'xl' => 3,
+            'md' => 4,
+            'xl' => 9,
         ];
     }
 
@@ -43,9 +44,10 @@ class Dashboard extends BaseDashboard
         return [
             DogsOverviewStats::class,
             MembershipOverviewStats::class,
-            BillingOverviewStats::class,
             BreedingOverviewStats::class,
             ShowsOverviewStats::class,
+            BillingOverviewStats::class,
+            RequestsOverviewStats::class,
         ];
     }
 }

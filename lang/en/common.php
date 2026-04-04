@@ -11,6 +11,8 @@ return [
         'perfect_from' => 'Perfect From',
         'metadata' => 'Metadata',
         'code' => 'Code',
+        'hebrew' => 'Hebrew',
+        'english' => 'English',
         'hebrew_name' => 'Hebrew Name',
         'english_name' => 'English Name',
         'breeder_code' => 'Breeder Code',

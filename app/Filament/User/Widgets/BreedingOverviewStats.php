@@ -13,7 +13,12 @@ class BreedingOverviewStats extends BaseWidget
 {
     use InteractsWithCurrentPrevUser;
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 2;
+
+    protected function getColumns(): int
+    {
+        return 2;
+    }
 
     protected static ?string $pollingInterval = null;
 
@@ -42,7 +47,7 @@ class BreedingOverviewStats extends BaseWidget
             );
 
         return [
-            Stat::make(__('Breedings'), (clone $breedingQuery)->count())
+            Stat::make(__('Breeding Count'), (clone $breedingQuery)->count())
                 ->icon('heroicon-o-heart')
                 ->url(BreedingActivityDashboard::getUrl(panel: 'user')),
             Stat::make(__('Recent breedings'), (clone $breedingQuery)
@@ -50,7 +55,7 @@ class BreedingOverviewStats extends BaseWidget
                 ->count())
                 ->color('warning')
                 ->url(BreedingActivityDashboard::getUrl(panel: 'user')),
-            Stat::make(__('Birth reports'), (clone $breedingQuery)
+            Stat::make(__('Litters'), (clone $breedingQuery)
                 ->whereNotNull('birthing_date')
                 ->count())
                 ->color('success')

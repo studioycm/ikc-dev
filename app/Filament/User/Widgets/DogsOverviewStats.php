@@ -16,6 +16,11 @@ class DogsOverviewStats extends BaseWidget
 
     protected int|string|array $columnSpan = 1;
 
+    protected function getColumns(): int
+    {
+        return 1;
+    }
+
     protected static ?string $pollingInterval = null;
 
     protected function getStats(): array
