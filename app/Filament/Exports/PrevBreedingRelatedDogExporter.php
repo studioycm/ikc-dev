@@ -15,7 +15,7 @@ class PrevBreedingRelatedDogExporter extends Exporter
     {
         return [
             ExportColumn::make('id')
-                ->label('ID'),
+                ->label(__('ID')),
             ExportColumn::make('temparory_name'),
             ExportColumn::make('chip_number'),
             ExportColumn::make('sagir_id'),

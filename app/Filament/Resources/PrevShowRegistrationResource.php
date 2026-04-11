@@ -226,11 +226,11 @@ class PrevShowRegistrationResource extends Resource
                     ->required(),
 
                 Placeholder::make('created_at')
-                    ->label('Created Date')
+                    ->label(__('Created Date'))
                     ->content(fn(?PrevShowRegistration $record): string => $record?->created_at?->diffForHumans() ?? '-'),
 
                 Placeholder::make('updated_at')
-                    ->label('Last Modified Date')
+                    ->label(__('Last Modified Date'))
                     ->content(fn(?PrevShowRegistration $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
             ]);
     }
@@ -418,5 +418,4 @@ class PrevShowRegistrationResource extends Resource
                 SoftDeletingScope::class,
             ]);
     }
-
 }

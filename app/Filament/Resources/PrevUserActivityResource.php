@@ -104,7 +104,7 @@ class PrevUserActivityResource extends Resource
                 IconColumn::make('Is_Payment')->label(__('Payment'))->boolean(),
                 IconColumn::make('Is_Show')->label(__('Show'))->boolean(),
                 IconColumn::make('Is_Study')->label(__('Study'))->boolean(),
-                TextColumn::make('deleted_at')->label(__('Deleted At'))->since()->dateTimeTooltip()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('deleted_at')->label(__('Deleted at'))->since()->dateTimeTooltip()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
@@ -141,7 +141,7 @@ class PrevUserActivityResource extends Resource
                         IconEntry::make('Is_Study')->label(__('Is Study'))->boolean(),
                         TextEntry::make('Activity_Desc')->label(__('Activity Description'))->columnSpanFull(),
                         TextEntry::make('Activity_Log')->label(__('Activity Log'))->columnSpanFull(),
-                        TextEntry::make('deleted_at')->label(__('Deleted At'))->since()->dateTimeTooltip()->placeholder('-'),
+                        TextEntry::make('deleted_at')->label(__('Deleted at'))->since()->dateTimeTooltip()->placeholder('-'),
                     ])
                     ->columns(4),
             ]);

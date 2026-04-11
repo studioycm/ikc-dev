@@ -7,7 +7,6 @@
         "junie"
     ],
     "guidelines": true,
-    "herd_mcp": true,
     "mcp": true,
     "nightwatch_mcp": false,
     "packages": [
@@ -15,9 +14,10 @@
     ],
     "sail": false,
     "skills": [
+        "laravel-best-practices",
         "configuring-horizon",
         "pest-testing",
         "tailwindcss-development",
-        "technical-debt-manager-php-laravel"
+        "techniecal-dbt-manager-php-laravel"
     ]
 }

@@ -1,1 +1,12 @@
 table,model,total,active,deleted
+ShowsDB,PrevShow,1016,981,35
+Shows_Dogs_DB,PrevShowDog,71470,70210,1260
+Shows_Structure,PrevShowArena,2930,2655,275
+Shows_Breeds,PrevShowBreed,23508,23508,
+Shows_Classes,PrevShowClass,498922,394013,104909
+shows_results,PrevShowResult,33994,33994,0
+JudgesDB,PrevJudge,392,392,
+BreedsDB,PrevBreed,260,257,3
+DogsDB,PrevDog,263317,263010,307
+shows_registration,PrevShowRegistration,33641,30408,3233
+shows_payments_info,PrevShowPayment,25196,25196,0

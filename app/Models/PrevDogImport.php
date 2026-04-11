@@ -18,13 +18,15 @@ class PrevDogImport extends Model
 
     protected $casts = [
         'id' => 'integer',
-        'dog_import_sagir' => 'integer',
         'dog_birth_date' => 'date',
         'dog_country_id' => 'integer',
         'user_id' => 'integer',
         'dog_sagir_id' => 'integer',
         'dog_country_id_2' => 'integer',
         'dog_country_id_3' => 'integer',
+        'dog_breed' => 'integer',
+        'dog_hair_color' => 'integer',
+        'dog_chip' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
@@ -33,5 +35,20 @@ class PrevDogImport extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(PrevUser::class, 'user_id', 'id');
+    }
+
+    public function dog(): BelongsTo
+    {
+        return $this->belongsTo(PrevDog::class, 'dog_sagir_id', 'SagirID');
+    }
+
+    public function breed(): BelongsTo
+    {
+        return $this->belongsTo(PrevBreed::class, 'dog_breed', 'BreedCode');
+    }
+
+    public function color(): BelongsTo
+    {
+        return $this->belongsTo(PrevColor::class, 'dog_hair_color', 'OldCode');
     }
 }

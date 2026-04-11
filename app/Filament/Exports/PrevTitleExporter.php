@@ -15,14 +15,14 @@ class PrevTitleExporter extends Exporter
     {
         return [
             ExportColumn::make('id')
-                ->label('ID'),
+                ->label(__('ID')),
             ExportColumn::make('DataID'),
             ExportColumn::make('TitleCode'),
             ExportColumn::make('TitleName'),
             ExportColumn::make('TitleDesc'),
             ExportColumn::make('Remark'),
             ExportColumn::make('dogs_count')
-                ->label('Dogs Count')
+                ->label(__('Dogs Count'))
                 ->counts('dogs'),
             ExportColumn::make('ModificationDateTime'),
             ExportColumn::make('CreationDateTime'),

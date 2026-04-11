@@ -15,7 +15,7 @@ class PrevDogImportExporter extends Exporter
     {
         return [
             ExportColumn::make('id')
-                ->label('ID'),
+                ->label(__('ID')),
             ExportColumn::make('dog_name'),
             ExportColumn::make('dog_import_sagir'),
             ExportColumn::make('dog_birth_date'),

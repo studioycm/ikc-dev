@@ -116,7 +116,7 @@ class PrevSkillUserResource extends Resource
                     ->searchable(['BreedName', 'BreedNameEN'], isIndividual: true, isGlobal: false),
                 TextColumn::make('created_at')->label(__('Created At'))->dateTime()->sortable(),
                 TextColumn::make('updated_at')->label(__('Updated At'))->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deleted_at')->label(__('Deleted At'))->since()->dateTimeTooltip()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('deleted_at')->label(__('Deleted at'))->since()->dateTimeTooltip()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('skill')
@@ -178,7 +178,7 @@ class PrevSkillUserResource extends Resource
                         TextEntry::make('skill.skill_name_en')->label(__('Skill (EN)')),
                         TextEntry::make('created_at')->label(__('Created At'))->dateTime(),
                         TextEntry::make('updated_at')->label(__('Updated At'))->dateTime(),
-                        TextEntry::make('deleted_at')->label(__('Deleted At'))->since()->dateTimeTooltip()->placeholder('-'),
+                        TextEntry::make('deleted_at')->label(__('Deleted at'))->since()->dateTimeTooltip()->placeholder('-'),
                     ])
                     ->columns(3),
             ]);

@@ -137,6 +137,7 @@ class ParentsPairForm extends Component implements HasForms
                                             ->limit(50)
                                             ->get();
                                         $formattedData = $dogs->map(fn($dog) => '<li>' . $dog->formatted_label . '</li>')->implode('');
+
                                         return new HtmlString(
                                             '<ul style="list-style-type: disc; padding-left: 20px;">' .
                                             $formattedData .
@@ -196,7 +197,7 @@ class ParentsPairForm extends Component implements HasForms
                             ->unique(PrevDog::class, 'Chip', ignoreRecord: true)
                             ->maxLength(200),
                         TextInput::make('DnaID')
-                            ->label(__('DNA ID'))
+                            ->label(__('DNA'))
                             ->unique(PrevDog::class, 'DnaID', ignoreRecord: true)
                             ->maxLength(200),
                         TextInput::make('Breeder_Name')
@@ -210,7 +211,7 @@ class ParentsPairForm extends Component implements HasForms
                             ->maxLength(1000),
                         TextInput::make('PedigreeNotes')
                             ->label(__('Titles (Pedigree Notes)'))
-                            ->helperText('Comma separated'),
+                            ->helperText(__('Comma separated')),
                         Select::make('sagir_prefix')
                             ->label(__('Sagir Prefix'))
                             ->options(LegacySagirPrefix::class)
@@ -271,7 +272,7 @@ class ParentsPairForm extends Component implements HasForms
 
     protected function optionLabel(PrevDog $d): string
     {
-        $idPart = $d->sagir_prefix?->code() . "-" . $d->SagirID . " | " . ($d->ImportNumber ? $d->ImportNumber : __('w/o Imp'));
+        $idPart = $d->sagir_prefix?->code() . '-' . $d->SagirID . ' | ' . ($d->ImportNumber ? $d->ImportNumber : __('w/o Imp'));
         $namePart = $d->full_name;
         $breed = $d->breed?->BreedName ?? null;
         $breed = $breed ? " • {$breed}" : '';
@@ -284,10 +285,11 @@ class ParentsPairForm extends Component implements HasForms
         $depth_heading = match ($this->depth) {
             1 => __('Parents'),
             2 => __('Grandparents'),
-//            3 => __('Great Grandparent'),
+            //            3 => __('Great Grandparent'),
             default => __(':n Generation', ['n' => $this->depth]),
         };
         $parent_of = __('Parents of');
+
         return "{$depth_heading} • {$parent_of} {$subject_dog->SagirID} • {$subject_dog->full_name}";
     }
 

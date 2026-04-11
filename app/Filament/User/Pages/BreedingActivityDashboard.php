@@ -8,7 +8,7 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class BreedingActivityDashboard extends BaseDashboard
 {
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 50;
 
     protected static ?string $navigationIcon = 'heroicon-o-heart';
 
@@ -16,12 +16,12 @@ class BreedingActivityDashboard extends BaseDashboard
 
     public static function getNavigationLabel(): string
     {
-        return __('Breeding Activity');
+        return __('Previous Litters');
     }
 
     public function getTitle(): string
     {
-        return __('Breeding Activity');
+        return __('Previous Litters');
     }
 
     public function getColumns(): int|string|array

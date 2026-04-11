@@ -4,7 +4,7 @@ return [
 
     'single' => [
 
-        'label' => 'פרטים',
+        'label' => 'תצוגה',
 
         'modal' => [
 

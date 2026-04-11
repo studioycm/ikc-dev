@@ -64,8 +64,10 @@ class UserResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label(__('Name'))
                     ->required(),
                 Forms\Components\TextInput::make('email')
+                    ->label(__('Email'))
                     ->email()
                     ->required(),
                 Forms\Components\Select::make('prev_user_id')
@@ -87,13 +89,16 @@ class UserResource extends Resource
                     })
                     ->unique(ignoreRecord: true),
                 Forms\Components\DateTimePicker::make('email_verified_at')
+                    ->label(__('Verified At'))
                     ->native(false)
                     ->displayFormat('d/m/Y H:i'),
                 Forms\Components\TextInput::make('password')
+                    ->label(__('Password'))
                     ->password()
-                    ->hidden(fn(string $context, User $record): bool => $context === 'edit' && auth()->user()->id === $record->id)
+                    ->hidden(fn(string $operation, ?User $record): bool => $operation === 'edit' && auth()->id() === $record?->id)
                     ->revealable(),
                 Forms\Components\Select::make('roles')
+                    ->label(__('Roles'))
                     ->relationship('roles', 'name')
                     ->multiple()
                     ->preload()
@@ -116,12 +121,15 @@ class UserResource extends Resource
             })
             ->columns([
                 Tables\Columns\TextColumn::make('id')
+                    ->label(__('ID'))
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->label(__('Name'))
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->label(__('Email'))
                     ->icon('heroicon-o-envelope')
                     ->iconColor('warning')
                     ->sortable()
@@ -152,25 +160,25 @@ class UserResource extends Resource
                         }
 
                         // Combine Phone and Email, filtering out empty values
-                        return collect([$legacy->mobile_phone, $legacy->email])
+                        return collect([$legacy->normalised_phone, $legacy->email, "#{$legacy->id}"])
                             ->filter()
                             ->join(' • '); // Separator dot
                     })
                     ->sortable(false)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('prevUser.dogs_count')
-                    ->label('Dogs')
+                    ->label(__('dog/model/general.labels.plural'))
                     ->badge()
                     ->color(fn($state) => $state > 0 ? 'success' : 'gray')
                     ->default(0)
                     ->toggleable(),
                 Tables\Columns\IconColumn::make('email_verified_at')
-                    ->label('Verified')
+                    ->label(__('Verified'))
                     ->boolean()
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('roles.name')
-                    ->label('Role')
+                    ->label(__('Role'))
                     ->badge()
                     ->formatStateUsing(fn ($state): string => Str::headline($state))
                     ->color(fn (string $state): string => match ($state) {
@@ -180,15 +188,17 @@ class UserResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('Created'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('Updated'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->searchPlaceholder('Search (ID, Name)')
+            ->searchPlaceholder(__('Search (ID, Name)'))
             ->searchOnBlur()
             ->filters([
                 //
@@ -196,9 +206,9 @@ class UserResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('email_verification')
-                    ->label('Verify')
+                    ->label(__('Verify'))
                     ->button()
-                    ->tooltip('Send email verification link')
+                    ->tooltip(__('Send email verification link'))
                     ->color(Color::hex('#ec8200'))
                     ->icon('heroicon-o-shield-check')
                     ->action(function (User $user) {
@@ -206,8 +216,11 @@ class UserResource extends Resource
                         $notification->url = Filament::getVerifyEmailUrl($user);
                         $user->notify($notification);
                         Notification::make()
-                            ->title('Email verification link sent')
-                            ->body('Email verification link sent to ' . $user->email . '<br>' . $notification->url)
+                            ->title(__('Email verification link sent'))
+                            ->body(__('Email verification link sent to :email<br>:url', [
+                                'email' => $user->email,
+                                'url' => $notification->url,
+                            ]))
                             ->success()
                             ->icon('heroicon-o-shield-check')
                             ->iconColor('primary')
@@ -215,27 +228,27 @@ class UserResource extends Resource
                             ->send();
                     }),
                 Tables\Actions\Action::make('email_verified')
-                    ->label('Verified')
+                    ->label(__('Verified'))
                     ->button()
-                    ->tooltip('Mark as verified')
+                    ->tooltip(__('Mark as verified'))
                     ->color(Color::hex('#10b138'))
                     ->icon('heroicon-o-check')
                     ->action(function (User $user) {
                         $user->markEmailAsVerified();
                     }),
                 Tables\Actions\Action::make('send_db_notice')
-                    ->label('Notify')
+                    ->label(__('Notify'))
                     ->button()
-                    ->tooltip('Send a database notification to this user')
+                    ->tooltip(__('Send a database notification to this user'))
                     ->color('gray')
                     ->icon('heroicon-o-bell')
                     ->form([
                         Forms\Components\TextInput::make('subject')
-                            ->label('Subject')
+                            ->label(__('Subject'))
                             ->required()
                             ->maxLength(150),
                         Forms\Components\RichEditor::make('body')
-                            ->label('Message')
+                            ->label(__('Message'))
                             ->toolbarButtons([
                                 'attachFiles',
                                 'blockquote',
@@ -268,24 +281,24 @@ class UserResource extends Resource
                         ));
 
                         Notification::make()
-                            ->title('Notification created')
-                            ->body('A database notification was created for ' . $record->email)
+                            ->title(__('Notification created'))
+                            ->body(__('A database notification was created for :email', ['email' => $record->email]))
                             ->success()
                             ->send();
                     }),
                 Tables\Actions\Action::make('send_email')
-                    ->label('Send Email')
+                    ->label(__('Send Email'))
                     ->button()
-                    ->tooltip('Send an email to this user')
+                    ->tooltip(__('Send an email to this user'))
                     ->color('primary')
                     ->icon('heroicon-o-envelope')
                     ->form([
                         Forms\Components\TextInput::make('subject')
-                            ->label('Subject')
+                            ->label(__('Subject'))
                             ->required()
                             ->maxLength(150),
                         Forms\Components\RichEditor::make('body')
-                            ->label('Message')
+                            ->label(__('Message'))
                             ->toolbarButtons([
                                 'attachFiles',
                                 'blockquote',
@@ -318,8 +331,8 @@ class UserResource extends Resource
                         ));
 
                         Notification::make()
-                            ->title('Email sent')
-                            ->body('Email sent to ' . $record->email)
+                            ->title(__('Email sent'))
+                            ->body(__('Email sent to :email', ['email' => $record->email]))
                             ->success()
                             ->send();
                     }),
@@ -327,17 +340,17 @@ class UserResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\BulkAction::make('bulk_send_email')
-                        ->label('Send Email')
+                        ->label(__('Send Email'))
                         ->icon('heroicon-o-envelope')
                         ->color('primary')
                         ->requiresConfirmation()
                         ->form([
                             Forms\Components\TextInput::make('subject')
-                                ->label('Subject')
+                                ->label(__('Subject'))
                                 ->required()
                                 ->maxLength(150),
                             Forms\Components\RichEditor::make('body')
-                                ->label('Message')
+                                ->label(__('Message'))
                                 ->toolbarButtons([
                                     'attachFiles',
                                     'blockquote',
@@ -372,8 +385,8 @@ class UserResource extends Resource
                             LaravelNotification::sendNow($records, $notification);
 
                             Notification::make()
-                                ->title('Emails sent')
-                                ->body('Email sent to ' . $records->count() . ' users')
+                                ->title(__('Emails sent'))
+                                ->body(__('Email sent to :count users', ['count' => $records->count()]))
                                 ->success()
                                 ->send();
                         }),

@@ -389,7 +389,7 @@ class PrevBreedingResource extends Resource
 
                 // Booleans - Rules & Checks
                 IconColumn::make('Rules_IsOwner')
-                    ->label('Is Owner')
+                    ->label(__('Is Owner'))
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
 
@@ -398,31 +398,31 @@ class PrevBreedingResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 IconColumn::make('Male_More_Than_5')
-                    ->label('Male > 5 Litters')
+                    ->label(__('Male > 5 Litters'))
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 IconColumn::make('Male_More_Than_2')
-                    ->label('Male > 2 Litters')
+                    ->label(__('Male > 2 Litters'))
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 IconColumn::make('Male_DNA')
-                    ->label('Male DNA')
+                    ->label(__('Male DNA'))
                     ->boolean(),
 
                 IconColumn::make('Female_DNA')
-                    ->label('Female DNA')
+                    ->label(__('Female DNA'))
                     ->boolean(),
 
                 IconColumn::make('Male_Breeding_Not_Approved')
-                    ->label('Sire Not Approved')
+                    ->label(__('Sire Not Approved'))
                     ->boolean()
                     ->color('danger')
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 IconColumn::make('Female_Breeding_Not_Approved')
-                    ->label('Dam Not Approved')
+                    ->label(__('Dam Not Approved'))
                     ->boolean()
                     ->color('danger')
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -446,22 +446,22 @@ class PrevBreedingResource extends Resource
 
                 // Puppies Count
                 TextColumn::make('live_male_puppie')
-                    ->label('Live M')
+                    ->label(__('Live M'))
                     ->numeric()
                     ->sortable(),
 
                 TextColumn::make('live_female_puppie')
-                    ->label('Live F')
+                    ->label(__('Live F'))
                     ->numeric()
                     ->sortable(),
 
                 TextColumn::make('dead_male_puppie')
-                    ->label('Dead M')
+                    ->label(__('Dead M'))
                     ->numeric()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('dead_female_puppie')
-                    ->label('Dead F')
+                    ->label(__('Dead F'))
                     ->numeric()
                     ->toggleable(isToggledHiddenByDefault: true),
 
@@ -470,7 +470,7 @@ class PrevBreedingResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('puppies_count')
-                    ->label('Puppies')
+                    ->label(__('Puppies'))
                     ->numeric()
                     ->sortable(),
 
@@ -480,7 +480,7 @@ class PrevBreedingResource extends Resource
                     ->color('info'),
 
                 TextColumn::make('birthing_date')
-                    ->label('Whelping Date')
+                    ->label(__('Whelping Date'))
                     ->date()
                     ->sortable(),
 
@@ -522,12 +522,12 @@ class PrevBreedingResource extends Resource
 
                 // Age Validation
                 IconColumn::make('less_than_8_years')
-                    ->label('< 8 Years')
+                    ->label(__('< 8 Years'))
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 IconColumn::make('more_than_18_months')
-                    ->label('> 18 Months')
+                    ->label(__('> 18 Months'))
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
 
@@ -541,7 +541,7 @@ class PrevBreedingResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('responsiable_owner')
-                    ->label('Responsible Owner')
+                    ->label(__('Responsible owner'))
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->toggleable(isToggledHiddenByDefault: true),
 

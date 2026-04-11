@@ -15,7 +15,7 @@ class PrevBreedingExporter extends Exporter
     {
         return [
             ExportColumn::make('id')
-                ->label('ID'),
+                ->label(__('ID')),
             ExportColumn::make('SagirId'),
             ExportColumn::make('BreddingDate'),
             ExportColumn::make('MaleSagirId'),

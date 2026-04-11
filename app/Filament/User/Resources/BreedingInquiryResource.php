@@ -39,16 +39,23 @@ class BreedingInquiryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 40;
+
+    protected static ?string $navigationLabel = 'Breeding Inquiry';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('New Litters');
+    }
 
     public static function getModelLabel(): string
     {
-        return __('Breeding Inquiry');
+        return __('New Litter');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Breeding Inquiries');
+        return __('New Litters');
     }
 
     public static function getEloquentQuery(): Builder
@@ -424,7 +431,7 @@ class BreedingInquiryResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
-                    ->label(__('Deleted At'))
+                    ->label(__('Deleted at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

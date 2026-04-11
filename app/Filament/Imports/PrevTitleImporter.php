@@ -15,7 +15,7 @@ class PrevTitleImporter extends Importer
     {
         return [
             ImportColumn::make('TitleCode')
-                ->label('Title Code')
+                ->label(__('Title Code'))
                 ->requiredMapping()
                 ->numeric()
                 ->rules(['required', 'integer']),
@@ -36,9 +36,10 @@ class PrevTitleImporter extends Importer
 
     public function resolveRecord(): ?PrevTitle
     {
-        return PrevTitle::firstOrNew([
-            'TitleCode' => $this->data['TitleCode'],
-        ]);
+//        return PrevTitle::firstOrNew(attributes: [
+//            'TitleCode' => $this->data['TitleCode'],
+//        ]);
+        return new PrevTitle;
     }
 
     public static function getCompletedNotificationBody(Import $import): string

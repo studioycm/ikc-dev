@@ -8,7 +8,7 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class ShowsDashboard extends BaseDashboard
 {
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 30;
 
     protected static ?string $navigationIcon = 'heroicon-o-trophy';
 
@@ -16,12 +16,12 @@ class ShowsDashboard extends BaseDashboard
 
     public static function getNavigationLabel(): string
     {
-        return __('Shows & Results');
+        return __('Shows');
     }
 
     public function getTitle(): string
     {
-        return __('Shows & Results');
+        return __('Shows');
     }
 
     public function getColumns(): int|string|array

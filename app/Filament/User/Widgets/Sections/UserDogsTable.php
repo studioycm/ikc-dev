@@ -72,7 +72,7 @@ class UserDogsTable extends BaseWidget
             ->columns([
                 Tables\Columns\TextColumn::make('SagirID')
                     ->label(__('Sagir'))
-                    ->description(fn(PrevDog $record): string => $record->id ? "ID: {$record->id}" : '')
+                    ->description(fn(PrevDog $record): string => $record->id ? __('ID') . ': ' . $record->id : '')
                     ->size('lg')
                     ->weight(FontWeight::Bold)
                     ->color(fn(PrevDog $record): string => $record->sagir_prefix?->getColor() ?? 'gray')
@@ -80,7 +80,7 @@ class UserDogsTable extends BaseWidget
                     ->sortable(),
                 Tables\Columns\TextColumn::make('full_name')
                     ->label(__('Dog name'))
-                    ->description(fn(PrevDog $record): string => $record->breed?->BreedName ?? '~')
+                    ->description(fn(PrevDog $record): string => $record->breed?->BreedName ?? __('N/A'))
                     ->searchable(['Heb_Name', 'Eng_Name'])
                     ->sortable(['Heb_Name']),
                 Tables\Columns\TextColumn::make('BirthDate')
@@ -99,11 +99,11 @@ class UserDogsTable extends BaseWidget
                     ->expandableLimitedList(),
                 Tables\Columns\TextColumn::make('father.full_name')
                     ->label(__('Father'))
-                    ->description(fn(PrevDog $record): string => $record->father?->SagirID ?? 'n/a')
+                    ->description(fn(PrevDog $record): string => $record->father?->SagirID ?? __('N/A'))
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('mother.full_name')
                     ->label(__('Mother'))
-                    ->description(fn(PrevDog $record): string => $record->mother?->SagirID ?? 'n/a')
+                    ->description(fn(PrevDog $record): string => $record->mother?->SagirID ?? __('N/A'))
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('breedinghouse.name')
                     ->label(__('Kennel'))
@@ -164,7 +164,7 @@ class UserDogsTable extends BaseWidget
                         return $query
                             ->when(
                                 $data['birth_date_start'] ?? null,
-                                fn(Builder $dogQuery, string $date): Builder => $dogQuery->whereDate('BirthDate', '>=', $date)
+                                    fn(Builder $dogQuery, string $date): Builder => $dogQuery->whereDate('BirthDate', '>=', $date)
                             )
                             ->when(
                                 ($data['birth_date_start'] ?? null) && !($data['birth_date_end'] ?? null),
@@ -172,7 +172,7 @@ class UserDogsTable extends BaseWidget
                             )
                             ->when(
                                 $data['birth_date_end'] ?? null,
-                                fn(Builder $dogQuery, string $date): Builder => $dogQuery->whereDate('BirthDate', '<=', $date)
+                                    fn(Builder $dogQuery, string $date): Builder => $dogQuery->whereDate('BirthDate', '<=', $date)
                             );
                     }),
                 Filter::make('age_groups')

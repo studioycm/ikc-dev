@@ -121,7 +121,7 @@ class PrevUserRequestResource extends Resource
                 Forms\Components\Section::make(__('Dog and request metadata'))
                     ->schema([
                         Forms\Components\TextInput::make('owner_name')->label(__('Owner Name'))->maxLength(255),
-                        Forms\Components\TextInput::make('dog_name')->label(__('Dog Name'))->maxLength(255),
+                        Forms\Components\TextInput::make('dog_name')->label(__('Dog name'))->maxLength(255),
                         Forms\Components\Select::make('sagirID')
                             ->label(__('Dog Record'))
                             ->relationship('dog', 'SagirID')
@@ -161,6 +161,26 @@ class PrevUserRequestResource extends Resource
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '')
                     ->sortable()
                     ->searchable(isIndividual: true, isGlobal: false)
+                    ->toggleable(),
+                TextColumn::make('request_status')
+                    ->label(__('Status'))
+                    ->state(fn(PrevUserRequest $record): string => $record->IsDone ? __('Done') : __('Pending'))
+                    ->badge()
+                    ->color(fn(string $state, PrevUserRequest $record): string => $record->IsDone ? 'success' : 'warning'),
+                TextColumn::make('status')
+                    ->label(__('Payment Status'))
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'pending payment' => 'warning',
+                        'payment done' => 'success',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'pending payment' => __('Pending Payment'),
+                        'payment done' => __('Payment Done'),
+                        default => $state,
+                    })
+                    ->sortable()
                     ->toggleable(),
                 TextColumn::make('topic')
                     ->label(__('Topic'))
@@ -256,21 +276,6 @@ class PrevUserRequestResource extends Resource
                 TextColumn::make('payment_approval_id')
                     ->label(__('Payment Approval Number'))
                     ->searchable(isIndividual: true, isGlobal: false)
-                    ->toggleable(),
-                TextColumn::make('status')
-                    ->label(__('Status'))
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'pending payment' => 'warning',
-                        'payment done' => 'success',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'pending payment' => __('Pending Payment'),
-                        'payment done' => __('Payment Done'),
-                        default => $state,
-                    })
-                    ->sortable()
                     ->toggleable(),
                 TextColumn::make('record_date_time')
                     ->label(__('Recorded at'))

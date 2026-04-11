@@ -88,7 +88,7 @@ class OwnersRelationManager extends RelationManager
                     // Show a simple modal instead of navigating to a non-existent View page
                     ->infolist([
                         InfolistGrid::make(3)->schema([
-                            TextEntry::make('id')->label('ID'),
+                            TextEntry::make('id')->label(__('ID')),
                             TextEntry::make('name')->label(__('Name')),
                             TextEntry::make('mobile_phone')->label(__('Phone')),
                             TextEntry::make('email')->label(__('Email')),

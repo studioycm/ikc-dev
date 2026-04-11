@@ -92,7 +92,7 @@ class PrevPriceResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('deleted_at')
-                    ->label(__('Deleted At'))
+                    ->label(__('Deleted at'))
                     ->since()
                     ->dateTimeTooltip()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -137,7 +137,7 @@ class PrevPriceResource extends Resource
                             ->label(__('Updated At'))
                             ->dateTime(),
                         TextEntry::make('deleted_at')
-                            ->label(__('Deleted At'))
+                            ->label(__('Deleted at'))
                             ->since()
                             ->dateTimeTooltip()
                             ->placeholder('-'),

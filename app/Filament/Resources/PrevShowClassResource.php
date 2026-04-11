@@ -143,11 +143,11 @@ class PrevShowClassResource extends Resource
                     ->integer(),
 
                 Placeholder::make('created_at')
-                    ->label('Created Date')
+                    ->label(__('Created Date'))
                     ->content(fn(?PrevShowClass $record): string => $record?->created_at?->diffForHumans() ?? '-'),
 
                 Placeholder::make('updated_at')
-                    ->label('Last Modified Date')
+                    ->label(__('Last Modified Date'))
                     ->content(fn(?PrevShowClass $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
             ]);
     }
@@ -196,7 +196,7 @@ class PrevShowClassResource extends Resource
                             TextEntry::make('ClassName')->label(__('Class Name')),
                             TextEntry::make('GenderID')->label(__('Gender')),
                             TextEntry::make('BreedID')->label(__('Breed (code)')),
-                            TextEntry::make('ShowID')->label(__('Show ID')),
+                            TextEntry::make('ShowID')->label(__('Show')),
                             TextEntry::make('ShowArenaID')->label(__('Arena ID')),
                         ]),
                     ]),

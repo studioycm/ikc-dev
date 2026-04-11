@@ -36,14 +36,14 @@
         <div>
             <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Valid From') }}</h3>
             <p class="mt-1 text-sm text-gray-900 dark:text-white">
-                {{ $membership->created_at?->format('Y-m-d') ?? 'N/A' }}
+                {{ $membership->created_at?->format('Y-m-d') ?? __('N/A') }}
             </p>
         </div>
 
         <div>
             <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Valid Until') }}</h3>
             <p class="mt-1 text-sm text-gray-900 dark:text-white">
-                {{ $membership->expire_date?->format('Y-m-d') ?? 'N/A' }}
+                {{ $membership->expire_date?->format('Y-m-d') ?? __('N/A') }}
             </p>
         </div>
 
