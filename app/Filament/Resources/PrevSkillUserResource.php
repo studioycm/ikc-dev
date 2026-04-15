@@ -25,8 +25,6 @@ class PrevSkillUserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static ?string $recordTitleAttribute = 'id';
-
     public static function getModelLabel(): string
     {
         return __('User Skill');
@@ -150,6 +148,7 @@ class PrevSkillUserResource extends Resource
                     }),
                 Tables\Filters\TrashedFilter::make(),
             ])
+            ->filtersLayout(Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
