@@ -16,6 +16,7 @@
     "skills": [
         "laravel-best-practices",
         "configuring-horizon",
+        "livewire-development",
         "pest-testing",
         "tailwindcss-development",
         "techniecal-dbt-manager-php-laravel"

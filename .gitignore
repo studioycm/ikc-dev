@@ -20,16 +20,6 @@ yarn-error.log
 /.fleet
 /.idea
 /.nova
-/.vscode
-/.github
-/.junie
 /.zed
-/docs
-/public/css/filament/admin/
 /app/Console/Commands/LegacyResearch
-/.vscode/
-/.junie/
-/.ai/
-/.claude/
-/.gemini/
 /.output.txt

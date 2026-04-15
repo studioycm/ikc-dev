@@ -44,6 +44,11 @@ domain—don't wait until you're stuck.
   crashes, timeout chain ordering, LongWaitDetected notifications, waits config). Also covers job tagging and silencing.
   Do not use for generic Laravel queues without Horizon, SQS or database drivers, standalone Redis setup, Linux
   supervisord, Telescope, or job batching.
+- `livewire-development` — Use for any task or question involving Livewire. Activate if user mentions Livewire, wire:
+  directives, or Livewire-specific concepts like wire:model, wire:click, invoke this skill. Covers building new
+  components, debugging reactivity issues, real-time form validation, loading states, migrating from Livewire 2 to 3,
+  converting component formats (SFC/MFC/class-based), and performance optimization. Do not use for non-Livewire reactive
+  UI (React, Vue, Alpine-only, Inertia.js) or standard Laravel forms without Livewire.
 - `pest-testing` — Use this skill for Pest PHP testing in Laravel projects only. Trigger whenever any test is being
   written, edited, fixed, or refactored — including fixing tests that broke after a code change, adding assertions,
   converting PHPUnit to Pest, adding datasets, and TDD workflows. Always activate when the user asks how to write
@@ -235,6 +240,14 @@ domain—don't wait until you're stuck.
 
 - Casts can and likely should be set in a `casts()` method on a model rather than the `$casts` property. Follow existing
   conventions from other models.
+
+=== livewire/core rules ===
+
+# Livewire
+
+- Livewire allow to build dynamic, reactive interfaces in PHP without writing JavaScript.
+- You can use Alpine.js for client-side interactions instead of JavaScript frameworks.
+- Keep state server-side so the UI reflects it. Validate and authorize in actions as you would in HTTP requests.
 
 === pint/core rules ===
 

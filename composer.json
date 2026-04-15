@@ -18,6 +18,7 @@
         "laravel/framework": "^12.21",
         "laravel/horizon": "^5.33",
         "laravel/tinker": "^2.10.1",
+        "livewire/livewire": "^3.7",
         "owenvoke/blade-fontawesome": "^2.9"
     },
     "require-dev": {
