@@ -9,6 +9,7 @@ use App\Notifications\UserMessageNotification;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Notifications\Auth\VerifyEmail;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -92,10 +93,15 @@ class UserResource extends Resource
                     ->label(__('Verified At'))
                     ->native(false)
                     ->displayFormat('d/m/Y H:i'),
+                Forms\Components\Toggle::make('edit_password')
+                    ->label(__('Edit Password'))
+                    ->default(false)
+                    ->dehydrated(false)
+                    ->live(),
                 Forms\Components\TextInput::make('password')
                     ->label(__('Password'))
                     ->password()
-                    ->hidden(fn(string $operation, ?User $record): bool => $operation === 'edit' && auth()->id() === $record?->id)
+                    ->hidden(fn(string $operation, Get $get, ?User $record): bool => $operation === 'edit' && (auth()->id() === $record?->id || $get('edit_password') === false))
                     ->revealable(),
                 Forms\Components\Select::make('roles')
                     ->label(__('Roles'))
@@ -184,6 +190,8 @@ class UserResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'super_admin' => 'success',
                         'panel_user' => 'warning',
+                        'admin' => 'danger',
+                        default => 'info',
                     })
                     ->sortable()
                     ->searchable(),
