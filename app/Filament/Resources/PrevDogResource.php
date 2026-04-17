@@ -1218,9 +1218,8 @@ class PrevDogResource extends Resource
                 Tables\Filters\SelectFilter::make('owners')
                     ->label(__('Owners'))
                     ->multiple()
-                    ->relationship('owners', 'id') // Defines the relationship to query against
-                    ->searchable(false) // We provide a custom search, so disable the default
-
+//                    ->relationship('owners', 'id') // Defines the relationship to query against
+                    ->searchable()
                     // What to do when the user types in the search box
                     ->getSearchResultsUsing(
                         fn (?string $search): array => PrevUser::selectOptions($search)
